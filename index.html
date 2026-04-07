@@ -6,713 +6,491 @@
 <title>Austar · Sistema Comercial México 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3350;--text:#e8eaf0;--text2:#8b90a8;--text3:#5a5f7a;--green:#22c55e;--green2:#16a34a;--blue:#3b82f6;--blue2:#2563eb;--amber:#f59e0b;--red:#ef4444;--purple:#8b5cf6;--teal:#14b8a6}
-  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;min-height:100vh}
-  .sc{display:none}.sc.on{display:block}.sc-flex.on{display:flex}
-  .btn{cursor:pointer;border:1px solid var(--border);background:var(--bg3);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:500;color:var(--text);transition:all .15s}
-  .btn:hover{background:var(--bg2);border-color:#3e4460}
-  .btn-sm{padding:4px 10px;font-size:11px}
-  .btn-g{background:var(--green2);border-color:var(--green);color:#fff}
-  .btn-g:hover{background:#15803d}
-  .btn-b{background:var(--blue2);border-color:var(--blue);color:#fff}
-  .btn-b:hover{background:#1d4ed8}
-  .btn-r{background:#b91c1c;border-color:var(--red);color:#fff}
-  input,select,textarea{border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:12px;background:var(--bg3);color:var(--text);width:100%;outline:none;transition:border .15s}
-  input:focus,select:focus,textarea:focus{border-color:var(--blue)}
-  select option{background:var(--bg2)}
-  .card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
-  .card-c{cursor:pointer;transition:border .15s}.card-c:hover{border-color:#3e4460}
-  .tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;margin:1px 2px 1px 0;letter-spacing:.02em}
-  .t-gr{background:#14532d;color:#86efac}
-  .t-bl{background:#1e3a5f;color:#93c5fd}
-  .t-am{background:#451a03;color:#fcd34d}
-  .t-rd{background:#450a0a;color:#fca5a5}
-  .t-gy{background:#1e2235;color:#94a3b8}
-  .t-pu{background:#2e1065;color:#c4b5fd}
-  .met{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
-  .mv{font-size:24px;font-weight:700;line-height:1.2}
-  .ml{font-size:11px;color:var(--text2);margin-top:3px}
-  .hr{border:none;border-top:1px solid var(--border);margin:10px 0}
-  .lbl{font-size:11px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
-  /* SIDEBAR NAV */
-  #app-shell{display:flex;min-height:100vh}
-  #sidebar{width:200px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;padding:16px 0}
-  #sidebar .logo{padding:0 16px 16px;border-bottom:1px solid var(--border);margin-bottom:8px}
-  #sidebar .logo-title{font-size:16px;font-weight:700;color:var(--green)}
-  #sidebar .logo-sub{font-size:10px;color:var(--text3);margin-top:2px}
-  .nav-item{padding:9px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;border-radius:0;transition:background .15s;color:var(--text2);font-size:13px}
-  .nav-item:hover{background:var(--bg3);color:var(--text)}
-  .nav-item.act{background:var(--bg3);color:var(--green);border-right:2px solid var(--green)}
-  .nav-icon{font-size:15px;width:18px;text-align:center}
-  #sidebar-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--border)}
-  #user-badge{display:flex;align-items:center;gap:8px}
-  #user-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
-  #main-content{flex:1;overflow-y:auto;padding:20px 24px}
-  /* LOGIN */
-  #sc-login{min-height:100vh;align-items:center;justify-content:center;background:var(--bg)}
-  .login-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;max-width:400px;width:100%;text-align:center}
-  .login-logo{font-size:28px;font-weight:800;color:var(--green);margin-bottom:4px;letter-spacing:-1px}
-  .login-sub{font-size:13px;color:var(--text2);margin-bottom:32px}
-  .user-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-  .user-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:20px 12px;cursor:pointer;transition:all .2s;text-align:center}
-  .user-card:hover{border-color:var(--green);transform:translateY(-2px)}
-  .user-av-lg{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin:0 auto 10px}
-  /* SCROLLBAR */
-  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-  /* CHARTS */
-  .chart-wrap{position:relative;height:220px;width:100%}
-  /* PIPELINE STAGES */
-  .stage-btn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-size:11px;transition:all .15s}
-  .stage-btn:hover{border-color:#3e4460;color:var(--text)}
-  .stage-btn.active-stage{font-weight:600}
-  /* MOBILE */
-  @media(max-width:700px){
-    #app-shell{flex-direction:column}
-    #sidebar{width:100%;flex-direction:row;padding:8px 12px;align-items:center;gap:8px;overflow-x:auto}
-    #sidebar .logo{padding:0 8px 0 0;border:none;margin:0}
-    #sidebar-footer{margin-top:0;padding:0;border:none}
-    .nav-item{padding:7px 10px;font-size:11px;flex-direction:column;gap:3px;min-width:52px;border-radius:8px;white-space:nowrap}
-    .nav-item.act{border-right:none;border-bottom:2px solid var(--green)}
-    #main-content{padding:14px}
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3350;
+  --text:#e8eaf0;--text2:#8b90a8;--text3:#5a5f7a;
+  --green:#22c55e;--green2:#16a34a;--blue:#3b82f6;--blue2:#2563eb;
+  --amber:#f59e0b;--red:#ef4444;--purple:#8b5cf6;--teal:#14b8a6;--orange:#f97316;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;min-height:100vh}
+/* ── LAYOUT ── */
+#app{display:flex;min-height:100vh}
+#sidebar{width:210px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+#main{flex:1;overflow-y:auto;min-height:100vh}
+/* ── SIDEBAR ── */
+.sb-logo{padding:16px 16px 14px;border-bottom:1px solid var(--border)}
+.sb-title{font-size:18px;font-weight:800;color:var(--green);letter-spacing:-1px}
+.sb-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.nav-section{padding:8px 10px 4px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.nav-item{padding:9px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;color:var(--text2);font-size:12px;font-weight:500;transition:all .15s;border-left:2px solid transparent}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.act{background:var(--bg3);color:var(--green);border-left-color:var(--green)}
+.nav-item .ni{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.sb-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--border)}
+/* ── SCREENS ── */
+.sc{display:none}.sc.on{display:block}
+/* ── LOGIN ── */
+#sc-login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+.login-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;max-width:420px;width:100%;text-align:center}
+.login-logo{font-size:32px;font-weight:800;color:var(--green);letter-spacing:-2px;margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--text2);margin-bottom:28px}
+.user-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.ucard{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:20px 12px;cursor:pointer;transition:all .2s;text-align:center}
+.ucard:hover{border-color:var(--green);transform:translateY(-2px)}
+.uav{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin:0 auto 10px}
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.card-c{cursor:pointer}.card-c:hover{border-color:#3e4460}
+.ct{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+/* ── METRICS ── */
+.met{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.met.gl{border-left:3px solid var(--green)}.met.bl{border-left:3px solid var(--blue)}
+.met.al{border-left:3px solid var(--amber)}.met.pl{border-left:3px solid var(--purple)}
+.met.tl{border-left:3px solid var(--teal)}.met.ol{border-left:3px solid var(--orange)}
+.mv{font-size:22px;font-weight:700;line-height:1.2;margin-bottom:3px}
+.ml{font-size:11px;color:var(--text2)}
+.md{font-size:11px;font-weight:500;margin-top:3px}
+.up{color:var(--green)}.dn{color:var(--red)}
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+/* ── TAGS & BADGES ── */
+.tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;margin:1px 2px}
+.t-gr{background:#14532d;color:#86efac}.t-bl{background:#1e3a5f;color:#93c5fd}
+.t-am{background:#451a03;color:#fcd34d}.t-rd{background:#450a0a;color:#fca5a5}
+.t-gy{background:#1e2235;color:#94a3b8}.t-pu{background:#2e1065;color:#c4b5fd}
+/* ── ROWS ── */
+.row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:12px}
+.row:last-child{border-bottom:none}
+/* ── ALERTS ── */
+.alert{background:#1a1208;border:1px solid #854f0b;border-radius:8px;padding:10px 12px;margin-top:8px}
+.at{font-size:11px;font-weight:600;color:var(--amber);margin-bottom:3px}
+.ab{font-size:11px;color:#fcd34d;line-height:1.5}
+.insight{background:#0d1a0d;border:1px solid var(--green2);border-radius:8px;padding:10px 12px;margin-top:8px}
+.it{font-size:11px;font-weight:600;color:var(--green);margin-bottom:3px}
+.ib{font-size:11px;color:#86efac;line-height:1.5}
+/* ── ODISEO BANNER ── */
+.oa-banner{background:linear-gradient(135deg,#1a1208,#0d1a1a);border:1px solid var(--amber);border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.oa-name{font-size:14px;font-weight:700;color:var(--amber)}
+.oa-sub{font-size:11px;color:#fcd34d;margin-top:2px}
+.oa-stats{display:flex;gap:16px;flex-wrap:wrap}
+.oa-val{font-size:17px;font-weight:700;color:var(--amber)}
+.oa-lbl{font-size:10px;color:#fcd34d}
+/* ── YEAR TABS ── */
+.ytabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px}
+.ytab{padding:5px 12px;border-radius:20px;cursor:pointer;font-size:11px;font-weight:500;border:1px solid var(--border);color:var(--text2);background:var(--bg3)}
+.ytab:hover{border-color:#3e4460;color:var(--text)}
+.ytab.act{background:var(--green2);border-color:var(--green);color:#fff}
+.ytab.act-oa{background:#854f0b;border-color:var(--amber);color:#fcd34d}
+/* ── FORMS ── */
+.btn{cursor:pointer;border:1px solid var(--border);background:var(--bg3);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:500;color:var(--text);transition:all .15s}
+.btn:hover{background:var(--bg2);border-color:#3e4460}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-g{background:var(--green2);border-color:var(--green);color:#fff}
+.btn-g:hover{background:#15803d}
+.btn-b{background:var(--blue2);border-color:var(--blue);color:#fff}
+.btn-b:hover{background:#1d4ed8}
+input,select,textarea{border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:12px;background:var(--bg3);color:var(--text);width:100%;outline:none;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+select option{background:var(--bg2)}
+.lbl{font-size:11px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.hr{border:none;border-top:1px solid var(--border);margin:10px 0}
+/* ── PIPELINE STAGES ── */
+.stage-btn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-size:11px}
+.stage-btn:hover{border-color:#3e4460;color:var(--text)}
+/* ── PAGE HEADER ── */
+.page-header{padding:20px 22px 0}
+.page-title{font-size:20px;font-weight:700;margin-bottom:3px}
+.page-sub{font-size:12px;color:var(--text2);margin-bottom:18px}
+/* ── CHART ── */
+.ch-wrap{position:relative}
+/* ── CYCLE TRACK ── */
+.cycle-step{display:inline-flex;flex-direction:column;align-items:center;gap:3px;margin:0 3px 8px;min-width:48px;cursor:pointer}
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+/* ── MOBILE ── */
+@media(max-width:700px){
+  #app{flex-direction:column}
+  #sidebar{width:100%;height:auto;flex-direction:row;padding:8px 10px;flex-wrap:nowrap;overflow-x:auto;position:relative}
+  .sb-logo{padding:0 10px 0 0;border:none}
+  .sb-footer{display:none}
+  .nav-section{display:none}
+  .nav-item{padding:6px 10px;font-size:10px;flex-direction:column;gap:2px;min-width:50px;border-left:none;border-bottom:2px solid transparent;border-radius:6px;white-space:nowrap}
+  .nav-item.act{border-left:none;border-bottom-color:var(--green)}
+  .g2,.g3{grid-template-columns:1fr}
+  .g4,.g5{grid-template-columns:repeat(2,1fr)}
+  .page-header{padding:14px 14px 0}
+  #main{padding-bottom:20px}
+  .oa-banner{flex-direction:column;gap:10px}
+}
 </style>
 </head>
 <body>
 
-<!-- ═══ LOGIN ═══ -->
-<div id="sc-login" class="sc sc-flex on">
+<!-- ═══════════════ LOGIN ═══════════════ -->
+<div id="sc-login" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg)">
   <div class="login-card">
     <div class="login-logo">AUSTAR</div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;letter-spacing:1px">SISTEMA COMERCIAL</div>
-    <div class="login-sub">México 2026 · Chemical Direct</div>
+    <div style="font-size:10px;color:var(--text3);letter-spacing:1px;margin-bottom:4px">SISTEMA COMERCIAL INTEGRADO</div>
+    <div class="login-sub">México 2026 · Chemical Direct · Nueva Etapa BI</div>
     <div class="user-cards">
-      <div class="user-card" onclick="login('yaneth')">
-        <div class="user-av-lg" style="background:#14532d;color:#86efac">YA</div>
+      <div class="ucard" onclick="login('yaneth')">
+        <div class="uav" style="background:#14532d;color:#86efac">YA</div>
         <div style="font-weight:600;font-size:13px">Yaneth</div>
         <div style="font-size:11px;color:var(--text2);margin-top:2px">Clientes B2C</div>
+        <span class="tag t-gr" style="margin-top:8px;display:inline-block">Activa</span>
       </div>
-      <div class="user-card" onclick="login('vale')">
-        <div class="user-av-lg" style="background:#1e3a5f;color:#93c5fd">VA</div>
+      <div class="ucard" onclick="login('vale')">
+        <div class="uav" style="background:#1e3a5f;color:#93c5fd">VA</div>
         <div style="font-weight:600;font-size:13px">Vale</div>
         <div style="font-size:11px;color:var(--text2);margin-top:2px">Nuevos B2B</div>
+        <span class="tag t-bl" style="margin-top:8px;display:inline-block">Nueva etapa</span>
       </div>
     </div>
     <div id="login-stat" style="font-size:11px;color:var(--text3)"></div>
   </div>
 </div>
 
-<!-- ═══ APP SHELL ═══ -->
-<div id="app-shell" style="display:none">
+<!-- ═══════════════ APP ═══════════════ -->
+<div id="app" style="display:none">
+
   <!-- SIDEBAR -->
   <div id="sidebar">
-    <div class="logo">
-      <div class="logo-title">AUSTAR</div>
-      <div class="logo-sub">Sistema Comercial MX</div>
+    <div class="sb-logo">
+      <div class="sb-title">AUSTAR</div>
+      <div class="sb-sub">Sistema Comercial MX 2026</div>
     </div>
-    <div class="nav-item act" onclick="gotoTab('dashboard')" id="nav-dashboard"><span class="nav-icon">📊</span>Dashboard</div>
-    <div class="nav-item" onclick="gotoTab('clientes')" id="nav-clientes"><span class="nav-icon">👥</span>Clientes</div>
-    <div class="nav-item" onclick="gotoTab('inventario')" id="nav-inventario"><span class="nav-icon">📦</span>Inventario</div>
-    <div class="nav-item" onclick="gotoTab('nuevo')" id="nav-nuevo"><span class="nav-icon">➕</span>Nuevo</div>
-    <div id="sidebar-footer">
-      <div id="user-badge">
-        <div id="user-av"></div>
-        <div><div id="user-name" style="font-weight:600;font-size:12px"></div><div style="font-size:10px;color:var(--text3);cursor:pointer" onclick="logout()">Cerrar sesión</div></div>
+    <div class="nav-section">Principal</div>
+    <div class="nav-item act" onclick="gotoTab('dashboard')" id="nav-dashboard"><span class="ni">📊</span>Dashboard</div>
+    <div class="nav-item" onclick="gotoTab('historico')" id="nav-historico"><span class="ni">📈</span>Histórico</div>
+    <div class="nav-section">Operación</div>
+    <div class="nav-item" onclick="gotoTab('clientes')" id="nav-clientes"><span class="ni">👥</span>Clientes</div>
+    <div class="nav-item" onclick="gotoTab('inventario')" id="nav-inventario"><span class="ni">📦</span>Inventario</div>
+    <div class="nav-item" onclick="gotoTab('nuevo')" id="nav-nuevo"><span class="ni">➕</span>Nuevo prospecto</div>
+    <div class="sb-footer">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div id="user-av" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0"></div>
+        <div>
+          <div id="user-name" style="font-weight:600;font-size:12px"></div>
+          <div style="font-size:10px;color:var(--text3);cursor:pointer" onclick="logout()">Cerrar sesión</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- MAIN -->
-  <div id="main-content">
+  <!-- MAIN CONTENT -->
+  <div id="main">
 
-    <!-- ─── DASHBOARD ─── -->
+    <!-- ─── DASHBOARD EJECUTIVO ─── -->
     <div id="tab-dashboard" class="sc on">
-      <div style="font-size:18px;font-weight:700;margin-bottom:4px">Dashboard</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:18px">Resumen ejecutivo Austar México</div>
-      <div id="dash-metrics" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-        <div class="card">
-          <div class="lbl" style="margin-bottom:10px">Pipeline por etapa</div>
-          <div class="chart-wrap"><canvas id="ch-pipeline"></canvas></div>
+      <div class="page-header">
+        <div class="page-title">Dashboard ejecutivo</div>
+        <div class="page-sub">Visión integrada CDM + Odiseo Amezcua · 2025</div>
+      </div>
+      <div style="padding:0 22px 22px">
+        <!-- Odiseo Banner -->
+        <div class="oa-banner">
+          <div>
+            <div class="oa-name">🌵 Odiseo Amezcua · Socio Comercial Sureste</div>
+            <div class="oa-sub">Oaxaca · Guerrero · Chiapas</div>
+          </div>
+          <div class="oa-stats">
+            <div><div class="oa-val">37,550 L</div><div class="oa-lbl">Litros 2025 (récord)</div></div>
+            <div><div class="oa-val">77%</div><div class="oa-lbl">Del total 2025</div></div>
+            <div><div class="oa-val">$1.23M</div><div class="oa-lbl">Mayor cliente 2025</div></div>
+          </div>
         </div>
-        <div class="card">
-          <div class="lbl" style="margin-bottom:10px">Clientes por estado (top 8)</div>
-          <div class="chart-wrap"><canvas id="ch-estados"></canvas></div>
+        <!-- Metrics -->
+        <div class="g5" style="margin-bottom:14px" id="dash-metrics"></div>
+        <!-- Charts row 1 -->
+        <div class="g2" style="margin-bottom:14px">
+          <div class="card"><div class="ct">CDM vs Odiseo — litros por año</div><div class="ch-wrap" style="height:200px"><canvas id="dch1"></canvas></div></div>
+          <div class="card"><div class="ct">Pipeline de clientes CDM por etapa</div><div class="ch-wrap" style="height:200px"><canvas id="dch2"></canvas></div></div>
+        </div>
+        <!-- Charts row 2 -->
+        <div class="g3" style="margin-bottom:14px">
+          <div class="card"><div class="ct">Cultivos 2025 (CDM)</div><div class="ch-wrap" style="height:200px"><canvas id="dch3"></canvas></div></div>
+          <div class="card"><div class="ct">Top estados CDM 2025</div><div class="ch-wrap" style="height:200px"><canvas id="dch4"></canvas></div></div>
+          <div class="card"><div class="ct">Inventario actual</div><div class="ch-wrap" style="height:200px"><canvas id="dch5"></canvas></div><div id="inv-tags" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"></div></div>
+        </div>
+        <!-- Quick actions -->
+        <div class="g3">
+          <div class="card">
+            <div class="ct">Acciones rápidas</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button class="btn btn-g" onclick="gotoTab('nuevo')" style="text-align:left;padding:10px 14px">➕ Registrar nuevo prospecto</button>
+              <button class="btn" onclick="gotoTab('clientes')" style="text-align:left;padding:10px 14px">👥 Ver todos los clientes</button>
+              <button class="btn" onclick="gotoTab('inventario')" style="text-align:left;padding:10px 14px">📦 Registrar movimiento de inventario</button>
+              <button class="btn" onclick="gotoTab('historico')" style="text-align:left;padding:10px 14px">📈 Ver análisis histórico</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ct">Top 5 clientes activos</div>
+            <div id="dash-top5"></div>
+          </div>
+          <div class="card">
+            <div class="ct">Alertas estratégicas</div>
+            <div class="alert"><div class="at">⚠ Concentración de riesgo</div><div class="ab">Odiseo = 77% del volumen 2025. CDM debe diversificar y crecer su base directa.</div></div>
+            <div class="insight" style="margin-top:8px"><div class="it">✓ Recuperación CDM 2025</div><div class="ib">+14% litros vs 2024. Nueva etapa de Inteligencia de Negocios activada. Vale + Yaneth operando.</div></div>
+            <div class="insight" style="margin-top:8px"><div class="it">🎯 Oportunidad clave</div><div class="ib">61 clientes compraron en 2024 y no en 2025. Campaña de reactivación = incremento inmediato.</div></div>
+          </div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="card">
-          <div class="lbl" style="margin-bottom:10px">Cultivos más frecuentes (top 10)</div>
-          <div class="chart-wrap" style="height:260px"><canvas id="ch-cultivos"></canvas></div>
+    </div>
+
+    <!-- ─── HISTÓRICO ─── -->
+    <div id="tab-historico" class="sc">
+      <div class="page-header">
+        <div class="page-title">Análisis histórico</div>
+        <div class="page-sub">Ventas CDM + OA · 2017–2025</div>
+      </div>
+      <div style="padding:0 22px 22px">
+        <div class="ytabs" id="ytabs">
+          <div class="ytab act" onclick="setYear('total')">📊 Total</div>
+          <div class="ytab" onclick="setYear(2019)">2019</div>
+          <div class="ytab" onclick="setYear(2020)">2020</div>
+          <div class="ytab" onclick="setYear(2021)">2021</div>
+          <div class="ytab" onclick="setYear(2022)">2022</div>
+          <div class="ytab" onclick="setYear(2023)">2023</div>
+          <div class="ytab" onclick="setYear(2024)">2024</div>
+          <div class="ytab" onclick="setYear(2025)">2025</div>
+          <div class="ytab" onclick="setYear('oa')" style="border-color:var(--amber);color:var(--amber)">🌵 Odiseo OA</div>
         </div>
-        <div class="card">
-          <div class="lbl" style="margin-bottom:10px">Inventario actual (litros)</div>
-          <div class="chart-wrap"><canvas id="ch-inv"></canvas></div>
-          <div id="inv-summary" style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap"></div>
+        <div class="g5" style="margin-bottom:14px" id="hist-metrics"></div>
+        <div class="g2" style="margin-bottom:14px">
+          <div class="card"><div class="ct" id="hct1">CDM vs OA por año</div><div class="ch-wrap" style="height:200px"><canvas id="hch1"></canvas></div></div>
+          <div class="card"><div class="ct" id="hct2">% participación OA en total</div><div class="ch-wrap" style="height:200px"><canvas id="hch2"></canvas></div></div>
+        </div>
+        <div class="g2" style="margin-bottom:14px">
+          <div class="card">
+            <div class="ct">Top 15 clientes CDM histórico</div>
+            <div id="hist-top" style="max-height:300px;overflow-y:auto"></div>
+          </div>
+          <div class="card">
+            <div class="ct">Análisis estratégico</div>
+            <div id="hist-analysis"></div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ─── CLIENTES ─── -->
     <div id="tab-clientes" class="sc">
-      <div style="font-size:18px;font-weight:700;margin-bottom:4px">Clientes</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:16px">Base comercial activa</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <input id="f-s" placeholder="Buscar nombre, estado, cultivo..." style="flex:2;min-width:150px" oninput="applyFilter()">
-        <select id="f-e" style="flex:1;min-width:100px" onchange="applyFilter()"><option value="">Todos los estados</option></select>
-        <select id="f-c" style="flex:1;min-width:110px" onchange="applyFilter()"><option value="">Todos los cultivos</option></select>
-        <select id="f-t" style="flex:1;min-width:120px" onchange="applyFilter()">
-          <option value="">Todas las etapas</option>
-          <option value="prospecto">Prospecto</option><option value="contactado">Contactado</option>
-          <option value="interesado">Interesado</option><option value="compro">Compró</option>
-          <option value="recompra">Recompra</option><option value="no_compra">No compra</option>
-        </select>
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+          <div class="page-title">Clientes</div>
+          <button class="btn btn-sm btn-b" onclick="gotoTab('nuevo')">+ Nuevo prospecto</button>
+        </div>
+        <div class="page-sub">Base comercial activa</div>
       </div>
-      <div id="rc" style="font-size:11px;color:var(--text2);margin-bottom:10px"></div>
-      <div id="clist" style="display:flex;flex-direction:column;gap:6px"></div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 0">
-        <button class="btn btn-sm" id="bp" onclick="pg(-1)">← Anterior</button>
-        <span id="pgi" style="font-size:12px;color:var(--text2)"></span>
-        <button class="btn btn-sm" id="bn" onclick="pg(1)">Siguiente →</button>
+      <div style="padding:0 22px 22px">
+        <div class="g4" style="margin-bottom:12px" id="cli-metrics"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+          <input id="f-s" placeholder="Buscar nombre, estado, cultivo..." style="flex:2;min-width:150px" oninput="applyFilter()">
+          <select id="f-e" style="flex:1;min-width:100px" onchange="applyFilter()"><option value="">Todos los estados</option></select>
+          <select id="f-c" style="flex:1;min-width:110px" onchange="applyFilter()"><option value="">Todos los cultivos</option></select>
+          <select id="f-t" style="flex:1;min-width:120px" onchange="applyFilter()">
+            <option value="">Todas las etapas</option>
+            <option value="prospecto">Prospecto</option><option value="contactado">Contactado</option>
+            <option value="interesado">Interesado</option><option value="compro">Compró</option>
+            <option value="recompra">Recompra</option><option value="no_compra">No compra</option>
+          </select>
+        </div>
+        <div id="rc" style="font-size:11px;color:var(--text2);margin-bottom:8px"></div>
+        <div id="clist" style="display:flex;flex-direction:column;gap:6px"></div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 0">
+          <button class="btn btn-sm" id="bp" onclick="pg(-1)">← Anterior</button>
+          <span id="pgi" style="font-size:11px;color:var(--text2)"></span>
+          <button class="btn btn-sm" id="bn" onclick="pg(1)">Siguiente →</button>
+        </div>
       </div>
     </div>
 
-    <!-- ─── DETALLE ─── -->
+    <!-- ─── DETALLE CLIENTE ─── -->
     <div id="tab-detalle" class="sc">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <div style="display:flex;align-items:center;gap:10px;padding:18px 22px 0">
         <button class="btn btn-sm" onclick="gotoTab('clientes')">← Volver</button>
         <div id="det-ttl" style="font-size:18px;font-weight:700"></div>
       </div>
-      <div id="det-body"></div>
+      <div style="padding:14px 22px 22px" id="det-body"></div>
     </div>
 
     <!-- ─── INVENTARIO ─── -->
     <div id="tab-inventario" class="sc">
-      <div style="font-size:18px;font-weight:700;margin-bottom:4px">Inventario</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:18px">Control de litros — almacén, distribución y disponible</div>
-      <div id="inv-metrics" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px"></div>
-      <div class="card" style="margin-bottom:14px">
-        <div class="lbl" style="margin-bottom:12px">Registrar movimiento</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-          <div><div class="lbl">Tipo</div>
-            <select id="inv-tipo" onchange="toggleInvFields()">
-              <option value="entrada">Entrada — llegada de Australia</option>
-              <option value="venta">Venta — salida a cliente</option>
-              <option value="traslado_pv">Traslado a punto de venta</option>
-              <option value="devolucion">Devolución a almacén</option>
-            </select>
-          </div>
-          <div><div class="lbl">Litros</div><input id="inv-lt" type="number" min="1" placeholder="Ej: 200"></div>
-          <div id="inv-lote-w"><div class="lbl">No. lote / factura</div><input id="inv-lote" placeholder="Ej: LOT-2026-001"></div>
-          <div id="inv-cli-w" style="display:none"><div class="lbl">Nombre del cliente</div><input id="inv-cli" placeholder="Cliente"></div>
-          <div><div class="lbl">Fecha</div><input id="inv-fecha" type="date"></div>
-          <div><div class="lbl">Precio MXN/L</div><input id="inv-precio" type="number" placeholder="Ej: 888"></div>
-        </div>
-        <div style="margin-bottom:10px"><div class="lbl">Observaciones</div><input id="inv-obs" placeholder="Notas del movimiento..."></div>
-        <div style="text-align:right"><button class="btn btn-g" onclick="saveMovimiento()">Registrar movimiento</button></div>
+      <div class="page-header">
+        <div class="page-title">Inventario</div>
+        <div class="page-sub">Control de litros — almacén, distribución y disponible</div>
       </div>
-      <div class="card">
-        <div class="lbl" style="margin-bottom:10px">Historial de movimientos</div>
-        <div id="inv-hist"></div>
+      <div style="padding:0 22px 22px">
+        <div class="g3" style="margin-bottom:14px" id="inv-metrics"></div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="ct">Registrar movimiento</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div><div class="lbl">Tipo</div>
+              <select id="inv-tipo" onchange="toggleInvFields()">
+                <option value="entrada">Entrada — llegada de Australia</option>
+                <option value="venta">Venta — salida a cliente</option>
+                <option value="traslado_pv">Traslado a punto de venta</option>
+                <option value="devolucion">Devolución a almacén</option>
+              </select>
+            </div>
+            <div><div class="lbl">Litros</div><input id="inv-lt" type="number" min="1" placeholder="Ej: 200"></div>
+            <div id="inv-lote-w"><div class="lbl">No. lote / factura</div><input id="inv-lote" placeholder="Ej: LOT-2026-001"></div>
+            <div id="inv-cli-w" style="display:none"><div class="lbl">Cliente</div><input id="inv-cli" placeholder="Nombre del cliente"></div>
+            <div><div class="lbl">Fecha</div><input id="inv-fecha" type="date"></div>
+            <div><div class="lbl">Precio MXN/L</div><input id="inv-precio" type="number" placeholder="Ej: 1477"></div>
+          </div>
+          <div style="margin-bottom:10px"><div class="lbl">Observaciones</div><input id="inv-obs" placeholder="Notas..."></div>
+          <div style="text-align:right"><button class="btn btn-g" onclick="saveMovimiento()">Registrar movimiento</button></div>
+        </div>
+        <div class="card">
+          <div class="ct">Historial de movimientos</div>
+          <div id="inv-hist"></div>
+        </div>
       </div>
     </div>
 
     <!-- ─── NUEVO PROSPECTO ─── -->
     <div id="tab-nuevo" class="sc">
-      <div style="font-size:18px;font-weight:700;margin-bottom:4px">Nuevo prospecto</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:18px">Registrar nuevo contacto en el pipeline</div>
-      <div class="card">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-          <div><div class="lbl">Nombre completo</div><input id="n-nm" placeholder="Nombre y apellidos"></div>
-          <div><div class="lbl">Teléfono / Móvil</div><input id="n-tl" placeholder="10 dígitos"></div>
-          <div><div class="lbl">Estado</div>
-            <select id="n-st"><option value="">Seleccionar...</option>
-              <option>Sinaloa</option><option>Jalisco</option><option>Michoacán</option><option>Sonora</option><option>Nayarit</option>
-              <option>Colima</option><option>Chihuahua</option><option>Coahuila</option><option>Tamaulipas</option><option>Guerrero</option>
-              <option>Oaxaca</option><option>Veracruz</option><option>Guanajuato</option><option>México</option><option>Nuevo León</option>
-              <option>Querétaro</option><option>Zacatecas</option><option>Durango</option><option>Puebla</option><option>Chiapas</option>
-              <option>San Luis Potosí</option><option>Yucatán</option><option>Morelos</option><option>Aguascalientes</option>
-            </select>
+      <div class="page-header">
+        <div class="page-title">Nuevo prospecto</div>
+        <div class="page-sub">Registrar contacto en el pipeline comercial</div>
+      </div>
+      <div style="padding:0 22px 22px">
+        <div class="card">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div><div class="lbl">Nombre completo</div><input id="n-nm" placeholder="Nombre y apellidos"></div>
+            <div><div class="lbl">Teléfono / Móvil</div><input id="n-tl" placeholder="10 dígitos"></div>
+            <div><div class="lbl">Estado</div>
+              <select id="n-st" onchange="loadMunicipios()" style="width:100%"><option value="">Seleccionar estado...</option></select>
+            </div>
+            <div><div class="lbl">Municipio / Región</div>
+              <select id="n-mn" disabled style="width:100%"><option value="">Seleccionar estado primero...</option></select>
+            </div>
+            <div><div class="lbl">Cultivo principal</div><input id="n-cv" placeholder="Ej: Aguacate, Maíz, Mango"></div>
+            <div><div class="lbl">Tipo de contacto</div>
+              <select id="n-tp"><option value="agricultor">Agricultor</option><option value="socio_comercial">Socio Comercial</option><option value="casa_agro">Casa Agroquímica</option><option value="agroinfluencer">Agroinfluencer</option></select>
+            </div>
+            <div><div class="lbl">Origen del lead</div>
+              <select id="n-or"><option value="referido">Referido</option><option value="redes">Redes sociales</option><option value="evento">Evento / Campo</option><option value="web">Web / Chatbot</option><option value="directo">Directo</option></select>
+            </div>
+            <div><div class="lbl">Responsable</div>
+              <select id="n-rs"><option value="yaneth">Yaneth (B2C)</option><option value="vale">Vale (B2B)</option></select>
+            </div>
           </div>
-          <div><div class="lbl">Municipio</div><input id="n-mn" placeholder="Municipio"></div>
-          <div><div class="lbl">Cultivo principal</div><input id="n-cv" placeholder="Ej: Aguacate, Maíz, Mango"></div>
-          <div><div class="lbl">Tipo de contacto</div>
-            <select id="n-tp">
-              <option value="agricultor">Agricultor</option><option value="socio_comercial">Socio Comercial</option>
-              <option value="casa_agro">Casa Agroquímica</option><option value="agroinfluencer">Agroinfluencer</option>
-            </select>
+          <div style="margin-bottom:14px"><div class="lbl">Observaciones iniciales</div><textarea id="n-ob" rows="3" placeholder="Contexto, referido por, notas clave..."></textarea></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn" onclick="gotoTab('clientes')">Cancelar</button>
+            <button class="btn btn-g" onclick="saveNuevo()">Registrar prospecto</button>
           </div>
-          <div><div class="lbl">Origen del lead</div>
-            <select id="n-or">
-              <option value="referido">Referido</option><option value="redes">Redes sociales</option>
-              <option value="evento">Evento / Campo</option><option value="web">Web / Chatbot</option><option value="directo">Directo</option>
-            </select>
-          </div>
-          <div><div class="lbl">Responsable</div>
-            <select id="n-rs"><option value="yaneth">Yaneth (B2C)</option><option value="vale">Vale (B2B)</option></select>
-          </div>
-        </div>
-        <div style="margin-bottom:14px"><div class="lbl">Observaciones iniciales</div><textarea id="n-ob" rows="3" placeholder="Contexto, referido por, notas clave..."></textarea></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button class="btn" onclick="gotoTab('clientes')">Cancelar</button>
-          <button class="btn btn-g" onclick="saveNuevo()">Registrar prospecto</button>
         </div>
       </div>
     </div>
 
-  </div><!-- /main-content -->
-</div><!-- /app-shell -->
+  </div><!-- /main -->
+</div><!-- /app -->
 
 <script>
-// error logging active
-// ════════════════════════════════
-// DATA
-// ════════════════════════════════
+// ════════════════════════════════════════
+// DATA CONSTANTS
+// ════════════════════════════════════════
 const ETAPAS={prospecto:{l:'Prospecto',c:'t-gy'},contactado:{l:'Contactado',c:'t-bl'},interesado:{l:'Interesado',c:'t-am'},compro:{l:'Compró ✓',c:'t-gr'},recompra:{l:'Recompra ✓',c:'t-gr'},no_compra:{l:'No compra',c:'t-rd'}};
-const BADGES={
-  gfg:{key:'gfg',icon:'🌾',label:'Grow for Gold',short:'GFG',color:'#f59e0b',bg:'#451a03'},
-  reto:{key:'reto',icon:'🏆',label:'Reto Austar',short:'Reto',color:'#22c55e',bg:'#14532d'},
-  academy:{key:'academy',icon:'🎓',label:'Austar Academy',short:'Academy',color:'#3b82f6',bg:'#1e3a5f'}
-};
-function getBadges(id){try{return JSON.parse(localStorage.getItem('as_bg_'+id)||'[]');}catch{return[];}}
-function toggleBadge(id,key){
-  let bg=getBadges(id);
-  if(bg.includes(key))bg=bg.filter(k=>k!==key);else bg.push(key);
-  localStorage.setItem('as_bg_'+id,JSON.stringify(bg));
-  // Refresh only the badge section without full re-render
-  openDet(id);
-}
-function renderBadgeBar(id,badges){
-  const all=Object.values(BADGES);
-  const tripleCorona=all.every(b=>badges.includes(b.key));
-  return`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-    ${all.map(b=>{
-      const active=badges.includes(b.key);
-      return`<button onclick="toggleBadge('${id}','${b.key}')" style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:1.5px solid ${active?b.color:'var(--border)'};background:${active?b.bg:'var(--bg3)'};cursor:pointer;font-size:11px;font-weight:600;color:${active?b.color:'var(--text3)'};transition:all .2s">
-        <span>${b.icon}</span>${b.short}
-      </button>`;
-    }).join('')}
-    ${tripleCorona?`<span style="display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:20px;background:linear-gradient(135deg,#451a03,#14532d,#1e3a5f);font-size:11px;font-weight:700;color:#fcd34d;border:1.5px solid #f59e0b">🥇 Triple Corona</span>`:''}
-  </div>`;
-}
 const TIPO_LBL={agricultor:'Agricultor',socio_comercial:'Socio Comerc.',casa_agro:'Casa Agro',agroinfluencer:'Agroinfluencer'};
+const BADGES={gfg:{key:'gfg',icon:'🌾',label:'Grow for Gold',color:'#f59e0b',bg:'#451a03'},reto:{key:'reto',icon:'🏆',label:'Reto Austar',color:'#22c55e',bg:'#14532d'},academy:{key:'academy',icon:'🎓',label:'Austar Academy',color:'#3b82f6',bg:'#1e3a5f'}};
 
-const D2=[
-["Adolfo Chavez Verduzco","Agrochaver SPR","Jalisco","Guzmán","3414106781","Aguacate","retomado"],
-["Agriexport SA de CV","Agriexport","Sonora","Obregón","6444154055","Tomate","activo"],
-["Alan Hernandez Vega","NIS Factory","Querétaro","Querétaro","4423910688","Maíz,Frijol","nuevo"],
-["Alan Santacruz","Agrícola DK","Sonora","Hermosillo","6621190956","Tomate","activo"],
-["Alberto Mesino","","Michoacán","Uruapan","4523409644","Maíz","nuevo"],
-["Alejandro Garfia Lopez","","Michoacán","Uruapan","4443164041","Aguacate","activo"],
-["Alejandro Villarreal","Fomento Industrial","Nuevo León","Monterrey","8182537909","Nogal","activo"],
-["Alfonso Medina Villanueva","Bermet SPR","Michoacán","Los Reyes","3411155571","Aguacate","activo"],
-["Alfredo Dante Guevara","Agrícola Freshver","Veracruz","","2717060706","Papaya","activo"],
-["Aljuro SPR","Aljuro SPR","Sonora","Obregón","6441505024","Chile","activo"],
-["Andrés Castañeda","","Jalisco","Zapopan","3326289680","Tomate,Chía","activo"],
-["Arturo Fernandez","Frutas Finas Tangancicuaro","Michoacán","Tangancícuaro","3515532479","Tomate","activo"],
-["Carlos Mendivil Ocuca","Urrea Paredes SPR","Sonora","Huatabampo","6471179506","Nogal","activo"],
-["Cleto García","Mariano Matamoros SPR","Jalisco","La Barca","3337202962","Maíz,Trigo","activo"],
-["Complementos Mhibap","Complementos Mhibap","Colima","Villa de Álvarez","3121196200","Mango","nuevo"],
-["Crescencio Sandoval","","Nayarit","","3921077128","Maíz,Frijol","activo"],
-["Daniel Benitez Pardo","","Nayarit","Tepic","6691272715","Mango","nuevo"],
-["Daniel Fernandez","Nogal Santa Rita","Nuevo León","Montemorelos","8262633212","Nogal","nuevo"],
-["Edelmiro Montemayor","Horticultores Santa Cruz","Nuevo León","Cadereyta","8281000422","Hortalizas","nuevo"],
-["Eduardo Aguilera","Nutrire Agro","Jalisco","Acatic","3316022548","Trigo","nuevo"],
-["Ernestina Cervantes","","Michoacán","Ario de Rosales","4251327846","Aguacate","activo"],
-["Ernesto Blackeller","Agropecuaria BC","Coahuila","Monclova","8661358070","Nogal","activo"],
-["Eva Acosta Lopez","","Michoacán","Tancítaro","4525044541","Aguacate","nuevo"],
-["Ezequiel Alvarez Ornelas","","Michoacán","Huaniqueo","4341385596","Aguacate","activo"],
-["Federico Parra","Bernardo Parra Fernandez","Nayarit","","3118477393","Aguacate","activo"],
-["Fernando Flores Gaytan","","Coahuila","Saltillo","8444198022","Maíz","activo"],
-["Gerardo Morales Huerta","Sertiagri","Jalisco","Sayula","3421010336","Aguacate","activo"],
-["Gilberto Seberino Garza Falcon","","Michoacán","Pátzcuaro","4343422481","Aguacate","activo"],
-["Hector Raul Ceja Juarez","","Michoacán","","3541141719","Aguacate","activo"],
-["Ismael Cruz Marroquin","","Nuevo León","Monterrey","8110505835","Chile","reactivado"],
-["Jaime Alberto Molina","El Tumin SPR","Michoacán","Uruapan","4521662262","Aguacate","retomado"],
-["Joaquin Lopez","","Nayarit","Ixtlán del Río","3241001397","Maíz","activo"],
-["Jonathan Michel Uribe","Inmobiliaria Casa Golf","Jalisco","Guadalajara","3165250001","Golf","activo"],
-["Jose de Jesus Hernandez","Coop. San Juan Viscarra","Jalisco","Tonalá","3312432508","Hortalizas","activo"],
-["Jose Francisco Reyes Sanchez","Grupo Camporey SPR","San Luis Potosí","Guadalcázar","4881036191","Nogal,Hortalizas","nuevo"],
-["Juan Carlos Zubia Amaya","","Sonora","Obregón","6442229201","Limón","nuevo"],
-["Juan Delgado","El Rio Golf CC","Jalisco","El Arenal","3841132158","Golf","activo"],
-["Julio Cesar Ordaz Gonzalez","","Colima","Tecomán","3131060224","Papaya","nuevo"],
-["Lenin Briones","","Colima","Tecomán","2229239352","Mango","activo"],
-["Lizbeth Fontanilla","Alta Tecnología Agrotécnica","Jalisco","","3313054014","Berries","activo"],
-["Manantial Las Amapolas","Manantial Las Amapolas","Michoacán","Uruapan","4521507691","Aguacate","nuevo"],
-["Miguel Zarco","Productores Hortalizas","Puebla","Puebla","9631145205","Aguacate","activo"],
-["Nahum Tress Marini","Tress Marini SPR","Campeche","Tenabo","9341042937","Mango","activo"],
-["Nelson Marin Lara","Rosa Iselda Montero","Veracruz","","2297787043","Limón","activo"],
-["Norberto Torres Taboada","La Pequeña Maria SPR","Coahuila","Torreón","8722959168","Nogal,Algodón","activo"],
-["Osvaldo Emmanuel Becerra","","Jalisco","Poncitlán","3312506307","Tomate","activo"],
-["Patricia Nevarez","Agro BR SPR","Chihuahua","Casas Grandes","6366950230","Manzano","activo"],
-["Pedro Alfonso Valenzuela","","Sonora","Obregón","6441394808","Nogal","activo"],
-["Pedro Medina Villanueva","","Michoacán","Los Reyes","3411155571","Aguacate","activo"],
-["Ricardo Naranjo","José Naranjo Nuñez","Michoacán","Ario de Rosales","3173883559","Aguacate","activo"],
-["Rodrigo Corral Hernandez","Alejandra Chavira Lopez","Chihuahua","Delicias","6391190734","Nogal","activo"],
-["Rodrigo Sanchez","Teknigrow","Michoacán","Zamora","3332584784","Aguacate","nuevo"],
-["Ruben Perez","Fco. Nuñez Vargas","Michoacán","Jiquilpan","3535633557","Aguacate","activo"],
-["Victor Barragan","Avocados San Miguel","Michoacán","Uruapan","4525255806","Aguacate","activo"],
-["Zezart Merino","Agropecuaria Bomanz","Sonora","Obregón","6449989470","Aguacate","nuevo"]
-];
+// Historical data
+const BY_YEAR=[{year:2019,cdm:13043,oa:23418,total:36461,pct_oa:64},{year:2020,cdm:13855,oa:21211,total:35066,pct_oa:60},{year:2021,cdm:10015,oa:23580,total:33595,pct_oa:70},{year:2022,cdm:11545,oa:24495,total:36040,pct_oa:68},{year:2023,cdm:8267,oa:27769,total:36036,pct_oa:77},{year:2024,cdm:10058,oa:31330,total:41388,pct_oa:76},{year:2025,cdm:11473,oa:37550,total:49023,pct_oa:77}];
+const OA_FULL=[{year:2017,litros:29581},{year:2018,litros:24630},{year:2019,litros:23418},{year:2020,litros:21211},{year:2021,litros:23580},{year:2022,litros:24495},{year:2023,litros:27769},{year:2024,litros:31330},{year:2025,litros:37550}];
+const CDM_CLIENTES={2019:117,2020:112,2021:116,2022:128,2023:90,2024:83,2025:53};
+const CULT_2025={AGUACATE:6285,MANGO:1517,CANNABIS:1215,NOGAL:890,GOLF:842,PAPAYA:373,MAIZ:79,HORTALIZAS:11};
+const EST_2025={MICHOACAN:5945,JALISCO:3297,SINALOA:1700,NAYARIT:231,NL:105,VERACRUZ:100,CAMPECHE:33,TAMAULIPAS:30};
+const TOP_CLI=[{n:"Sinuhe Alvarez",L:15300,p:22,e:"Michoacán",c:"Aguacate",pa:2020,ua:2025},{n:"Ricardo Naranjo",L:7500,p:9,e:"Michoacán",c:"Aguacate",pa:2019,ua:2021},{n:"H.R. Guerrero Quiroz",L:6103,p:203,e:"Sinaloa",c:"Nogal/Mango",pa:2019,ua:2025},{n:"Juan Pablo Urtado",L:4600,p:7,e:"Michoacán",c:"Aguacate",pa:2025,ua:2025},{n:"Lic. Bernardo Ramos",L:2405,p:8,e:"Sinaloa",c:"Mango",pa:2023,ua:2025},{n:"Agrícola El Puma",L:1689,p:54,e:"Jalisco",c:"Golf",pa:2020,ua:2025},{n:"Osvaldo Rivera Garcia",L:1466,p:35,e:"Jalisco",c:"Cannabis",pa:2022,ua:2025},{n:"Oscar H. Torres Sanchez",L:1361,p:66,e:"Jalisco",c:"Mango/Papaya",pa:2020,ua:2024},{n:"Alfonso Medina Villanueva",L:1035,p:34,e:"Jalisco",c:"Aguacate",pa:2019,ua:2025},{n:"Pedro Medina Villanueva",L:1020,p:26,e:"Michoacán",c:"Aguacate",pa:2019,ua:2024},{n:"Omar Arreola Morales",L:880,p:11,e:"Michoacán",c:"Aguacate",pa:2020,ua:2022},{n:"Eduardo/Gamaliel Fajardo",L:760,p:8,e:"Jalisco",c:"Aguacate",pa:2025,ua:2025},{n:"Chula Brand Mexico",L:700,p:6,e:"Jalisco",c:"Papaya",pa:2025,ua:2025},{n:"Carlos J. Salazar Sanchez",L:681,p:28,e:"Jalisco",c:"Sin definir",pa:2025,ua:2025},{n:"Humberto Sorzano",L:650,p:8,e:"Michoacán",c:"Aguacate",pa:2021,ua:2023}];
+const PERDIDOS=[{n:"Jorge Crespo",L:200,e:"Sinaloa",c:"Mango"},{n:"Oscar H.T.S. (Arturo Hermosillo)",L:170,e:"Jalisco",c:"Cannabis"},{n:"Ricardo Vega",L:140,e:"Michoacán",c:"Aguacate"},{n:"Campo Santa Alicia",L:110,e:"Sonora",c:"Nogal"},{n:"Alfonso Prandini",L:100,e:"Sinaloa",c:"Frijol"}];
 
-const D1=[
-["Jose Angel de la Cruz","Jalisco","Guadalajara","3424210202","Fertilizantes",2],
-["Luis Carrillo Castañeda","Sinaloa","Culiacán","6671525864","Tomate,Chile",0],
-["Luis Gallardo Trejo","Sinaloa","Culiacán","6671510716","Tomate,Pepino,Chile",0],
-["Fernando Avendaño","Sinaloa","Culiacán","6677592600","Maíz",0],
-["Giovanni Cota","Sinaloa","Navolato","6672231645","Maíz",0],
-["Javier Madrid","Sinaloa","Culiacán","6672532824","Maíz,Garbanzo",0],
-["Jorge Elenes Rochin","Sinaloa","Badiraguato","6971026192","Tomate",0],
-["Jose Luis Espinal","Sinaloa","Culiacán","6671850919","Tomate,Pepino,Chile",0],
-["Jose Arena Martinez","Guanajuato","Dolores Hidalgo","6672150203","Tomate,Cebolla,Chile",0],
-["Enrique Higuera","Sinaloa","Navolato","6671750490","Chile",0],
-["Rodolfo Palazuelos","Sinaloa","Navolato","6677517671","Maíz,Frijol",0],
-["Nardo Ahumada","Sinaloa","Guasave","6871103185","Maíz",0],
-["Ernesto Ochoa Valdez","Sinaloa","Guasave","6688610705","Mango",0],
-["Ricardo Cuen","Sinaloa","Navolato","6672334202","Maíz,Frijol",0],
-["David Castro Monjaraz","Sinaloa","Culiacán","6679969808","Chile",0],
-["Ruben De la Garza","Sinaloa","Culiacán","6671370770","Maíz,Garbanzo,Frijol",0],
-["Alfredo Torres","Sinaloa","Culiacán","6671339803","Tomate",0],
-["Arnulfo Lopez Castaños","Sinaloa","Navolato","6727517443","Maíz",0],
-["Jesus Palazuelos Velazquez","Sinaloa","Culiacán","6677677437","Maíz",0],
-["Ivan Renato Almeida","Sinaloa","Ahome","6681737362","Trigo,Garbanzo",0],
-["Hugo Mexia Valle","Sinaloa","Guasave","6681160001","Maíz,Sorgo",0],
-["Ricardo Saracho","Sinaloa","Guasave","6688201651","Sorgo",0],
-["Ivan de Jesus Vallejo Garcia","Sinaloa","Guasave","6871250559","Maíz,Garbanzo",0],
-["Jorge Ignacio Nuñez Lugo","Sinaloa","Guasave","6871610056","Garbanzo",0],
-["Juan Luis Acosta Soto","Sinaloa","Guasave","6878578029","Maíz,Sorgo,Frijol,Chile",0],
-["Humberto Rodrigo Valenzuela","Sinaloa","Ahome","6681688474","Maíz,Sorgo",0],
-["Froylan Luque Leyva","Sinaloa","Ahome","6681162679","Maíz,Sorgo,Frijol",0],
-["Gustavo Rendon Redon","Sinaloa","Ahome","6681010370","Maíz",0],
-["Fabian Inzunza Perez","Sinaloa","","6681246106","Maíz,Tomate,Tomatillo",0],
-["Senon Alvarez Carrasco","Sinaloa","Ahome","6681160846","Maíz,Tomatillo",0],
-["Alonso Elenes","Sinaloa","Culiacán","6677273299","Maíz,Tomate,Garbanzo,Frijol",0],
-["Jaime Inzunza Inzunza","Sinaloa","Salvador Alvarado","6731068983","Garbanzo,Cártamo",0],
-["David Cebreros Gallardo","Sinaloa","Mocorito","6731160915","Cacahuate",0],
-["Enrique Castro Armenta","Sinaloa","Salvador Alvarado","6731068283","Garbanzo",0],
-["Humberto Barron Camacho","Sinaloa","Escuinapa","3316037495","Mango",0],
-["Benjamin Lopez Gaxiola","Sinaloa","Salvador Alvarado","6731015840","Sorgo,Garbanzo",0],
-["Roberto Montoya Montoya","Sinaloa","Salvador Alvarado","6737321790","Garbanzo",0],
-["Faustino Lugo Castro","Sinaloa","Salvador Alvarado","6731007961","Sorgo,Garbanzo",0],
-["Gidardo Gaxiola","Sinaloa","Salvador Alvarado","6731071231","Trigo,Garbanzo",0],
-["Rafael Lopez Tamayo","Sinaloa","Navolato","6727512391","Aguacate",0],
-["Juventino Lopez Heredia","Sinaloa","Salvador Alvarado","6737382973","Garbanzo,Frijol",0],
-["Salomon Sanchez Lopez","Sinaloa","Angostura","6977299616","Maíz,Sorgo,Frijol",0],
-["Silvano Valdez Montoya","Sinaloa","Salvador Alvarado","6737397519","Sorgo",0],
-["Oscar Espinosa Cervantes","Sinaloa","Mocorito","6738528878","Sorgo,Cacahuate",0],
-["Cesar Gallardo Jimenez","Sinaloa","Salvador Alvarado","6738524122","Garbanzo,Cacahuate",0],
-["Jesus Rosales Estrada","Sinaloa","Sinaloa","6871079319","Maíz,Sorgo,Garbanzo,Frijol",0],
-["Efrain Inzunza Sanchez","Sinaloa","Salvador Alvarado","6737380430","Trigo",0],
-["Jorge Luis Sotelo Escalante","Sinaloa","Salvador Alvarado","6737387251","Maíz,Trigo,Garbanzo",0],
-["Ramon Terrazas Lopez","Sinaloa","Sinaloa","6871201479","Maíz,Trigo,Frijol",0],
-["Salvador Favela Verduzco","Sinaloa","Sinaloa","6871213456","Sorgo,Garbanzo,Cártamo",0],
-["José de Jesús Sánchez López","Sinaloa","Salvador Alvarado","6738524108","Socio Comercial",1],
-["Jose Abel Garcia Gastelum","Sinaloa","Elota","6969611278","Socio Comercial",1],
-["Ismael Figueroa Tovar","Michoacán","Uruapan","4521027448","Socio Comercial",1],
-["Margarito Villanueva Velazquez","Michoacán","","4251083306","Socio Comercial",1],
-["Jesus Manuel Lopez Baldenebro","Sinaloa","Ahome","6681894685","Socio Comercial",1],
-["Hector Raul Guerrero Quiroz","Sinaloa","Ahome","6681240363","Socio Comercial",1],
-["Carlos Batiz Murillo","Sinaloa","Culiacán","6862690614","Socio Comercial",1],
-["Miguel Morales Beltran","Tamaulipas","Río Bravo","8999367224","Socio Comercial",1],
-["Odiseo Amezcua Castillo","Querétaro","","7551140088","Socio Comercial",1],
-["Luis Mendoza Magaña","Michoacán","Uruapan","4525294023","Aguacate",0],
-["Viridiana Valenzuela","Sinaloa","Culiacán","6673905498","Maíz,Trigo,Garbanzo",0],
-["Adolfo Valenzuela Robles","Sinaloa","Ahome","6681491991","Maíz,Trigo",0],
-["Everardo Gaxiola Gaxiola","Sinaloa","Salvador Alvarado","6731077207","Maíz,Garbanzo,Frijol",0],
-["Alejandro Garcia Molina","Sinaloa","Angostura","6977425150","Maíz,Frijol",0],
-["Benjamin Gutierrez Gallo","Nayarit","Tepic","3111108644","Mango",0],
-["Antonio Raygoza Jimenez","Jalisco","Chapala","3310227917","Maíz,Trigo",0],
-["Jose Rodriguez Zamonsett","Coahuila","San Pedro","8721058917","Nogal,Algodón",0],
-["Pedro Carbajal Robles","Chihuahua","Buenaventura","6591012773","Manzano",0],
-["Martin Baltazar Ibarra","Sonora","Huatabampo","6471080770","Maíz,Trigo,Frijol,Cártamo",0],
-["Javier Velarde Rubalcaba","Sonora","Hermosillo","6622299794","Trigo,Garbanzo",0],
-["Alejandro Barrera Velazquez","Coahuila","","8712196299","Nogal",0],
-["Jose Arturo Muñoz Eguiarte","Chihuahua","Delicias","6391069239","Nogal",0],
-["Manuel Amparan Hinostroza","Chihuahua","Chihuahua","6144888538","Tomate,Nogal,Cebolla,Algodón",0],
-["Juan Federico Raynal Garcia","Chihuahua","Chihuahua","6144883342","Maíz,Trigo,Frijol,Avena",0],
-["Ricardo Ramos Camilo","Aguascalientes","Aguascalientes","4491960707","Agroquímica,Tomate,Chile",3],
-["Hugo Abraham Luna Ramirez","Jalisco","Puerto Vallarta","3221811953","Mango,Chile,Papaya,Piña",0],
-["David Ulises Alvarez Angeles","Yucatán","Mérida","9991631421","Agroquímica,Mango",3],
-["Jorge Crespo Duran","Sinaloa","Rosario","6949562100","Mango",0],
-["Francisco G. De Jesus Aguirre","Coahuila","Saltillo","8441988088","Nogal",0],
-["Francisco Javier Baldenegro","Sonora","Hermosillo","6621420988","Nogal",0],
-["Herman Giottonini Matus","Sonora","Hermosillo","6621876161","Nogal",0],
-["Blanca Rivera Arvizu","Sonora","Hermosillo","6621050800","Nogal",0],
-["Gerardo Barnetche","Sonora","Cajeme","6444624553","Nogal",0],
-["Eduardo Baeza Gomez","Chihuahua","Meoqui","6141843930","Nogal",0],
-["Humberto Davila","Sonora","Hermosillo","6621200722","Nogal",0],
-["Angel Bours Griffith","Sonora","Hermosillo","6623017149","Nogal",0],
-["David Montoya","San Luis Potosí","Moctezuma","4861048277","Tomate,Chile",0],
-["Jose Gil Raya Linares","Guanajuato","Cuérámaro","4296335043","Maíz,Trigo,Sorgo,Cebada",0],
-["Eliseo Ramirez Hernandez","Michoacán","Penjamillo","3595240040","Maíz,Trigo,Sorgo",0],
-["Jukselin Nuñez Barrera","Guerrero","Técpan de Galeana","7421116262","Mango",0],
-["Isaac Mejia Benavides","Guerrero","Benito Juárez","7811101711","Mango",0],
-["Gerardo Garcia Magno","Guerrero","Atoyac de Álvarez","7421022735","Mango",0],
-["Oscar de los Santos Diaz","Oaxaca","San Pedro Tapanatepec","9611769566","Mango",0],
-["Eduardo Castillejos Allard","Oaxaca","Chahuites","9942638848","Mango",0],
-["Aurelio Velazco Moreno","Chiapas","Comitán de Domínguez","9631441759","Maíz",0],
-["Francisco Chong Chong","Chiapas","Tapachula","9621840556","Tomate,Chile",0],
-["Jorge Muñoz Renteria","Zacatecas","Zacatecas","4921531533","Tomate,Pepino,Ajo",0],
-["Mauricio Andrade","Durango","Durango","6181051608","Chile",0],
-["Miguel Angel Elizondo","Durango","Durango","6181588059","Nogal",0],
-["Victor Soto","Colima","Tecomán","3133254365","Papaya",0],
-["Abel Aguilar Chavez","Michoacán","Apatzingán","4531171732","Limón",0],
-["Alejandro Baeza Salcedo","Jalisco","Acatic","3781096617","Maíz,Chía",0],
-["Juan Manuel González Sainz","Jalisco","Arandas","3481022683","Agave,Maíz,Tomate",0],
-["Rafael Oseguera Diaz","Michoacán","Los Reyes","3545452721","Agave,Maíz,Aguacate,Tomate",0],
-["Ernesto Moreno Ruiz","Jalisco","Tuxpan","3411228155","Aguacate",0],
-["Elias Moreno Ruiz","Jalisco","Tuxpan","3418863717","Aguacate",0],
-["Juan Manuel Prado Andrade","Jalisco","Atotonilco el Alto","3310087842","Maíz,Trigo,Sorgo,Avena",0],
-["Luis Alfonso Medina Torres","Jalisco","Zapotlán el Grande","3541013273","Aguacate,Berries",0],
-["Jose Antonio Jimenez Galvan","Jalisco","Zapotlán el Grande","3411179446","Aguacate,Caña",0],
-["Tomas Avalos Rios","Jalisco","Zapotlán el Grande","3411300229","Maíz,Aguacate",0],
-["Eduardo Capiz Molina","Michoacán","Tacámbaro","4591001002","Aguacate",0],
-["Salvador Arteaga Chavez","Michoacán","Los Reyes","3545410774","Aguacate",0],
-["Santiago Ochoa Torres","Jalisco","Zapotlán el Grande","3418794910","Aguacate",0],
-["Juan Reyes Sanchez","Michoacán","Zitácuaro","7151315631","Aguacate",0],
-["Oswaldo Ivan Alvarez Pedraza","Michoacán","Pátzcuaro","4432274666","Aguacate",0],
-["Cristobal Bravo Silva","Michoacán","Uruapan","4525260605","Aguacate",0],
-["Leodegario Garcia Hurtado","Michoacán","Tacámbaro","4591088941","Aguacate,Mango,Caña",0],
-["Armando Trujillo Bastida","Michoacán","Tacámbaro","4591077527","Aguacate",0],
-["Jose Luciano Morales Garcia","Michoacán","Uruapan","4525256887","Aguacate",0],
-["Humberto Cervantes Ramirez","Michoacán","Ario","4521056425","Aguacate",0],
-["Juan Martin Merino Castillo","Michoacán","Ario","4432174949","Aguacate",0],
-["Jesus Ramos Chavez","Michoacán","Peribán","3541074269","Aguacate",0],
-["Jose Luis Velazquez Oseguera","Michoacán","Uruapan","4521136618","Aguacate",0],
-["Raul Urigel","Guanajuato","Pénjamo","3521004493","Aguacate",0],
-["Jaime Lopez Villanueva","Michoacán","Tancítaro","4521068932","Aguacate",0],
-["Gerardo Zacarias Lopez","Michoacán","Sahuayo","3535368566","Maíz,Frijol,Berries",0],
-["Benito Chavez Mendez","Michoacán","Jiquilpan","3531080850","Tomate,Cebolla",0],
-["Ignacio Maldonado Manzo","Michoacán","Cotija","3541050613","Aguacate",0],
-["Rafael Vega del Rio","Michoacán","Zamora","3511083132","Berries",0],
-["Antonio Alvarez Naranjo","Michoacán","Los Reyes","3541108487","Aguacate,Berries",0],
-["Valentin Valencia Gonzalez","Michoacán","Los Reyes","3545420555","Maíz,Aguacate",0],
-["Juan Luis Barragan Aviles","Michoacán","Tingüindín","3541074399","Maíz,Trigo,Aguacate",0],
-["Juan Antonio Echeverria Toral","Michoacán","Uruapan","4521354703","Aguacate",0],
-["Carlos Alberto Garcia Bonilla","Michoacán","Uruapan","4525251967","Aguacate",0],
-["Jose Flores Gonzalez","Michoacán","Tancítaro","4521428081","Aguacate",0],
-["Jorge Giottonini","Sonora","Hermosillo","6622141427","Nogal",0],
-["Ricardo Ramonet","Sonora","Hermosillo","6629489978","Nogal",0],
-["Ramon Zazueta","Sonora","Cajeme","6644474535","Nogal",0],
-["Carlos Obeso Santos","Sinaloa","Salvador Alvarado","6731001132","Sorgo,Frijol",0],
-["Cosme Diaz Arredondo","Sinaloa","Salvador Alvarado","6731150025","Trigo,Garbanzo",0],
-["Gilberto Camacho Angulo","Sinaloa","Salvador Alvarado","6737383969","Maíz,Frijol",0],
-["Jose Sanchez Felix","Sinaloa","Salvador Alvarado","6731071054","Frijol",0],
-["Miguel Sotelo Burgos","Sinaloa","Angostura","6977299975","Maíz,Sorgo,Frijol",0],
-["Florentino Angulo Chon","Sinaloa","Guasave","6871291637","Frijol",0],
-["Rodolfo Perez Rodriguez","Sinaloa","Guasave","6731006222","Sorgo,Garbanzo",0],
-["Ruben Lopez Lopez","Sinaloa","Salvador Alvarado","6731007799","Maíz,Chile,Sandía",0],
-["Senen Sanchez Hernandez","Sinaloa","Angostura","6677518298","Maíz,Garbanzo,Frijol",0],
-["Isidro Morales Lozano","Sinaloa","Angostura","6971047808","Garbanzo,Frijol",0],
-["Juan Antonio Arce Gutierrez","Sinaloa","Guasave","6977294173","Sorgo,Garbanzo",0],
-["Bernardo Lopez Sanchez","Sinaloa","Guasave","6871500648","Trigo,Frijol",0],
-["Juan Daniel Chavez Buitron","Sinaloa","Angostura","6731040983","Maíz,Trigo",0],
-["Jaime Castro Inzunza","Sinaloa","Angostura","6971071554","Maíz,Sorgo,Frijol",0],
-["Gildardo Gaxiola Montoya","Sinaloa","Salvador Alvarado","6731071231","Trigo,Garbanzo",0],
-["Fernando Lopez Pimentel","Sinaloa","Angostura","6738524297","Maíz,Cebolla,Garbanzo,Frijol",0],
-["Eduardo Valenzuela Gamez","Sinaloa","Salvador Alvarado","6731013343","Maíz,Sorgo,Garbanzo,Frijol",0],
-["Jesus Camacho Espinoza","Sinaloa","Guasave","6871107010","Sorgo",0],
-["Jose Leobardo Sanchez Sanchez","Sinaloa","Guasave","6731140869","Maíz,Trigo,Garbanzo",0],
-["Daniel Soto","Sinaloa","Ahome","6871409596","Sorgo",0],
-["Jose Jorge Sierra","Sinaloa","Ahome","6871200681","Maíz,Sorgo,Frijol",0],
-["Nestor Barraza Felix","Sinaloa","Angostura","6971044781","Maíz,Garbanzo",0],
-["Hector Cañedo Ruiz","Sinaloa","Ahome","6681641968","Tomate",0],
-["German Plavovich","Sinaloa","Ahome","6621120622","Trigo,Garbanzo",0],
-["Heriberto Barron Camacho","Sinaloa","Escuinapa","7641039829","Mango",0],
-["Saul Barraza Torres","Sinaloa","Angostura","6731190869","Maíz,Trigo,Sorgo,Garbanzo",0],
-["Inocente Sandoval Alcaraz","Sinaloa","Ahome","6688290759","Maíz,Frijol,Calabaza",0],
-["Ernesto Cervantes Gastelum","Sinaloa","Mocorito","6731140142","Sorgo,Tomate,Cacahuate",0],
-["Jose Bojorquez","Sinaloa","Guasave","6877211282","Maíz,Trigo,Sorgo,Frijol",0],
-["Mario Sanchez Castro","Sinaloa","Guasave","6871600467","Maíz,Garbanzo,Frijol",0],
-["Rodolfo Ramirez Rojas","Sinaloa","Rosario","6691146042","Mango",0],
-["Jose Carlos Gastelum","Sinaloa","Mazatlán","6691656175","Mango",0],
-["David Sanchez Velarde","Sinaloa","Mazatlán","6691396864","Maíz,Mango",0],
-["Jorge Aponte","Sinaloa","Rosario","6949510144","Mango",0],
-["Martin Castro Melendrez","Sinaloa","Rosario","6691550520","Mango",0],
-["Cesar Oscar Martinez Alvarado","Sinaloa","Escuinapa","6949510239","Mango",0],
-["Saul Luna Raya","Sinaloa","Rosario","6949510267","Mango,Chile",0],
-["Natividad Aguilar Morales","Sinaloa","Escuinapa","6951092583","Mango",0],
-["Nemesio Quezada Jimenez","Sinaloa","Rosario","6949562121","Tomate,Chile,Tomatillo",0],
-["Francisco Vargas Martinez","Coahuila","Torreón","8712777121","Tomate,Chile,Sandía",0],
-["Jaime Mancinas Lopes","Coahuila","San Pedro","8721143236","Nogal,Algodón",0],
-["Jaime Roel Salinas","Tamaulipas","Río Bravo","8991604235","Sorgo",0],
-["Marcelo Palomino","Nayarit","","3531050580","Mango",0],
-["Manuel Fregoso Ramos","Nayarit","San Blas","3272310258","Mango",0],
-["Nahu Medrano Moreno","Nayarit","Tecuala","3231067350","Mango",0],
-["Ignacio Anaya M","Nayarit","Santiago Ixcuintla","3232390454","Tomate,Frijol,Chile",0],
-["Artemio Hernandez Mata","Nayarit","Compostela","3271088976","Piña",0],
-["Raymundo Perez Ramirez","Nayarit","Santiago Ixcuintla","3231229015","Mango",0],
-["Mario Chavez Becerra","Nayarit","Santiago Ixcuintla","3231171613","Mango",0],
-["Rolando Hernandez Gutierrez","Nayarit","Santiago Ixcuintla","3232376258","Mango",0],
-["Ignacio Huerta Acosta","Nayarit","Santiago Ixcuintla","3232351656","Mango",0],
-["Javier Mercado","Nayarit","Santiago Ixcuintla","3231089636","Mango",0],
-["Silvia Acosta Guerrero","Nayarit","Santiago Ixcuintla","3231269490","Mango",0],
-["Felix Corrales","Nayarit","Tepic","3111418140","Aguacate",0],
-["Cristian Ramirez G.","Nayarit","Tepic","3111661113","Aguacate",0],
-["Bernardo Parra","Nayarit","Tepic","3111544756","Aguacate,Limón",0],
-["Federico Parra","Nayarit","Tepic","3118477393","Aguacate",0],
-["Salvador Popoca","Nayarit","Tepic","6671900508","Maíz,Aguacate",0],
-["Pedro Olmedo","Jalisco","Jocotepec","3311106763","Maíz,Berries",0],
-["Isaac Rodriguez Esparza","Jalisco","Jocotepec","3311747624","Berries",0],
-["Paolo Ponce Cardenas","Jalisco","Autlán de Navarro","3314737373","Berries",0],
-["Jorge Torres Zamudio","Jalisco","Tuxpan","3411009906","Berries",0],
-["Marta Gabriela Campos","Jalisco","Tuxpan","3411116733","Aguacate",0],
-["Antonio Caro Mejia","Jalisco","Zapotlán el Grande","3411247562","Aguacate",0],
-["Luis Gabriel Rodriguez Torres","Jalisco","Cocula","3751186140","Maíz,Limón,Caña",0],
-["Andres Rivas Ahumada","Jalisco","Etzatlán","3314793485","Maíz,Trigo,Caña",0],
-["Jesus Arturo Villanueva Curiel","Jalisco","Guadalajara","3331567737","Aguacate",0],
-["Ruben Gastelum Gallardo","Jalisco","Guadalajara","36305244","Maíz,Garbanzo,Frijol",0],
-["Noel Gutierrez Barrera","Jalisco","Zapotlán el Grande","3411116139","Berries",0],
-["Carlos Vargas Rutter","Jalisco","Tomatlán","3314791912","Garbanzo,Chía,Ajonjolí,Cártamo",0],
-["Manuel Zuno Zuñiga","Jalisco","Ocotlán","3318100175","Maíz,Sorgo",0],
-["Martin Ochoa Sanchez","Jalisco","Tequila","3741007617","Maíz,Sorgo",0],
-["Raul Castro Quirarte","Jalisco","Ameca","3751001099","Maíz,Caña",0],
-["Rodolfo Villaruel Zuñiga","Jalisco","Tototlán","3331017904","Maíz,Trigo",0],
-["Omar Gomez Andrade","Jalisco","La Barca","3931006170","Maíz,Trigo,Sorgo",0],
-["Moises Ramos Lazcon","Jalisco","La Barca","3931048579","Maíz,Trigo,Sorgo",0],
-["Jesus Ochoa Ruiz","Jalisco","La Barca","3931082834","Maíz,Trigo",0],
-["Daniel Godinez Partida","Jalisco","Jamay","3921062123","Maíz,Sorgo,Cártamo",0],
-["Emilio Flores Ramirez","Jalisco","Jamay","3921107006","Maíz,Trigo,Cártamo",0],
-["Enrique Cervantes Jimenez","Jalisco","Jamay","3921006797","Maíz,Sorgo,Chía",0],
-["Juan Carlos Santos Rico","Jalisco","San Martín Hidalgo","3857552062","Maíz",0],
-["Ricardo Solorzano Buenrostro","Jalisco","Cocula","3314778511","Maíz",0],
-["Jair Rodrigo Gomez Maya","Jalisco","Guadalajara","3313486445","Aguacate,Ornamentales",0],
-["Laura de la Torre","Jalisco","Guadalajara","3331495335","Zarzamora",0],
-["Macario Valdez","Sonora","Cajeme","6441211144","Maíz",0],
-["Noe Preciado","Sonora","Cajeme","6441436946","Maíz",0],
-["Ramiro Almada","Sonora","","6441030523","Garbanzo",0],
-["Jose Alfonso Ramos Ochoa","Sonora","","6441809980","Nogal",0],
-["Alfredo Tapia","Sonora","","6449989818","Nogal",0],
-["Gerardo Ramos","Sonora","","6444151565","Nogal",0],
-["Francisco Zubia Amaya","Sonora","","6444202365","Maíz,Nogal,Soya",0],
-["David Esquer Olivarria","Sonora","Hermosillo","6622181173","Nogal",0],
-["David Arvallo","Sonora","Hermosillo","6622799758","Nogal",0],
-["Carlos Arturo Garcia Toyos","Sonora","Cajeme","6444472710","Nogal",0],
-["FRBM Agroindustrias","Sonora","Navojoa","6421233327","Tomate",0],
-["Reginaldo Torres Rabago","Sonora","","6444515804","Nogal",0],
-["Rosario Leon Armenta","Sonora","Navojoa","6421091217","Trigo",0],
-["Jazmin Olivia Archuleta","Sonora","Hermosillo","6621465220","Tomate",0],
-["Gerardo Esquer","Sonora","Cajeme","6444472222","Chile",0],
-["Roberto Sanora Ceballos","Baja California","Mexicali","6861681079","Maíz,Trigo",0],
-["Jesus Villa Correa","Baja California","Mexicali","6861575375","Trigo,Algodón",0],
-["Porfirio Trejo Perez","Zacatecas","Zacatecas","4929310207","Hortalizas",0],
-["Dionicio Palmeros Morales","Veracruz","Xalapa","2281606065","Mango",0],
-["Omar Dominguez","Veracruz","","2798311322","Mango",0],
-["Ramiro Sanchez Uranga","Veracruz","","2961090500","Limón,Piña",0],
-["Cornelio Peters Fehr","Chihuahua","Cuauhtémoc","6251307294","Maíz",0],
-["Franz Neufeld","Chihuahua","Cuauhtémoc","6251024710","Maíz",0],
-["Manuel Jesus Erives Aragon","Chihuahua","Namiquipa","6591012211","Maíz,Manzano",0],
-["Jesus Albarran Diaz","México","Villa Guerrero","7222819689","Tomate,Cebolla,Chile",0],
-["Carlos Andres Ortiz Alba","México","Tenancingo","7224711879","Aguacate",0],
-["Felipe Giron Valdez","México","Toluca","7226029641","Aguacate,Mango,Frijol",0],
-["Gerardo Noriega Altamirano","México","Texcoco","5540157540","Maíz",0],
-["Humberto Maceda Cordero","Morelos","Cuautla","7351401760","Maíz,Tomate,Cebolla,Arroz",0],
-["Felipe Arturo Ocampo Ibarra","Morelos","Yautepec","7353587768","Aguacate",0],
-["Jose Luciano Morales Garcia","Michoacán","Uruapan","4525256887","Aguacate",0],
-["Sinuhe Alvarez Chavez","Michoacán","Uruapan","4525251171","Aguacate",0],
-["Oscar Adolfo Castro Banderas","Michoacán","Uruapan","4521056472","Aguacate,Mango",0],
-["Salvador Duran Castro","Michoacán","Tingambato","4522033962","Aguacate",0],
-["Fidel Quintana Lemus","Michoacán","Ario","4251125480","Aguacate",0],
-["Jesus Alonso Correa Acosta","Michoacán","Charo","4432612004","Aguacate",0],
-["Juan Carlos Aguilar Gonzalez","Michoacán","Tacámbaro","4591048135","Aguacate",0],
-["Jacinto Avila Villa","Michoacán","Tacámbaro","4591120561","Aguacate",0],
-["Diego Leal","Michoacán","Tacámbaro","4434525481","Aguacate",0],
-["Jose C. Castro Saavedra","Michoacán","Pátzcuaro","4341034673","Aguacate",0],
-["Brisio Bermudez","Michoacán","Salvador Escalante","4341207014","Aguacate",0],
-["Abel Chavez Rodriguez","Michoacán","Uruapan","8112493642","Aguacate",0],
-["Alberto Diaz Contreras","Michoacán","Uruapan","4521155731","Aguacate",0],
-["Juan Carlos Ayala","Michoacán","Uruapan","4521056538","Aguacate",0],
-["Brayan Mondragon Sanchez","Michoacán","Uruapan","4524324592","Aguacate",0],
-["Humberto Sorzano Mendoza","Michoacán","Uruapan","4521143766","Aguacate",0],
-["Miguel Angel Alejandre Merino","Michoacán","Ario","4432731835","Aguacate",0],
-["Jorge Eduardo Almanza Reyes","Michoacán","Ario","4521645079","Maíz,Aguacate",0],
-["Mauricio Alvarez","Michoacán","Uruapan","4521495118","Aguacate",0],
-["Jose Ignacio Lopez Lopez","Jalisco","Arandas","3323531627","Aguacate",0],
-["Bernardo Ballesteros","Puebla","Teziutlán","2311139557","Naranjo,Berries",0],
-["Vicente Cruz Torres","Puebla","Atlixco","2441032150","Ornamentales",0],
-["Natividad Moreno Gutierrez","Colima","Manzanillo","3141208162","Mango",0],
-["Armando Chavez Acevedo","Colima","Tecomán","3133290995","Limón,Papaya",0],
-["Maximiliano Infante Pantoja","Colima","Tecomán","3131114924","Mango",0],
-["Juan Flores Mendoza","Colima","Tecomán","3131484018","Mango",0],
-["Francisco Cervantes Mejia","Colima","Tecomán","3133291710","Mango",0],
-["Jose Gil Raya Linares","Guanajuato","Cuérámaro","4296335043","Maíz,Trigo,Sorgo,Cebada",0],
-["Rogelio Vega Ponce","Michoacán","José Sixto Verduzco","4386980168","Maíz",0],
-["Jose Sergio Lemus Zaragoza","Michoacán","Zamora","4381033698","Maíz,Sorgo,Cebolla,Hortalizas",0],
-["Julio Antonio Martinez Suarez","Michoacán","Yurécuaro","3561014811","Maíz,Alfalfa",0],
-["Ivan Rivas Tamez","Michoacán","Uruapan","4521272169","Agroquímica,Aguacate",3]
-];
+// Municipios
+const MUNICIPIOS={Sinaloa:["Ahome","Angostura","Badiraguato","Concordia","Cosalá","Culiacán","Choix","El Fuerte","Elota","Escuinapa","Guasave","Mazatlán","Mocorito","Rosario","Salvador Alvarado","San Ignacio","Sinaloa","Navolato","Otro/Región"],Jalisco:["Acatic","Ahualulco de Mercado","Ameca","Arandas","Atotonilco el Alto","Autlán de Navarro","Ayotlán","Chapala","Cihuatlán","Cocula","Cuquío","El Arenal","Etzatlán","Guadalajara","Ixtlahuacán de los Membrillos","Ixtlahuacán del Río","Jamay","Jocotepec","La Barca","Magdalena","Mascota","Mazamitla","Ocotlán","Poncitlán","Puerto Vallarta","San Juan de los Lagos","San Marcos","Sayula","Tequila","Tepatitlán de Morelos","Tlajomulco de Zúñiga","Tonalá","Tototlán","Tuxpan","Zapopan","Zapotiltic","Zapotlán el Grande","Zapotlanejo","Otro/Región"],Michoacán:["Apatzingán","Ario","Briseñas","Charo","Cotija","Huaniqueo","Jiquilpan","Los Reyes","Morelia","Nuevo Parangaricutiro","Pátzcuaro","Penjamillo","Peribán","Purúandiro","Sahuayo","Salvador Escalante","Tacámbaro","Tancítaro","Tanhuato","Tingambato","Uruapan","Yurécuaro","Zamora","Ziracuaretiro","Zitácuaro","Otro/Región"],Sonora:["Cajeme","Guaymas","Hermosillo","Huatabampo","Navojoa","Nogales","San Luis Río Colorado","Obregón","Otro/Región"],Nayarit:["Amatlán de Cañas","Compostela","Ixtlán del Río","Rosamorada","San Blas","San Pedro Lagunillas","Santiago Ixcuintla","Tecuala","Tepic","Tuxpan","Otro/Región"],Colima:["Armería","Colima","Manzanillo","Tecomán","Villa de Álvarez","Otro/Región"],Chihuahua:["Ascensión","Buenaventura","Casas Grandes","Chihuahua","Cuauhtémoc","Delicias","Guachochi","Meoqui","Namiquipa","Ojinaga","Otro/Región"],Coahuila:["Monclova","Ramos Arizpe","Saltillo","San Pedro","Torreón","Otro/Región"],Tamaulipas:["Altamira","Ciudad Victoria","Matamoros","Río Bravo","Tampico","Otro/Región"],Guerrero:["Acapulco","Atoyac de Álvarez","Benito Juárez","Chilpancingo","Técpan de Galeana","Otro/Región"],Oaxaca:["Chahuites","Oaxaca","San Pedro Tapanatepec","Santo Domingo Zanatepec","Tuxtepec","Otro/Región"],Veracruz:["Córdoba","Jalapa","Orizaba","Tuxpan","Veracruz","Xalapa","Otro/Región"],Guanajuato:["Celaya","Cuérámaro","Dolores Hidalgo","León","Pénjamo","Salamanca","Otro/Región"],México:["Atlacomulco","Tenancingo","Texcoco","Toluca","Villa Guerrero","Otro/Región"],"Nuevo León":["Cadereyta","Montemorelos","Monterrey","San Pedro Garza García","Otro/Región"],Querétaro:["El Marqués","Querétaro","San Juan del Río","Otro/Región"],Zacatecas:["Fresnillo","Sombrerete","Zacatecas","Otro/Región"],Durango:["Durango","Gómez Palacio","Lerdo","Otro/Región"],Puebla:["Atlixco","Puebla","Tehuacán","Teziutlán","Otro/Región"],Chiapas:["Comitán de Domínguez","San Cristóbal de las Casas","Tapachula","Tuxtla Gutiérrez","Otro/Región"],"San Luis Potosí":["Ciudad Valles","Guadalcázar","Matehuala","Moctezuma","San Luis Potosí","Otro/Región"],Yucatán:["Mérida","Tekax","Valladolid","Otro/Región"],Morelos:["Cuautla","Cuernavaca","Yautepec","Otro/Región"],Aguascalientes:["Aguascalientes","Calvillo","Rincón de Romos","Otro/Región"],Campeche:["Campeche","Carmen","Champotón","Tenabo","Otro/Región"],"Baja California":["Ensenada","Mexicali","San Quintín","Tijuana","Otro/Región"],Hidalgo:["Pachuca","Tulancingo","Otro/Región"],"Sureste - Odiseo Amezcua":["Oaxaca","Guerrero","Chiapas","Otra región"]};
 
-// ════════════════════════════════
-// BUILD CLIENTS
-// ════════════════════════════════
+// Client data (B2B + B2C combined)
+const D2=[["Adolfo Chavez Verduzco","Agrochaver SPR","Jalisco","Guzmán","3414106781","Aguacate","retomado"],["Agriexport SA de CV","Agriexport","Sonora","Obregón","6444154055","Tomate","activo"],["Alan Santacruz","Agrícola DK","Sonora","Hermosillo","6621190956","Tomate","activo"],["Alejandro Villarreal","Fomento Industrial","Nuevo León","Monterrey","8182537909","Nogal","activo"],["Alfonso Medina Villanueva","Bermet SPR","Michoacán","Los Reyes","3411155571","Aguacate","activo"],["Alfredo Dante Guevara","Agrícola Freshver","Veracruz","","2717060706","Papaya","activo"],["Aljuro SPR","Aljuro SPR","Sonora","Obregón","6441505024","Chile","activo"],["Andrés Castañeda","","Jalisco","Zapopan","3326289680","Tomate,Chía","activo"],["Arturo Fernandez","Frutas Finas Tangancicuaro","Michoacán","Tangancícuaro","3515532479","Tomate","activo"],["Carlos Mendivil Ocuca","Urrea Paredes SPR","Sonora","Huatabampo","6471179506","Nogal","activo"],["Cleto García","Mariano Matamoros SPR","Jalisco","La Barca","3337202962","Maíz,Trigo","activo"],["Crescencio Sandoval","","Nayarit","","3921077128","Maíz,Frijol","activo"],["Daniel Benitez Pardo","","Nayarit","Tepic","6691272715","Mango","nuevo"],["Ernestina Cervantes","","Michoacán","Ario de Rosales","4251327846","Aguacate","activo"],["Ernesto Blackeller","Agropecuaria BC","Coahuila","Monclova","8661358070","Nogal","activo"],["Eva Acosta Lopez","","Michoacán","Tancítaro","4525044541","Aguacate","nuevo"],["Ezequiel Alvarez Ornelas","","Michoacán","Huaniqueo","4341385596","Aguacate","activo"],["Federico Parra","Bernardo Parra Fernandez","Nayarit","","3118477393","Aguacate","activo"],["Fernando Flores Gaytan","","Coahuila","Saltillo","8444198022","Maíz","activo"],["Gerardo Morales Huerta","Sertiagri","Jalisco","Sayula","3421010336","Aguacate","activo"],["Gilberto Seberino Garza Falcon","","Michoacán","Pátzcuaro","4343422481","Aguacate","activo"],["Hector Raul Ceja Juarez","","Michoacán","","3541141719","Aguacate","activo"],["Ismael Cruz Marroquin","","Nuevo León","Monterrey","8110505835","Chile","reactivado"],["Jaime Alberto Molina","El Tumin SPR","Michoacán","Uruapan","4521662262","Aguacate","retomado"],["Joaquin Lopez","","Nayarit","Ixtlán del Río","3241001397","Maíz","activo"],["Jonathan Michel Uribe","Inmobiliaria Casa Golf","Jalisco","Guadalajara","3165250001","Golf","activo"],["Jose de Jesus Hernandez","Coop. San Juan Viscarra","Jalisco","Tonalá","3312432508","Hortalizas","activo"],["Lenin Briones","","Colima","Tecomán","2229239352","Mango","activo"],["Lizbeth Fontanilla","Alta Tecnología Agrotécnica","Jalisco","","3313054014","Berries","activo"],["Miguel Zarco","Productores Hortalizas","Puebla","Puebla","9631145205","Aguacate","activo"],["Nahum Tress Marini","Tress Marini SPR","Campeche","Tenabo","9341042937","Mango","activo"],["Nelson Marin Lara","Rosa Iselda Montero","Veracruz","","2297787043","Limón","activo"],["Norberto Torres Taboada","La Pequeña Maria SPR","Coahuila","Torreón","8722959168","Nogal,Algodón","activo"],["Osvaldo Emmanuel Becerra","","Jalisco","Poncitlán","3312506307","Tomate","activo"],["Patricia Nevarez","Agro BR SPR","Chihuahua","Casas Grandes","6366950230","Manzano","activo"],["Pedro Alfonso Valenzuela","","Sonora","Obregón","6441394808","Nogal","activo"],["Pedro Medina Villanueva","","Michoacán","Los Reyes","3411155571","Aguacate","activo"],["Ricardo Naranjo","José Naranjo Nuñez","Michoacán","Ario de Rosales","3173883559","Aguacate","activo"],["Rodrigo Corral Hernandez","Alejandra Chavira Lopez","Chihuahua","Delicias","6391190734","Nogal","activo"],["Ruben Perez","Fco. Nuñez Vargas","Michoacán","Jiquilpan","3535633557","Aguacate","activo"],["Victor Barragan","Avocados San Miguel","Michoacán","Uruapan","4525255806","Aguacate","activo"]];
+const D1=[["Jose Angel de la Cruz","Jalisco","Guadalajara","3424210202","Fertilizantes",2],["Luis Carrillo Castañeda","Sinaloa","Culiacán","6671525864","Tomate,Chile",0],["Luis Gallardo Trejo","Sinaloa","Culiacán","6671510716","Tomate,Pepino,Chile",0],["Fernando Avendaño","Sinaloa","Culiacán","6677592600","Maíz",0],["Giovanni Cota","Sinaloa","Navolato","6672231645","Maíz",0],["Javier Madrid","Sinaloa","Culiacán","6672532824","Maíz,Garbanzo",0],["Jorge Elenes Rochin","Sinaloa","Badiraguato","6971026192","Tomate",0],["Jose Luis Espinal","Sinaloa","Culiacán","6671850919","Tomate,Pepino,Chile",0],["Jose Arena Martinez","Guanajuato","Dolores Hidalgo","6672150203","Tomate,Cebolla,Chile",0],["Enrique Higuera","Sinaloa","Navolato","6671750490","Chile",0],["Rodolfo Palazuelos","Sinaloa","Navolato","6677517671","Maíz,Frijol",0],["Nardo Ahumada","Sinaloa","Guasave","6871103185","Maíz",0],["Ernesto Ochoa Valdez","Sinaloa","Guasave","6688610705","Mango",0],["Ricardo Cuen","Sinaloa","Navolato","6672334202","Maíz,Frijol",0],["David Castro Monjaraz","Sinaloa","Culiacán","6679969808","Chile",0],["Ruben De la Garza","Sinaloa","Culiacán","6671370770","Maíz,Garbanzo,Frijol",0],["Alfredo Torres","Sinaloa","Culiacán","6671339803","Tomate",0],["Ivan Renato Almeida","Sinaloa","Ahome","6681737362","Trigo,Garbanzo",0],["Hugo Mexia Valle","Sinaloa","Guasave","6681160001","Maíz,Sorgo",0],["Ricardo Saracho","Sinaloa","Guasave","6688201651","Sorgo",0],["Ivan de Jesus Vallejo Garcia","Sinaloa","Guasave","6871250559","Maíz,Garbanzo",0],["Juan Luis Acosta Soto","Sinaloa","Guasave","6878578029","Maíz,Sorgo,Frijol,Chile",0],["Humberto Rodrigo Valenzuela","Sinaloa","Ahome","6681688474","Maíz,Sorgo",0],["Froylan Luque Leyva","Sinaloa","Ahome","6681162679","Maíz,Sorgo,Frijol",0],["Gustavo Rendon Redon","Sinaloa","Ahome","6681010370","Maíz",0],["Senon Alvarez Carrasco","Sinaloa","Ahome","6681160846","Maíz,Tomatillo",0],["Alonso Elenes","Sinaloa","Culiacán","6677273299","Maíz,Tomate,Garbanzo,Frijol",0],["Jaime Inzunza Inzunza","Sinaloa","Salvador Alvarado","6731068983","Garbanzo,Cártamo",0],["David Cebreros Gallardo","Sinaloa","Mocorito","6731160915","Cacahuate",0],["Benjamin Lopez Gaxiola","Sinaloa","Salvador Alvarado","6731015840","Sorgo,Garbanzo",0],["Jesus Rosales Estrada","Sinaloa","Sinaloa","6871079319","Maíz,Sorgo,Garbanzo,Frijol",0],["José de Jesús Sánchez López","Sinaloa","Salvador Alvarado","6738524108","Socio Comercial",1],["Jose Abel Garcia Gastelum","Sinaloa","Elota","6969611278","Socio Comercial",1],["Ismael Figueroa Tovar","Michoacán","Uruapan","4521027448","Socio Comercial",1],["Hector Raul Guerrero Quiroz","Sinaloa","Ahome","6681240363","Socio Comercial",1],["Carlos Batiz Murillo","Sinaloa","Culiacán","6862690614","Socio Comercial",1],["Miguel Morales Beltran","Tamaulipas","Río Bravo","8999367224","Socio Comercial",1],["Odiseo Amezcua Castillo","Sureste - Odiseo Amezcua","Oaxaca","7551140088","Socio Comercial",1],["Luis Mendoza Magaña","Michoacán","Uruapan","4525294023","Aguacate",0],["Benjamin Gutierrez Gallo","Nayarit","Tepic","3111108644","Mango",0],["Jose Rodriguez Zamonsett","Coahuila","San Pedro","8721058917","Nogal,Algodón",0],["Martin Baltazar Ibarra","Sonora","Huatabampo","6471080770","Maíz,Trigo,Frijol,Cártamo",0],["Alejandro Barrera Velazquez","Coahuila","","8712196299","Nogal",0],["Jose Arturo Muñoz Eguiarte","Chihuahua","Delicias","6391069239","Nogal",0],["Jorge Giottonini","Sonora","Hermosillo","6622141427","Nogal",0],["Jorge Crespo Duran","Sinaloa","Rosario","6949562100","Mango",0],["Francisco Javier Baldenegro","Sonora","Hermosillo","6621420988","Nogal",0],["Herman Giottonini Matus","Sonora","Hermosillo","6621876161","Nogal",0],["Blanca Rivera Arvizu","Sonora","Hermosillo","6621050800","Nogal",0],["David Montoya","San Luis Potosí","Moctezuma","4861048277","Tomate,Chile",0],["Jose Gil Raya Linares","Guanajuato","Cuérámaro","4296335043","Maíz,Trigo,Sorgo,Cebada",0],["Jukselin Nuñez Barrera","Guerrero","Técpan de Galeana","7421116262","Mango",0],["Isaac Mejia Benavides","Guerrero","Benito Juárez","7811101711","Mango",0],["Gerardo Garcia Magno","Guerrero","Atoyac de Álvarez","7421022735","Mango",0],["Oscar de los Santos Diaz","Oaxaca","San Pedro Tapanatepec","9611769566","Mango",0],["Eduardo Castillejos Allard","Oaxaca","Chahuites","9942638848","Mango",0],["Aurelio Velazco Moreno","Chiapas","Comitán de Domínguez","9631441759","Maíz",0],["Francisco Chong Chong","Chiapas","Tapachula","9621840556","Tomate,Chile",0],["Mauricio Andrade","Durango","Durango","6181051608","Chile",0],["Miguel Angel Elizondo","Durango","Durango","6181588059","Nogal",0],["Alejandro Baeza Salcedo","Jalisco","Acatic","3781096617","Maíz,Chía",0],["Juan Manuel González Sainz","Jalisco","Arandas","3481022683","Agave,Maíz,Tomate",0],["Ernesto Moreno Ruiz","Jalisco","Tuxpan","3411228155","Aguacate",0],["Luis Alfonso Medina Torres","Jalisco","Zapotlán el Grande","3541013273","Aguacate,Berries",0],["Tomas Avalos Rios","Jalisco","Zapotlán el Grande","3411300229","Maíz,Aguacate",0],["Eduardo Capiz Molina","Michoacán","Tacámbaro","4591001002","Aguacate",0],["Salvador Arteaga Chavez","Michoacán","Los Reyes","3545410774","Aguacate",0],["Juan Reyes Sanchez","Michoacán","Zitácuaro","7151315631","Aguacate",0],["Luis Mendoza Magaña","Michoacán","Uruapan","4525294023","Aguacate",0],["Humberto Cervantes Ramirez","Michoacán","Ario","4521056425","Aguacate",0],["Jesus Ramos Chavez","Michoacán","Peribán","3541074269","Aguacate",0],["Ignacio Maldonado Manzo","Michoacán","Cotija","3541050613","Aguacate",0],["Valentin Valencia Gonzalez","Michoacán","Los Reyes","3545420555","Maíz,Aguacate",0],["Juan Antonio Echeverria Toral","Michoacán","Uruapan","4521354703","Aguacate",0],["Saul Barraza Torres","Sinaloa","Angostura","6731190869","Maíz,Trigo,Sorgo,Garbanzo",0],["Inocente Sandoval Alcaraz","Sinaloa","Ahome","6688290759","Maíz,Frijol,Calabaza",0],["Jose Bojorquez","Sinaloa","Guasave","6877211282","Maíz,Trigo,Sorgo,Frijol",0],["Rodolfo Ramirez Rojas","Sinaloa","Rosario","6691146042","Mango",0],["Jose Carlos Gastelum","Sinaloa","Mazatlán","6691656175","Mango",0],["David Sanchez Velarde","Sinaloa","Mazatlán","6691396864","Maíz,Mango",0],["Saul Luna Raya","Sinaloa","Rosario","6949510267","Mango,Chile",0],["Martin Castro Melendrez","Sinaloa","Rosario","6691550520","Mango",0],["Benjamin Gutierrez Gallo","Nayarit","Tepic","3111108644","Mango",0],["Raymundo Perez Ramirez","Nayarit","Santiago Ixcuintla","3231229015","Mango",0],["Javier Mercado","Nayarit","Santiago Ixcuintla","3231089636","Mango",0],["Felix Corrales","Nayarit","Tepic","3111418140","Aguacate",0],["Pedro Olmedo","Jalisco","Jocotepec","3311106763","Maíz,Berries",0],["Paolo Ponce Cardenas","Jalisco","Autlán de Navarro","3314737373","Berries",0],["Jorge Torres Zamudio","Jalisco","Tuxpan","3411009906","Berries",0],["Carlos Vargas Rutter","Jalisco","Tomatlán","3314791912","Garbanzo,Chía,Ajonjolí,Cártamo",0],["Manuel Zuno Zuñiga","Jalisco","Ocotlán","3318100175","Maíz,Sorgo",0],["Raul Castro Quirarte","Jalisco","Ameca","3751001099","Maíz,Caña",0],["Omar Gomez Andrade","Jalisco","La Barca","3931006170","Maíz,Trigo,Sorgo",0],["Jesus Ochoa Ruiz","Jalisco","La Barca","3931082834","Maíz,Trigo",0],["Enrique Cervantes Jimenez","Jalisco","Jamay","3921006797","Maíz,Sorgo,Chía",0],["Natividad Moreno Gutierrez","Colima","Manzanillo","3141208162","Mango",0],["Armando Chavez Acevedo","Colima","Tecomán","3133290995","Limón,Papaya",0],["Juan Flores Mendoza","Colima","Tecomán","3131484018","Mango",0],["Dionicio Palmeros Morales","Veracruz","Xalapa","2281606065","Mango",0],["Ramiro Sanchez Uranga","Veracruz","","2961090500","Limón,Piña",0],["Jesus Albarran Diaz","México","Villa Guerrero","7222819689","Tomate,Cebolla,Chile",0],["Felipe Giron Valdez","México","Toluca","7226029641","Aguacate,Mango,Frijol",0],["Humberto Maceda Cordero","Morelos","Cuautla","7351401760","Maíz,Tomate,Cebolla,Arroz",0],["Jose Luciano Morales Garcia","Michoacán","Uruapan","4525256887","Aguacate",0],["Oscar Adolfo Castro Banderas","Michoacán","Uruapan","4521056472","Aguacate,Mango",0],["Fidel Quintana Lemus","Michoacán","Ario","4251125480","Aguacate",0],["Juan Carlos Aguilar Gonzalez","Michoacán","Tacámbaro","4591048135","Aguacate",0],["Jacinto Avila Villa","Michoacán","Tacámbaro","4591120561","Aguacate",0],["Abel Chavez Rodriguez","Michoacán","Uruapan","8112493642","Aguacate",0],["Juan Carlos Ayala","Michoacán","Uruapan","4521056538","Aguacate",0],["Brayan Mondragon Sanchez","Michoacán","Uruapan","4524324592","Aguacate",0],["Mauricio Alvarez","Michoacán","Uruapan","4521495118","Aguacate",0],["Jose Ignacio Lopez Lopez","Jalisco","Arandas","3323531627","Aguacate",0],["Bernardo Ballesteros","Puebla","Teziutlán","2311139557","Naranjo,Berries",0],["Hugo Abraham Luna Ramirez","Jalisco","Puerto Vallarta","3221811953","Mango,Chile,Papaya,Piña",0],["Cornelio Peters Fehr","Chihuahua","Cuauhtémoc","6251307294","Maíz",0],["Rosario Leon Armenta","Sonora","Navojoa","6421091217","Trigo",0],["Gerardo Barnetche","Sonora","Cajeme","6444624553","Nogal",0],["Eduardo Baeza Gomez","Chihuahua","Meoqui","6141843930","Nogal",0],["Angel Bours Griffith","Sonora","Hermosillo","6623017149","Nogal",0],["Victor Soto","Colima","Tecomán","3133254365","Papaya",0],["Jorge Muñoz Renteria","Zacatecas","Zacatecas","4921531533","Tomate,Pepino,Ajo",0]];
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let user=null, page=1, filtered=[], CY='total';
+const PP=20;
+const charts={};
+const COLS=['#22c55e','#3b82f6','#f59e0b','#8b5cf6','#14b8a6','#f97316','#ef4444','#ec4899','#a855f7','#06b6d4'];
+
+function ls(k,v){if(v===undefined)try{return localStorage.getItem(k)}catch{return null};try{localStorage.setItem(k,v)}catch{}}
+function getStage(c){return ls('as_st_'+c.id)||c.etapa_base;}
+function setStage(id,s){ls('as_st_'+id,s);}
+function getNotes(id){try{return JSON.parse(ls('as_nt_'+id)||'[]')}catch{return[]}}
+function saveNotes(id,n){ls('as_nt_'+id,JSON.stringify(n))}
+function getExtra(id){try{return JSON.parse(ls('as_ex_'+id)||'{}')}catch{return{}}}
+function saveExtra(id,e){ls('as_ex_'+id,JSON.stringify(e))}
+function getInv(){try{return JSON.parse(ls('austar_inv')||'{"almacen":0,"distribucion":0,"mov":[]}')}catch{return{almacen:0,distribucion:0,mov:[]}}}
+function saveInv(d){ls('austar_inv',JSON.stringify(d))}
+function getBadges(id){try{return JSON.parse(ls('as_bg_'+id)||'[]')}catch{return[]}}
+function toggleBadge(id,key){let b=getBadges(id);if(b.includes(key))b=b.filter(k=>k!==key);else b.push(key);ls('as_bg_'+id,JSON.stringify(b));openDet(id);}
+function fmt(n){return Math.round(n).toLocaleString('es-MX')}
+function fmtM(n){return'$'+(n/1000000).toFixed(1)+'M'}
+
+// Build clients
 function buildClients(){
   const all=[];
   const sm={activo:'compro',nuevo:'prospecto',retomado:'contactado',reactivado:'contactado'};
   D2.forEach((r,i)=>all.push({id:'b'+i,nombre:r[0],razon:r[1],estado:r[2],municipio:r[3],tel:r[4],cultivos:r[5]?r[5].split(',').map(s=>s.trim()).filter(Boolean):[],tipo:'agricultor',etapa_base:sm[r[6]]||'prospecto'}));
-  D1.forEach((r,i)=>{const t=['agricultor','socio_comercial','casa_agro','agroinfluencer'];
-    all.push({id:'c'+i,nombre:r[0],razon:null,estado:r[1],municipio:r[2],tel:r[3],cultivos:r[4]?r[4].split(',').map(s=>s.trim()).filter(Boolean):[],tipo:t[r[5]||0],etapa_base:'prospecto'});
-  });
-  // Load custom clients from localStorage
-  try{const ex=JSON.parse(localStorage.getItem('austar_extra_clients')||'[]');all.push(...ex);}catch{}
+  D1.forEach((r,i)=>{const t=['agricultor','socio_comercial','casa_agro','agroinfluencer'];all.push({id:'c'+i,nombre:r[0],razon:null,estado:r[1],municipio:r[2],tel:r[3],cultivos:r[4]?r[4].split(',').map(s=>s.trim()).filter(Boolean):[],tipo:t[r[5]||0],etapa_base:'prospecto'});});
+  try{const ex=JSON.parse(ls('austar_extra_clients')||'[]');all.push(...ex);}catch{}
   return all;
 }
 let CLIENTS=buildClients();
 
-// ════════════════════════════════
-// STATE
-// ════════════════════════════════
-let user=null,page=1,filtered=[];
-const PP=20;
-
-function ls_get(k){try{return localStorage.getItem(k);}catch{return null;}}
-function ls_set(k,v){try{localStorage.setItem(k,v);}catch{}}
-function getStage(c){return ls_get('as_st_'+c.id)||c.etapa_base;}
-function setStage(id,s){ls_set('as_st_'+id,s);}
-function getNotes(id){try{return JSON.parse(ls_get('as_nt_'+id)||'[]');}catch{return[];}}
-function saveNotes(id,n){ls_set('as_nt_'+id,JSON.stringify(n));}
-function getExtra(id){try{return JSON.parse(ls_get('as_ex_'+id)||'{}');}catch{return{};}}
-function saveExtra(id,e){ls_set('as_ex_'+id,JSON.stringify(e));}
-
-function getInv(){try{return JSON.parse(ls_get('austar_inv')||'{"almacen":0,"distribucion":0,"mov":[]}');}catch{return{almacen:0,distribucion:0,mov:[]};}}
-function saveInv(d){ls_set('austar_inv',JSON.stringify(d));}
-
-// ════════════════════════════════
-// INIT FILTERS
-// ════════════════════════════════
-function initFilters(){
+// ════════════════════════════════════════
+// INIT FILTERS & SELECTS
+// ════════════════════════════════════════
+function initSelects(){
+  // Estado selector for new prospect
+  const ns=document.getElementById('n-st');
+  if(ns){Object.keys(MUNICIPIOS).forEach(e=>{const o=document.createElement('option');o.value=e;o.textContent=e;ns.appendChild(o);});}
+  // Client list filters
   const fe=document.getElementById('f-e');
-  [...new Set(CLIENTS.map(c=>c.estado).filter(Boolean))].sort().forEach(e=>{
-    const o=document.createElement('option');o.value=e;o.textContent=e;fe.appendChild(o);
-  });
+  if(fe){[...new Set(CLIENTS.map(c=>c.estado).filter(Boolean))].sort().forEach(e=>{const o=document.createElement('option');o.value=e;o.textContent=e;fe.appendChild(o);});}
   const fc=document.getElementById('f-c');
-  [...new Set(CLIENTS.flatMap(c=>c.cultivos))].sort().forEach(c=>{
-    const o=document.createElement('option');o.value=c;o.textContent=c;fc.appendChild(o);
-  });
+  if(fc){[...new Set(CLIENTS.flatMap(c=>c.cultivos))].sort().forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;fc.appendChild(o);});}
 }
 
-// ════════════════════════════════
-// LOGIN / LOGOUT
-// ════════════════════════════════
+function loadMunicipios(){
+  const st=document.getElementById('n-st');
+  const mn=document.getElementById('n-mn');
+  if(!st||!mn)return;
+  const estado=st.value;
+  const opts=MUNICIPIOS[estado]||[];
+  mn.innerHTML='<option value="">Seleccionar municipio...</option>'+opts.map(m=>`<option value="${m}">${m}</option>`).join('');
+  mn.disabled=!estado;
+}
+
+// ════════════════════════════════════════
+// LOGIN / NAV
+// ════════════════════════════════════════
 function login(u){
   user=u;
-  document.getElementById('sc-login').classList.remove('on');
-  document.getElementById('app-shell').style.display='flex';
+  document.getElementById('sc-login').style.display='none';
+  document.getElementById('app').style.display='flex';
   const av=document.getElementById('user-av');
   if(u==='yaneth'){av.style.background='#14532d';av.style.color='#86efac';av.textContent='YA';}
   else{av.style.background='#1e3a5f';av.style.color='#93c5fd';av.textContent='VA';}
   document.getElementById('user-name').textContent=u==='yaneth'?'Yaneth':'Vale';
+  initSelects();
   gotoTab('dashboard');
 }
-function logout(){
-  document.getElementById('app-shell').style.display='none';
-  document.getElementById('sc-login').classList.add('on');
-  user=null;
-}
+function logout(){document.getElementById('app').style.display='none';document.getElementById('sc-login').style.display='flex';user=null;}
 
-// ════════════════════════════════
-// NAVIGATION
-// ════════════════════════════════
-const ALL_TABS=['dashboard','clientes','detalle','inventario','nuevo'];
+const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo'];
 function gotoTab(t){
   ALL_TABS.forEach(x=>{
     const el=document.getElementById('tab-'+x);if(el)el.classList.remove('on');
@@ -721,92 +499,129 @@ function gotoTab(t){
   const el=document.getElementById('tab-'+t);if(el)el.classList.add('on');
   const n=document.getElementById('nav-'+t);if(n)n.classList.add('act');
   if(t==='dashboard')renderDashboard();
-  if(t==='clientes'){applyFilter();}
-  if(t==='inventario'){renderInv();document.getElementById('inv-fecha').value=new Date().toISOString().slice(0,10);}
+  if(t==='historico')renderHistorico('total');
+  if(t==='clientes'){renderCliMetrics();applyFilter();}
+  if(t==='inventario'){renderInv();setTimeout(()=>{const d=document.getElementById('inv-fecha');if(d)d.value=new Date().toISOString().slice(0,10);},50);}
 }
 
-// ════════════════════════════════
-// DASHBOARD
-// ════════════════════════════════
-let charts={};
-function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+// ════════════════════════════════════════
+// CHART HELPER
+// ════════════════════════════════════════
+function mkChart(id,type,labels,datasets,opts={}){
+  if(charts[id])charts[id].destroy();
+  const cfg={type,data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:opts.legend||{display:false}},layout:{padding:4}}};
+  if(type==='bar'||type==='line'){cfg.options.scales={x:{ticks:{color:'#8b90a8',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#8b90a8',font:{size:10},callback:opts.yCb||(v=>fmt(v))},grid:{color:'rgba(100,100,120,.15)'}}}; if(opts.idx)cfg.options.indexAxis=opts.idx;}
+  charts[id]=new Chart(document.getElementById(id),cfg);
+}
 
+// ════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════
 function renderDashboard(){
+  const total2025=BY_YEAR[6];
+  const total2024=BY_YEAR[5];
+  const pctL=Math.round((total2025.total-total2024.total)/total2024.total*100);
+  const stages=['prospecto','contactado','interesado','compro','recompra','no_compra'];
+  const sc=stages.map(s=>CLIENTS.filter(c=>getStage(c)===s).length);
+  const compro=sc[3]+sc[4];
+  const estados=[...new Set(CLIENTS.map(c=>c.estado).filter(Boolean))].length;
+  document.getElementById('dash-metrics').innerHTML=
+    `<div class="met gl"><div class="mv" style="color:var(--green)">${fmt(total2025.total)}L</div><div class="ml">Total 2025 (CDM+OA)</div><div class="md up">▲${pctL}% vs 2024</div></div>`+
+    `<div class="met bl"><div class="mv" style="color:var(--blue)">${fmt(total2025.cdm)}L</div><div class="ml">CDM directo 2025</div></div>`+
+    `<div class="met al"><div class="mv" style="color:var(--amber)">${fmt(total2025.oa)}L</div><div class="ml">Odiseo OA 2025</div></div>`+
+    `<div class="met pl"><div class="mv" style="color:var(--purple)">${CLIENTS.length}</div><div class="ml">Clientes en sistema</div></div>`+
+    `<div class="met tl"><div class="mv" style="color:var(--teal)">${compro}</div><div class="ml">Con compra registrada</div></div>`;
+  const years=BY_YEAR.map(r=>r.year);
+  mkChart('dch1','bar',years,[
+    {data:BY_YEAR.map(r=>r.cdm),backgroundColor:'#3b82f6',borderRadius:4,borderSkipped:false,label:'CDM'},
+    {data:BY_YEAR.map(r=>r.oa),backgroundColor:'#f59e0b',borderRadius:4,borderSkipped:false,label:'OA'}
+  ],{legend:{display:true,labels:{color:'#8b90a8',font:{size:10},boxWidth:10}}});
+  mkChart('dch2','bar',['Prospecto','Contactado','Interesado','Compró','Recompra','No compra'],[{data:sc,backgroundColor:['#475569','#3b82f6','#f59e0b','#22c55e','#16a34a','#ef4444'],borderRadius:5,borderSkipped:false}]);
+  mkChart('dch3','doughnut',Object.keys(CULT_2025),[{data:Object.values(CULT_2025),backgroundColor:COLS.slice(0,Object.keys(CULT_2025).length),borderWidth:0}]);
+  mkChart('dch4','bar',Object.keys(EST_2025),[{data:Object.values(EST_2025),backgroundColor:'#8b5cf6',borderRadius:4,borderSkipped:false}],{idx:'y'});
+  const inv=getInv();
+  const totVend=(inv.mov||[]).filter(m=>m.tipo==='venta').reduce((s,m)=>s+(parseFloat(m.lt)||0),0);
+  mkChart('dch5','doughnut',['Almacén','Distribución','Vendido'],[{data:[inv.almacen,inv.distribucion,totVend||0],backgroundColor:['#22c55e','#f59e0b','#3b82f6'],borderWidth:0}]);
+  document.getElementById('inv-tags').innerHTML=`<span class="tag t-gr">${fmt(inv.almacen)}L almacén</span><span class="tag t-am">${fmt(inv.distribucion)}L distribución</span><span class="tag t-bl">${fmt(totVend)}L vendidos</span>`;
+  document.getElementById('dash-top5').innerHTML=TOP_CLI.slice(0,5).map((c,i)=>`
+    <div class="row"><div><div style="font-weight:500">${i+1}. ${c.n}</div><div style="font-size:10px;color:var(--text3)">${c.e} · ${c.c}</div></div><div style="color:var(--green);font-weight:600">${fmt(c.L)}L</div></div>`).join('');
+}
+
+// ════════════════════════════════════════
+// HISTÓRICO
+// ════════════════════════════════════════
+function setYear(y){
+  CY=y;
+  document.querySelectorAll('.ytab').forEach(t=>t.classList.remove('act','act-oa'));
+  const tabs=document.querySelectorAll('.ytab');
+  if(y==='total')tabs[0].classList.add('act');
+  else if(y==='oa')tabs[tabs.length-1].classList.add('act-oa');
+  else{const idx=BY_YEAR.findIndex(r=>r.year===y)+1;if(tabs[idx])tabs[idx].classList.add('act');}
+  renderHistorico(y);
+}
+
+function renderHistorico(y){
+  // Metrics
+  let cdmL,oaL,totalL,clientes,del1;
+  if(y==='total'||y==='oa'){cdmL=BY_YEAR.reduce((s,r)=>s+r.cdm,0);oaL=BY_YEAR.reduce((s,r)=>s+r.oa,0);totalL=cdmL+oaL;clientes=454;del1=null;}
+  else{const r=BY_YEAR.find(d=>d.year===y)||{};const rp=BY_YEAR.find(d=>d.year===y-1)||{};cdmL=r.cdm||0;oaL=r.oa||0;totalL=r.total||0;clientes=CDM_CLIENTES[y]||0;del1=rp.total?Math.round((totalL-rp.total)/rp.total*100):null;}
+  const pctOA=Math.round(oaL/(totalL||1)*100);
+  const d1=del1!=null?`<div class="md ${del1>=0?'up':'dn'}">${del1>=0?'▲':'▼'}${Math.abs(del1)}% vs ant.</div>`:'';
+  document.getElementById('hist-metrics').innerHTML=
+    `<div class="met gl"><div class="mv" style="color:var(--green)">${fmt(totalL)}L</div><div class="ml">Total${y!=='total'&&y!=='oa'?' '+y:' 2019–25'}</div>${d1}</div>`+
+    `<div class="met bl"><div class="mv" style="color:var(--blue)">${fmt(cdmL)}L</div><div class="ml">CDM${y!=='total'&&y!=='oa'?' '+y:''}</div></div>`+
+    `<div class="met al"><div class="mv" style="color:var(--amber)">${fmt(oaL)}L</div><div class="ml">Odiseo OA</div></div>`+
+    `<div class="met pl"><div class="mv" style="color:var(--purple)">${pctOA}%</div><div class="ml">% participación OA</div></div>`+
+    `<div class="met tl"><div class="mv" style="color:var(--teal)">${fmt(clientes)}</div><div class="ml">Clientes únicos CDM</div></div>`;
+  // Charts
+  const years=BY_YEAR.map(r=>r.year);
+  if(y==='oa'){
+    document.getElementById('hct1').textContent='Odiseo OA — historial 2017–2025';
+    document.getElementById('hct2').textContent='Crecimiento OA año a año (%)';
+    mkChart('hch1','bar',OA_FULL.map(r=>r.year),[{data:OA_FULL.map(r=>r.litros),backgroundColor:OA_FULL.map((r,i)=>i===OA_FULL.length-1?'#f59e0b':'#854f0b'),borderRadius:5,borderSkipped:false}]);
+    const deltas=OA_FULL.map((r,i)=>i===0?0:Math.round((r.litros-OA_FULL[i-1].litros)/OA_FULL[i-1].litros*100));
+    mkChart('hch2','line',OA_FULL.map(r=>r.year),[{data:deltas,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.1)',borderWidth:2,pointBackgroundColor:deltas.map(v=>v>=0?'#22c55e':'#ef4444'),pointRadius:5,tension:.3,fill:true}],{yCb:v=>v+'%'});
+  } else {
+    document.getElementById('hct1').textContent=y==='total'?'CDM vs Odiseo — litros por año':'CDM vs OA · '+y;
+    document.getElementById('hct2').textContent='% participación OA en total';
+    mkChart('hch1','bar',years,[
+      {data:BY_YEAR.map(r=>r.cdm),backgroundColor:BY_YEAR.map(r=>y==='total'||r.year===y?'#3b82f6':'#1e3a5f'),borderRadius:4,borderSkipped:false,label:'CDM'},
+      {data:BY_YEAR.map(r=>r.oa),backgroundColor:BY_YEAR.map(r=>y==='total'||r.year===y?'#f59e0b':'#451a03'),borderRadius:4,borderSkipped:false,label:'OA'}
+    ],{legend:{display:true,labels:{color:'#8b90a8',font:{size:10},boxWidth:10}}});
+    mkChart('hch2','line',years,[{data:BY_YEAR.map(r=>r.pct_oa),borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.1)',borderWidth:2,pointBackgroundColor:'#f59e0b',pointRadius:5,tension:.3,fill:true}],{yCb:v=>v+'%'});
+  }
+  // Top clients
+  document.getElementById('hist-top').innerHTML=TOP_CLI.map((c,i)=>`
+    <div class="row"><div style="flex:1;min-width:0"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${i+1}. ${c.n}</div><div style="font-size:10px;color:var(--text3)">${c.e} · ${c.c} · ${c.pa}–${c.ua}</div></div><div style="text-align:right;flex-shrink:0;margin-left:8px"><div style="font-weight:600;color:var(--green)">${fmt(c.L)}L</div><div style="font-size:10px;color:var(--text3)">${c.p} pedidos</div></div></div>`).join('');
+  // Analysis
+  let html='';
+  if(y==='oa'){html=`<div class="insight"><div class="it">🌵 Odiseo — pieza clave</div><div class="ib">71% del volumen total CDM 2019–2025. Récord en 2025: 37,550L. Crecimiento sostenido desde 2021. Es el socio comercial más importante del ecosistema.</div></div>`;html+=`<div style="margin-top:10px">`;html+=OA_FULL.map(r=>{const p=OA_FULL.find(x=>x.year===r.year-1);const pct=p?Math.round((r.litros-p.litros)/p.litros*100):null;return`<div class="row"><span>${r.year}</span><div style="display:flex;align-items:center;gap:8px"><span style="font-weight:600">${fmt(r.litros)}L</span>${pct!=null?`<span class="tag ${pct>=0?'t-gr':'t-rd'}">${pct>=0?'+':''}${pct}%</span>`:''}</div></div>`;}).join('')+'</div>';}
+  else if(y==='total'){html=`<div class="insight"><div class="it">📈 2025: Mejor año total</div><div class="ib">49,023L totales — récord histórico. OA crece ininterrumpidamente desde 2021. CDM recupera +14%.</div></div>`;html+=`<div class="alert"><div class="at">⚠ Concentración</div><div class="ab">61 clientes compraron 2024 y no 2025. Campaña de reactivación = crecimiento inmediato.</div></div>`;html+=`<div style="margin-top:10px"><div class="ct">Top 5 clientes a reactivar</div>${PERDIDOS.map(p=>`<div class="row"><div><div style="font-weight:500">${p.n}</div><div style="font-size:10px;color:var(--text3)">${p.e} · ${p.c}</div></div><div style="color:var(--amber);font-weight:600">${fmt(p.L)}L</div></div>`).join('')}</div>`;}
+  else if(y===2023){html=`<div class="alert"><div class="at">⚠ Año quiebre CDM</div><div class="ab">Mínimo histórico CDM: 8,267L. OA compensó con 27,769L. Señal clara de que el seguimiento y la retención fallaron.</div></div>`;}
+  else if(y===2025){html=`<div class="insight"><div class="it">✓ Recuperación 2025</div><div class="ib">Total 49,023L. CDM +14% vs 2024. Nueva etapa BI activa. Vale + Yaneth operando. Insignias y seguimiento estructurado.</div></div>`;}
+  document.getElementById('hist-analysis').innerHTML=html||`<div style="font-size:12px;color:var(--text2);margin-top:8px">Selecciona un año o vista específica para ver el análisis.</div>`;
+}
+
+// ════════════════════════════════════════
+// CLIENTES
+// ════════════════════════════════════════
+function renderCliMetrics(){
   const total=CLIENTS.length;
   const compro=CLIENTS.filter(c=>['compro','recompra'].includes(getStage(c))).length;
   const pend=CLIENTS.filter(c=>['contactado','interesado'].includes(getStage(c))).length;
-  const estados=[...new Set(CLIENTS.map(c=>c.estado).filter(Boolean))].length;
-  const gfg=CLIENTS.filter(c=>getBadges(c.id).includes('gfg')).length;
-  const reto=CLIENTS.filter(c=>getBadges(c.id).includes('reto')).length;
-  const academy=CLIENTS.filter(c=>getBadges(c.id).includes('academy')).length;
-  const triple=CLIENTS.filter(c=>Object.keys(BADGES).every(k=>getBadges(c.id).includes(k))).length;
-  document.getElementById('dash-metrics').innerHTML=
-    `<div class="met"><div class="mv" style="color:var(--teal)">${total}</div><div class="ml">Total clientes</div></div>`+
-    `<div class="met"><div class="mv" style="color:var(--green)">${compro}</div><div class="ml">Compraron</div></div>`+
-    `<div class="met"><div class="mv" style="color:var(--amber)">${pend}</div><div class="ml">En seguimiento</div></div>`+
-    `<div class="met"><div class="mv" style="color:var(--purple)">${estados}</div><div class="ml">Estados cubiertos</div></div>`+
-    `<div class="met" style="border-left:3px solid #f59e0b"><div class="mv" style="color:#f59e0b">🌾 ${gfg}</div><div class="ml">Grow for Gold</div></div>`+
-    `<div class="met" style="border-left:3px solid var(--green)"><div class="mv" style="color:var(--green)">🏆 ${reto}</div><div class="ml">Reto Austar</div></div>`+
-    `<div class="met" style="border-left:3px solid var(--blue)"><div class="mv" style="color:var(--blue)">🎓 ${academy}</div><div class="ml">Austar Academy</div></div>`+
-    `<div class="met" style="border-left:3px solid #fcd34d;background:linear-gradient(135deg,#1a1410,#101a10,#101018)"><div class="mv" style="color:#fcd34d">🥇 ${triple}</div><div class="ml">Triple Corona</div></div>`;
-
-  // Pipeline chart
-  const stages=['prospecto','contactado','interesado','compro','recompra','no_compra'];
-  const stageCounts=stages.map(s=>CLIENTS.filter(c=>getStage(c)===s).length);
-  const stageLabels=['Prospecto','Contactado','Interesado','Compró','Recompra','No compra'];
-  const stageColors=['#475569','#3b82f6','#f59e0b','#22c55e','#16a34a','#ef4444'];
-  destroyChart('pipeline');
-  charts.pipeline=new Chart(document.getElementById('ch-pipeline'),{
-    type:'bar',data:{labels:stageLabels,datasets:[{data:stageCounts,backgroundColor:stageColors,borderRadius:6,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{ticks:{color:'#8b90a8',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#8b90a8',font:{size:10}},grid:{color:'#2e3350'}}}}
-  });
-
-  // Estados chart
-  const stateCounts={};CLIENTS.forEach(c=>{if(c.estado)stateCounts[c.estado]=(stateCounts[c.estado]||0)+1;});
-  const topStates=Object.entries(stateCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  destroyChart('estados');
-  charts.estados=new Chart(document.getElementById('ch-estados'),{
-    type:'bar',data:{labels:topStates.map(s=>s[0]),datasets:[{data:topStates.map(s=>s[1]),backgroundColor:'#3b82f6',borderRadius:6,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{ticks:{color:'#8b90a8',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#8b90a8',font:{size:10}},grid:{color:'#2e3350'}}}}
-  });
-
-  // Cultivos chart
-  const cultCounts={};CLIENTS.flatMap(c=>c.cultivos).forEach(cv=>{cultCounts[cv]=(cultCounts[cv]||0)+1;});
-  const topCult=Object.entries(cultCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const cultColors=['#22c55e','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#14b8a6','#f97316','#ec4899','#6366f1','#84cc16'];
-  destroyChart('cultivos');
-  charts.cultivos=new Chart(document.getElementById('ch-cultivos'),{
-    type:'bar',data:{labels:topCult.map(c=>c[0]),datasets:[{data:topCult.map(c=>c[1]),backgroundColor:cultColors,borderRadius:6,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},
-      scales:{x:{ticks:{color:'#8b90a8',font:{size:10}},grid:{color:'#2e3350'}},y:{ticks:{color:'#8b90a8',font:{size:10}},grid:{display:false}}}}
-  });
-
-  // Inventario chart
-  const inv=getInv();
-  const total_inv=inv.almacen+inv.distribucion;
-  const vendido=Math.max(0,...(inv.mov||[]).filter(m=>m.tipo==='venta').map(m=>parseFloat(m.lt)||0));
-  const totVendido=(inv.mov||[]).filter(m=>m.tipo==='venta').reduce((s,m)=>s+(parseFloat(m.lt)||0),0);
-  destroyChart('inv');
-  charts.inv=new Chart(document.getElementById('ch-inv'),{
-    type:'doughnut',
-    data:{labels:['Almacén','Distribución','Vendido (histórico)'],
-      datasets:[{data:[inv.almacen,inv.distribucion,totVendido||0],backgroundColor:['#22c55e','#f59e0b','#3b82f6'],borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b90a8',font:{size:11},padding:12}}}}
-  });
-  document.getElementById('inv-summary').innerHTML=
-    `<span class="tag t-gr">${inv.almacen.toFixed(0)}L almacén</span>`+
-    `<span class="tag t-am">${inv.distribucion.toFixed(0)}L distribución</span>`+
-    `<span class="tag t-bl">${totVendido.toFixed(0)}L vendidos</span>`;
+  const states=[...new Set(CLIENTS.map(c=>c.estado).filter(Boolean))].length;
+  document.getElementById('cli-metrics').innerHTML=
+    `<div class="met gl"><div class="mv" style="color:var(--green)">${total}</div><div class="ml">Total</div></div>`+
+    `<div class="met tl"><div class="mv" style="color:var(--teal)">${compro}</div><div class="ml">Compraron</div></div>`+
+    `<div class="met al"><div class="mv" style="color:var(--amber)">${pend}</div><div class="ml">Seguimiento</div></div>`+
+    `<div class="met pl"><div class="mv" style="color:var(--purple)">${states}</div><div class="ml">Estados</div></div>`;
 }
 
-// ════════════════════════════════
-// CLIENTS LIST
-// ════════════════════════════════
 function applyFilter(){
-  const s=document.getElementById('f-s').value.toLowerCase();
-  const fe=document.getElementById('f-e').value,fc=document.getElementById('f-c').value,ft=document.getElementById('f-t').value;
+  const s=(document.getElementById('f-s')||{}).value?.toLowerCase()||'';
+  const fe=(document.getElementById('f-e')||{}).value||'';
+  const fc=(document.getElementById('f-c')||{}).value||'';
+  const ft=(document.getElementById('f-t')||{}).value||'';
   filtered=CLIENTS.filter(c=>{
     if(fe&&c.estado!==fe)return false;
     if(fc&&!c.cultivos.includes(fc))return false;
@@ -816,20 +631,24 @@ function applyFilter(){
   });
   page=1;renderList();
 }
+
 function renderList(){
   const s=(page-1)*PP,items=filtered.slice(s,s+PP);
-  document.getElementById('rc').textContent=`${filtered.length} clientes encontrados`;
-  document.getElementById('clist').innerHTML=items.map(c=>{
+  const rcEl=document.getElementById('rc');if(rcEl)rcEl.textContent=`${filtered.length} clientes`;
+  const bg=CLIENTS.reduce((m,c)=>{m[c.id]=getBadges(c.id);return m;},{});
+  const clistEl=document.getElementById('clist');
+  if(!clistEl)return;
+  clistEl.innerHTML=items.map(c=>{
     const ep=ETAPAS[getStage(c)]||ETAPAS.prospecto;
-    const bg=getBadges(c.id);
-    const tripleCorona=Object.keys(BADGES).every(k=>bg.includes(k));
-    const badgeIcons=bg.map(k=>BADGES[k]?BADGES[k].icon:'').join('');
+    const badges=bg[c.id]||[];
+    const triple=Object.keys(BADGES).every(k=>badges.includes(k));
     const tt=c.tipo!=='agricultor'?`<span class="tag t-pu">${TIPO_LBL[c.tipo]}</span>`:'';
     const cv=c.cultivos.slice(0,3).map(x=>`<span class="tag t-gy">${x}</span>`).join('');
-    return`<div class="card card-c" onclick="openDet('${c.id}')" style="padding:10px 14px;${tripleCorona?'border-color:#f59e0b;':''}"> 
+    const bi=badges.map(k=>BADGES[k]?BADGES[k].icon:'').join('');
+    return`<div class="card card-c" onclick="openDet('${c.id}')" style="padding:10px 14px${triple?';border-color:#f59e0b':''}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
         <div style="flex:1;min-width:0">
-          <div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nombre} ${badgeIcons?`<span style="font-size:12px">${badgeIcons}${tripleCorona?"🥇":""}</span>`:""}</div>
+          <div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nombre} ${bi?`<span style="font-size:12px">${bi}${triple?'🥇':''}</span>`:''}</div>
           <div style="font-size:11px;color:var(--text2);margin-top:1px">${[c.estado,c.municipio].filter(Boolean).join(' · ')}</div>
           <div style="margin-top:4px">${tt}${cv}</div>
         </div>
@@ -840,54 +659,51 @@ function renderList(){
       </div></div>`;
   }).join('');
   const tp=Math.ceil(filtered.length/PP)||1;
-  document.getElementById('pgi').textContent=`Página ${page} de ${tp}`;
-  document.getElementById('bp').disabled=page<=1;document.getElementById('bn').disabled=page>=tp;
+  const pgiEl=document.getElementById('pgi');if(pgiEl)pgiEl.textContent=`Pág. ${page} / ${tp}`;
+  const bpEl=document.getElementById('bp');if(bpEl)bpEl.disabled=page<=1;
+  const bnEl=document.getElementById('bn');if(bnEl)bnEl.disabled=page>=tp;
 }
 function pg(d){page=Math.max(1,page+d);renderList();}
 
-// ════════════════════════════════
+// ════════════════════════════════════════
 // CLIENT DETAIL
-// ════════════════════════════════
+// ════════════════════════════════════════
 function openDet(id){
   const c=CLIENTS.find(x=>x.id===id);if(!c)return;
   document.getElementById('det-ttl').textContent=c.nombre;
   const et=getStage(c);const ep=ETAPAS[et]||ETAPAS.prospecto;
   const notes=getNotes(id);const ex=getExtra(id);
+  const badges=getBadges(id);
+  const renderBadgeBar=()=>{
+    const triple=Object.keys(BADGES).every(k=>badges.includes(k));
+    return Object.values(BADGES).map(b=>{
+      const active=badges.includes(b.key);
+      return`<button onclick="toggleBadge('${id}','${b.key}')" style="display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:24px;border:2px solid ${active?b.color:'var(--border)'};background:${active?b.bg:'var(--bg3)'};cursor:pointer;font-size:12px;font-weight:600;color:${active?b.color:'var(--text3)'};transition:all .2s;min-width:140px">
+        <span style="font-size:18px">${b.icon}</span>
+        <div><div>${b.label}</div><div style="font-size:10px;font-weight:400;opacity:.7">${active?'Activo':'Inactivo'}</div></div>
+        <span style="margin-left:auto">${active?'✓':''}</span>
+      </button>`;
+    }).join('')+
+    (triple?`<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:24px;border:2px solid #f59e0b;background:linear-gradient(135deg,#2a1800,#0a2a00,#001028);min-width:140px"><span style="font-size:18px">🥇</span><div><div style="font-size:12px;font-weight:700;color:#fcd34d">Triple Corona</div><div style="font-size:10px;color:#f59e0b">Descuento especial</div></div></div>`:
+    `<div style="font-size:11px;color:var(--text3);padding:8px">${3-Object.keys(BADGES).filter(k=>badges.includes(k)).length} insignia(s) para Triple Corona 🥇</div>`);
+  };
+  const CICLO=[{key:'compra',icon:'🛒',label:'Compra'},{key:'recepcion',icon:'📦',label:'Recepción'},{key:'aplicacion',icon:'🌱',label:'Aplicación'},{key:'seg30',icon:'📅',label:'30 días'},{key:'seg60',icon:'📅',label:'60 días'},{key:'seg90',icon:'📅',label:'90 días'},{key:'cosecha',icon:'🌾',label:'Cosecha'},{key:'roi',icon:'📊',label:'ROI'}];
+  const done=new Set(notes.map(n=>n.tipo));
+  const cycleHtml=CICLO.map(e=>`<div class="cycle-step" title="${e.label}"><div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;border:2px solid ${done.has(e.key)?'#22c55e':'var(--border)'};background:${done.has(e.key)?'rgba(34,197,94,.15)':'var(--bg3)'}">${e.icon}</div><div style="font-size:9px;color:${done.has(e.key)?'var(--text)':'var(--text3)'};text-align:center">${e.label}</div></div>`).join('<div style="width:10px;height:2px;background:var(--border);display:inline-block;vertical-align:middle;margin-bottom:16px"></div>');
+  const TMAP={compra:'🛒 Compra',recepcion:'📦 Recepción',aplicacion:'🌱 Aplicación',seg30:'📅 30 días',seg60:'📅 60 días',seg90:'📅 90 días',cosecha:'🌾 Cosecha',roi:'📊 ROI',recompra:'🔄 Recompra',nota:'📝 Nota'};
+  const TCOL={compra:'t-gr',recepcion:'t-bl',aplicacion:'t-bl',seg30:'t-am',seg60:'t-am',seg90:'t-am',cosecha:'t-am',roi:'t-gr',recompra:'t-gr',nota:'t-gy'};
+  const notesHtml=notes.length?notes.map(n=>`<div style="border-left:2px solid var(--border);padding:8px 12px;margin-bottom:8px;font-size:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span class="tag ${TCOL[n.tipo]||'t-gy'}">${TMAP[n.tipo]||'Nota'}</span><span style="font-size:10px;color:var(--text3)">${n.fecha||n.f||''} · ${n.u||''}</span></div>${n.t?`<div>${n.t}</div>`:''} ${n.ap_litros?`<div style="color:var(--text2);margin-top:4px">Aplicados: ${n.ap_litros}L · Dosis: ${n.ap_dosis||'—'} · Ha: ${n.ap_ha||'—'} · ${n.ap_etapa||''}</div>`:''} ${n.seg_resultado?`<div style="color:var(--text2)">Resultado: ${n.seg_resultado}</div>`:''} ${n.cos_roi?`<div style="color:var(--green);font-weight:600">ROI: ${n.cos_roi}</div>`:''} ${n.foto?'<span class="tag t-gy">📷 Evidencia</span>':''} ${n.caso?'<span class="tag t-gr">⭐ Caso de éxito</span>':''}</div>`).join(''):'<div style="font-size:12px;color:var(--text3)">Sin eventos registrados.</div>';
   document.getElementById('det-body').innerHTML=`
-    <!-- BADGES - full width -->
+    <!-- BADGES FULL WIDTH -->
     <div class="card" style="margin-bottom:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div class="lbl">Programa Austar</div>
+        <div class="ct">Programa Austar</div>
         <div style="font-size:10px;color:var(--text3)">Toca para activar / desactivar</div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        ${['gfg','reto','academy'].map(key=>{
-          const b=BADGES[key];
-          const active=getBadges(id).includes(key);
-          const triple=Object.keys(BADGES).every(k=>getBadges(id).includes(k));
-          return`<button onclick="toggleBadge('${id}','${key}')" style="display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:24px;border:2px solid ${active?b.color:'var(--border)'};background:${active?b.bg:'var(--bg3)'};cursor:pointer;font-size:12px;font-weight:600;color:${active?b.color:'var(--text3)'};transition:all .2s;min-width:140px">
-            <span style="font-size:18px">${b.icon}</span>
-            <div style="text-align:left">
-              <div>${b.label}</div>
-              <div style="font-size:10px;font-weight:400;opacity:.7">${active?'Activo':'Inactivo'}</div>
-            </div>
-            <span style="margin-left:auto">${active?'✓':''}</span>
-          </button>`;
-        }).join('')}
-        ${Object.keys(BADGES).every(k=>getBadges(id).includes(k))?
-          `<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:24px;border:2px solid #f59e0b;background:linear-gradient(135deg,#2a1800,#0a2a00,#00102a);min-width:140px">
-            <span style="font-size:18px">🥇</span>
-            <div>
-              <div style="font-size:12px;font-weight:700;color:#fcd34d">Triple Corona</div>
-              <div style="font-size:10px;color:#f59e0b">Descuento especial</div>
-            </div>
-          </div>`:
-          `<div style="font-size:11px;color:var(--text3);padding:8px">${3-Object.keys(BADGES).filter(k=>getBadges(id).includes(k)).length} insignia(s) para Triple Corona 🥇</div>`
-        }
-      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${renderBadgeBar()}</div>
     </div>
-    <!-- 2-col layout -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <!-- 2-col -->
+    <div class="g2">
       <div>
         <div class="card" style="margin-bottom:12px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -901,253 +717,173 @@ function openDet(id){
             <div><div class="lbl">Teléfono</div>${c.tel?`<a href="tel:${c.tel}" style="color:var(--teal)">${c.tel}</a>`:'—'}</div>
             <div><div class="lbl">Tipo</div>${TIPO_LBL[c.tipo]||c.tipo}</div>
             <div style="grid-column:span 2"><div class="lbl">Cultivos</div>${c.cultivos.join(', ')||'—'}</div>
-            ${ex.litros?`<div><div class="lbl">Litros acumulados</div><span style="font-weight:700;color:var(--green)">${ex.litros} L</span></div>`:''}
+            ${ex.litros?`<div><div class="lbl">Litros acumulados</div><span style="font-weight:700;color:var(--green)">${ex.litros}L</span></div>`:''}
             ${ex.roi?`<div><div class="lbl">ROI documentado</div><span style="color:var(--green)">${ex.roi}</span></div>`:''}
           </div>
         </div>
         <div class="card">
-          <div class="lbl" style="margin-bottom:10px">Cambiar etapa del pipeline</div>
+          <div class="ct">Cambiar etapa</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px">
-            ${Object.entries(ETAPAS).map(([k,v])=>`<button class="stage-btn${et===k?' active-stage t-'+v.c.split('-')[1]:''}" onclick="changeStage('${id}','${k}')">${v.l}</button>`).join('')}
+            ${Object.entries(ETAPAS).map(([k,v])=>`<button class="stage-btn${et===k?' tag '+v.c:''}" onclick="chStage('${id}','${k}')">${v.l}</button>`).join('')}
           </div>
         </div>
       </div>
       <div class="card">
-        <div class="lbl" style="margin-bottom:8px">Registro de seguimiento</div>
-        <div id="notes-list" style="max-height:200px;overflow-y:auto;margin-bottom:10px">
-          ${notes.length?notes.map(n=>`<div style="border-left:2px solid var(--border);padding:6px 10px;margin-bottom:6px;font-size:12px">
-            <div style="color:var(--text3);font-size:10px;margin-bottom:2px">${n.f} · ${n.u}</div>
-            <div style="color:var(--text)">${n.t}</div>
-            ${n.l?`<span class="tag t-gr" style="margin-top:4px">${n.l}L comprados</span>`:''}
-            ${n.r?`<span class="tag t-bl" style="margin-top:4px">${n.r}</span>`:''}
-          </div>`).join(''):'<div style="font-size:12px;color:var(--text3)">Sin notas aún.</div>'}
+        <div class="ct">Ciclo Austar</div>
+        <div style="margin-bottom:10px;display:flex;align-items:center;flex-wrap:wrap">${cycleHtml}</div>
+        <div class="hr"></div>
+        <div class="ct">Registrar evento</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><div class="lbl">Tipo</div>
+            <select id="n-tipo-ev" onchange="toggleCamposEvento()">
+              <option value="compra">🛒 Compra confirmada</option>
+              <option value="recepcion">📦 Recepción</option>
+              <option value="aplicacion">🌱 Aplicación</option>
+              <option value="seg30">📅 Seguimiento 30 días</option>
+              <option value="seg60">📅 Seguimiento 60 días</option>
+              <option value="seg90">📅 Seguimiento 90 días</option>
+              <option value="cosecha">🌾 Cosecha</option>
+              <option value="roi">📊 ROI documentado</option>
+              <option value="recompra">🔄 Recompra / Referido</option>
+              <option value="nota">📝 Nota</option>
+            </select>
+          </div>
+          <div><div class="lbl">Fecha</div><input id="n-fecha-ev" type="date"></div>
+        </div>
+        <div id="campos-ap" style="display:none;background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:8px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div class="lbl">Litros aplicados</div><input id="ap-litros" type="number" placeholder="L"></div>
+            <div><div class="lbl">Dosis (L/ha)</div><input id="ap-dosis" placeholder="0.5 L/ha"></div>
+            <div><div class="lbl">Etapa fenológica</div><input id="ap-etapa" placeholder="Floración, Cuaje..."></div>
+            <div><div class="lbl">Forma de aplicación</div>
+              <select id="ap-forma"><option value="">—</option><option value="foliar">Foliar</option><option value="drench">Drench</option><option value="fertirriego">Fertirrigación</option></select>
+            </div>
+            <div><div class="lbl">Hectáreas</div><input id="ap-ha" type="number" placeholder="Ha"></div>
+            <div><div class="lbl">Cultivo / Variedad</div><input id="ap-cultivo" placeholder="Aguacate Hass..."></div>
+          </div>
+        </div>
+        <div id="campos-seg" style="display:none;background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:8px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div class="lbl">Días desde aplicación</div><input id="seg-dias" type="number" placeholder="30"></div>
+            <div><div class="lbl">Resultado observado</div><input id="seg-resultado" placeholder="+15% amarre..."></div>
+            <div style="grid-column:span 2"><div class="lbl">Estado del cultivo</div><input id="seg-estado" placeholder="Desarrollo normal..."></div>
+          </div>
+        </div>
+        <div id="campos-cos" style="display:none;background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:8px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div class="lbl">Rendimiento obtenido</div><input id="cos-rend" placeholder="12 ton/ha"></div>
+            <div><div class="lbl">Rendimiento esperado</div><input id="cos-esp" placeholder="10 ton/ha"></div>
+            <div><div class="lbl">% mejora</div><input id="cos-mejora" placeholder="+20%"></div>
+            <div><div class="lbl">Valor cosecha MXN</div><input id="cos-valor" type="number" placeholder="250000"></div>
+            <div style="grid-column:span 2"><div class="lbl">ROI tangible</div><input id="cos-roi" placeholder="Inversión $3,200 → retorno $48,000 = 15x"></div>
+          </div>
+        </div>
+        <textarea id="nt" rows="2" placeholder="Observaciones, acuerdos, próximos pasos..." style="margin-bottom:8px"></textarea>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:10px">
+            <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);cursor:pointer"><input type="checkbox" id="n-foto"> 📷 Evidencia</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);cursor:pointer"><input type="checkbox" id="n-caso"> ⭐ Caso de éxito</label>
+          </div>
+          <button class="btn btn-g btn-sm" onclick="saveEvento('${id}')">Guardar evento</button>
         </div>
         <div class="hr"></div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div><div class="lbl">Nueva nota</div><textarea id="nt" rows="3" placeholder="Observaciones, resultado de llamada, acuerdo..."></textarea></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <div><div class="lbl">Litros comprados</div><input id="nl" type="number" placeholder="0" min="0"></div>
-            <div><div class="lbl">ROI observado</div><input id="nr" placeholder="Ej: +30% rendimiento"></div>
-          </div>
-          <div style="text-align:right"><button class="btn btn-g btn-sm" onclick="saveNote('${id}')">Guardar nota</button></div>
-        </div>
+        <div class="ct">Historial</div>
+        <div style="max-height:260px;overflow-y:auto">${notesHtml}</div>
       </div>
     </div>`;
-  setTimeout(()=>{
-    const df=document.getElementById('n-fecha-ev');
-    if(df)df.value=new Date().toISOString().slice(0,10);
-    const ts=document.getElementById('n-tipo-ev');
-    if(ts)ts.addEventListener('change',toggleCamposEvento);
-  },50);
+  setTimeout(()=>{const d=document.getElementById('n-fecha-ev');if(d)d.value=new Date().toISOString().slice(0,10);},50);
   gotoTab('detalle');
 }
 
-function changeStage(id,s){
-  setStage(id,s);openDet(id);
+function chStage(id,s){setStage(id,s);openDet(id);}
+
+function toggleCamposEvento(){
+  const t=(document.getElementById('n-tipo-ev')||{}).value||'';
+  const ap=document.getElementById('campos-ap');const seg=document.getElementById('campos-seg');const cos=document.getElementById('campos-cos');
+  if(ap)ap.style.display=t==='aplicacion'?'block':'none';
+  if(seg)seg.style.display=['seg30','seg60','seg90'].includes(t)?'block':'none';
+  if(cos)cos.style.display=['cosecha','roi'].includes(t)?'block':'none';
 }
-function saveNote(id){
-  const t=document.getElementById('nt').value.trim();if(!t)return;
-  const l=document.getElementById('nl').value,r=document.getElementById('nr').value;
-  const notes=getNotes(id);
-  const d=new Date();
-  notes.unshift({t,l:l||null,r:r||null,u:user,f:d.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'2-digit'})});
-  saveNotes(id,notes);
-  if(l){const ex=getExtra(id);ex.litros=(parseFloat(ex.litros||0)+parseFloat(l)).toString();if(r)ex.roi=r;saveExtra(id,ex);}
+
+function saveEvento(id){
+  const t=(document.getElementById('n-tipo-ev')||{}).value||'nota';
+  const txt=(document.getElementById('nt')||{}).value?.trim()||'';
+  const fecha=(document.getElementById('n-fecha-ev')||{}).value||new Date().toISOString().slice(0,10);
+  const foto=(document.getElementById('n-foto')||{}).checked||false;
+  const caso=(document.getElementById('n-caso')||{}).checked||false;
+  const ev={tipo:t,t:txt,fecha,u:user,f:new Date(fecha).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'2-digit'}),foto,caso};
+  if(t==='aplicacion'){ev.ap_litros=document.getElementById('ap-litros')?.value||'';ev.ap_dosis=document.getElementById('ap-dosis')?.value||'';ev.ap_etapa=document.getElementById('ap-etapa')?.value||'';ev.ap_forma=document.getElementById('ap-forma')?.value||'';ev.ap_ha=document.getElementById('ap-ha')?.value||'';if(ev.ap_litros){const ex=getExtra(id);ex.litros=(parseFloat(ex.litros||0)+parseFloat(ev.ap_litros)).toString();saveExtra(id,ex);}}
+  if(['seg30','seg60','seg90'].includes(t)){ev.seg_dias=document.getElementById('seg-dias')?.value||'';ev.seg_resultado=document.getElementById('seg-resultado')?.value||'';ev.seg_estado=document.getElementById('seg-estado')?.value||'';}
+  if(['cosecha','roi'].includes(t)){ev.cos_rend=document.getElementById('cos-rend')?.value||'';ev.cos_esp=document.getElementById('cos-esp')?.value||'';ev.cos_mejora=document.getElementById('cos-mejora')?.value||'';ev.cos_valor=document.getElementById('cos-valor')?.value||'';ev.cos_roi=document.getElementById('cos-roi')?.value||'';}
+  if(['cosecha','roi','recompra'].includes(t))setStage(id,'recompra');
+  else if(['compra','recepcion','aplicacion','seg30','seg60','seg90'].includes(t))setStage(id,'compro');
+  const notes=getNotes(id);notes.unshift(ev);saveNotes(id,notes);
   openDet(id);
 }
 
-// ════════════════════════════════
+// ════════════════════════════════════════
 // INVENTORY
-// ════════════════════════════════
+// ════════════════════════════════════════
 function toggleInvFields(){
-  const t=document.getElementById('inv-tipo').value;
-  document.getElementById('inv-cli-w').style.display=(t==='venta')?'block':'none';
-  document.getElementById('inv-lote-w').style.display=(t!=='venta')?'block':'none';
+  const t=(document.getElementById('inv-tipo')||{}).value||'';
+  const cw=document.getElementById('inv-cli-w');const lw=document.getElementById('inv-lote-w');
+  if(cw)cw.style.display=t==='venta'?'block':'none';
+  if(lw)lw.style.display=t!=='venta'?'block':'none';
 }
 function saveMovimiento(){
-  const tipo=document.getElementById('inv-tipo').value;
-  const lt=parseFloat(document.getElementById('inv-lt').value)||0;
-  if(!lt){alert('Ingresa la cantidad en litros');return;}
-  const lote=document.getElementById('inv-lote').value;
-  const cli=document.getElementById('inv-cli').value;
-  const fecha=document.getElementById('inv-fecha').value||new Date().toISOString().slice(0,10);
-  const precio=document.getElementById('inv-precio').value;
-  const obs=document.getElementById('inv-obs').value;
+  const tipo=(document.getElementById('inv-tipo')||{}).value||'entrada';
+  const lt=parseFloat((document.getElementById('inv-lt')||{}).value)||0;
+  if(!lt){alert('Ingresa los litros');return;}
   const inv=getInv();
-  const mov={tipo,lt,lote,cli,fecha,precio,obs,user};
-  if(tipo==='entrada'){inv.almacen+=lt;}
-  else if(tipo==='venta'){inv.almacen=Math.max(0,inv.almacen-lt);}
+  const mov={tipo,lt,lote:(document.getElementById('inv-lote')||{}).value||'',cli:(document.getElementById('inv-cli')||{}).value||'',fecha:(document.getElementById('inv-fecha')||{}).value||new Date().toISOString().slice(0,10),precio:(document.getElementById('inv-precio')||{}).value||'',obs:(document.getElementById('inv-obs')||{}).value||'',user};
+  if(tipo==='entrada')inv.almacen+=lt;
+  else if(tipo==='venta')inv.almacen=Math.max(0,inv.almacen-lt);
   else if(tipo==='traslado_pv'){inv.almacen=Math.max(0,inv.almacen-lt);inv.distribucion+=lt;}
   else if(tipo==='devolucion'){inv.distribucion=Math.max(0,inv.distribucion-lt);inv.almacen+=lt;}
-  inv.mov=inv.mov||[];inv.mov.unshift(mov);
-  saveInv(inv);
-  ['inv-lt','inv-lote','inv-cli','inv-precio','inv-obs'].forEach(i=>document.getElementById(i).value='');
+  inv.mov=inv.mov||[];inv.mov.unshift(mov);saveInv(inv);
+  ['inv-lt','inv-lote','inv-cli','inv-precio','inv-obs'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
   renderInv();
 }
 function renderInv(){
   const inv=getInv();
-  document.getElementById('inv-metrics').innerHTML=
-    `<div class="met" style="border-left:3px solid var(--green)"><div class="mv" style="color:var(--green)">${inv.almacen.toFixed(0)} L</div><div class="ml">En almacén</div></div>`+
-    `<div class="met" style="border-left:3px solid var(--amber)"><div class="mv" style="color:var(--amber)">${inv.distribucion.toFixed(0)} L</div><div class="ml">En punto de venta</div></div>`+
-    `<div class="met" style="border-left:3px solid var(--blue)"><div class="mv" style="color:var(--blue)">${inv.almacen.toFixed(0)} L</div><div class="ml">Disponible para venta</div></div>`;
-  const tmap={entrada:{l:'Entrada Australia',c:'t-gr'},venta:{l:'Venta',c:'t-bl'},traslado_pv:{l:'→ Punto venta',c:'t-am'},devolucion:{l:'← Devolución',c:'t-gy'}};
+  const invEl=document.getElementById('inv-metrics');
+  if(invEl)invEl.innerHTML=
+    `<div class="met gl"><div class="mv" style="color:var(--green)">${fmt(inv.almacen)}L</div><div class="ml">En almacén</div></div>`+
+    `<div class="met al"><div class="mv" style="color:var(--amber)">${fmt(inv.distribucion)}L</div><div class="ml">En punto de venta</div></div>`+
+    `<div class="met bl"><div class="mv" style="color:var(--blue)">${fmt(inv.almacen)}L</div><div class="ml">Disponible para venta</div></div>`;
+  const TMAP2={entrada:{l:'Entrada Australia',c:'t-gr'},venta:{l:'Venta',c:'t-bl'},traslado_pv:{l:'→ Punto venta',c:'t-am'},devolucion:{l:'← Devolución',c:'t-gy'}};
   const movs=inv.mov||[];
-  document.getElementById('inv-hist').innerHTML=movs.length?
-    `<table style="width:100%;border-collapse:collapse;font-size:12px">
-      <thead><tr style="border-bottom:1px solid var(--border)">
-        <th style="text-align:left;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Tipo</th>
-        <th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Litros</th>
-        <th style="text-align:left;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Cliente/Lote</th>
-        <th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">$/L</th>
-        <th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Fecha</th>
-      </tr></thead>
-      <tbody>${movs.slice(0,30).map(m=>{const tc=tmap[m.tipo]||{l:m.tipo,c:'t-gy'};return`<tr style="border-bottom:1px solid var(--bg3)">
-        <td style="padding:7px 4px"><span class="tag ${tc.c}">${tc.l}</span></td>
-        <td style="padding:7px 4px;text-align:right;font-weight:600">${m.lt}</td>
-        <td style="padding:7px 4px;color:var(--text2)">${m.cli||m.lote||'—'}</td>
-        <td style="padding:7px 4px;text-align:right;color:var(--text2)">${m.precio?'$'+parseFloat(m.precio).toLocaleString('es-MX'):'—'}</td>
-        <td style="padding:7px 4px;text-align:right;color:var(--text3)">${m.fecha}</td>
-      </tr>`;}).join('')}</tbody></table>`:
-    '<div style="font-size:12px;color:var(--text3);padding:8px 0">Sin movimientos registrados aún.</div>';
+  const histEl=document.getElementById('inv-hist');
+  if(!histEl)return;
+  if(!movs.length){histEl.innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px">Sin movimientos registrados.</div>';return;}
+  histEl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Tipo</th><th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Litros</th><th style="text-align:left;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Cliente/Lote</th><th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">$/L</th><th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Fecha</th></tr></thead><tbody>${movs.slice(0,30).map(m=>{const tc=TMAP2[m.tipo]||{l:m.tipo,c:'t-gy'};return`<tr style="border-bottom:0.5px solid var(--bg3)"><td style="padding:7px 4px"><span class="tag ${tc.c}">${tc.l}</span></td><td style="padding:7px 4px;text-align:right;font-weight:600">${m.lt}</td><td style="padding:7px 4px;color:var(--text2)">${m.cli||m.lote||'—'}</td><td style="padding:7px 4px;text-align:right;color:var(--text2)">${m.precio?'$'+parseFloat(m.precio).toLocaleString('es-MX'):'—'}</td><td style="padding:7px 4px;text-align:right;color:var(--text3)">${m.fecha}</td></tr>`;}).join('')}</tbody></table>`;
 }
 
-// ════════════════════════════════
+// ════════════════════════════════════════
 // NUEVO PROSPECTO
-// ════════════════════════════════
+// ════════════════════════════════════════
 function saveNuevo(){
-  const nm=document.getElementById('n-nm').value.trim();
-  const st=document.getElementById('n-st').value;
+  const nm=(document.getElementById('n-nm')||{}).value?.trim()||'';
+  const st=(document.getElementById('n-st')||{}).value||'';
   if(!nm||!st){alert('Nombre y estado son requeridos');return;}
   const id='x_'+Date.now();
-  const obj={id,nombre:nm,razon:null,estado:st,municipio:document.getElementById('n-mn').value,
-    tel:document.getElementById('n-tl').value,
-    cultivos:document.getElementById('n-cv').value.split(',').map(s=>s.trim()).filter(Boolean),
-    tipo:document.getElementById('n-tp').value,etapa_base:'prospecto'};
+  const obj={id,nombre:nm,razon:null,estado:st,municipio:(document.getElementById('n-mn')||{}).value||'',tel:(document.getElementById('n-tl')||{}).value||'',cultivos:((document.getElementById('n-cv')||{}).value||'').split(',').map(s=>s.trim()).filter(Boolean),tipo:(document.getElementById('n-tp')||{}).value||'agricultor',etapa_base:'prospecto'};
   CLIENTS.push(obj);
-  try{const ex=JSON.parse(ls_get('austar_extra_clients')||'[]');ex.push(obj);ls_set('austar_extra_clients',JSON.stringify(ex));}catch{}
-  const ob=document.getElementById('n-ob').value.trim();
-  if(ob){const d=new Date();saveNotes(id,[{t:ob,l:null,r:null,u:user,f:d.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'2-digit'})}]);}
-  ['n-nm','n-tl','n-mn','n-cv','n-ob'].forEach(i=>document.getElementById(i).value='');
+  try{const ex=JSON.parse(ls('austar_extra_clients')||'[]');ex.push(obj);ls('austar_extra_clients',JSON.stringify(ex));}catch{}
+  const ob=(document.getElementById('n-ob')||{}).value?.trim()||'';
+  if(ob){const d=new Date();saveNotes(id,[{tipo:'nota',t:ob,l:null,r:null,u:user,f:d.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'2-digit'})}]);}
+  ['n-nm','n-tl','n-cv','n-ob'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  const nm_el=document.getElementById('n-mn');if(nm_el){nm_el.innerHTML='<option value="">Seleccionar estado primero...</option>';nm_el.disabled=true;}
+  const st_el=document.getElementById('n-st');if(st_el)st_el.value='';
   alert(`✓ ${nm} registrado como prospecto.`);
   gotoTab('clientes');
 }
 
-// ════════════════════════════════
-// SEGUIMIENTO CICLO
-// ════════════════════════════════
-const CICLO_ETAPAS=[
-  {key:'compra',icon:'🛒',label:'Compra',color:'var(--green)'},
-  {key:'recepcion',icon:'📦',label:'Recepción',color:'var(--teal)'},
-  {key:'aplicacion',icon:'🌱',label:'Aplicación',color:'var(--blue)'},
-  {key:'seg30',icon:'📅',label:'30 días',color:'var(--amber)'},
-  {key:'seg60',icon:'📅',label:'60 días',color:'var(--amber)'},
-  {key:'seg90',icon:'📅',label:'90 días',color:'var(--amber)'},
-  {key:'cosecha',icon:'🌾',label:'Cosecha',color:'#f97316'},
-  {key:'roi',icon:'📊',label:'ROI',color:'var(--green)'}
-];
-
-function renderCycleTrack(notes){
-  const done=new Set(notes.map(n=>n.tipo));
-  return CICLO_ETAPAS.map((e,i)=>{
-    const isDone=done.has(e.key);
-    const note=notes.find(n=>n.tipo===e.key);
-    return`<div style="display:inline-flex;flex-direction:column;align-items:center;gap:3px;margin:0 4px 8px;min-width:52px;cursor:${isDone?'pointer':'default'}" ${isDone?`onclick="scrollToNote('${e.key}')"`:''}> 
-      <div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid ${isDone?e.color:'var(--border)'};background:${isDone?e.color+'22':'var(--bg3)'};">${e.icon}</div>
-      <div style="font-size:9px;text-align:center;color:${isDone?'var(--text)':'var(--text3)'};font-weight:${isDone?'600':'400'}">${e.label}</div>
-      ${note?`<div style="font-size:9px;color:var(--text3)">${note.f||''}</div>`:''}
-    </div>`;
-  }).join('<div style="display:inline-block;width:8px;height:2px;background:var(--border);margin:0 -2px 20px;vertical-align:middle"></div>');
-}
-
-function renderNotes(notes){
-  if(!notes.length)return'<div style="font-size:12px;color:var(--text3)">Sin eventos registrados aún.</div>';
-  const tipoLabel={compra:'🛒 Compra',recepcion:'📦 Recepción',aplicacion:'🌱 Aplicación',seg30:'📅 30 días',seg60:'📅 60 días',seg90:'📅 90 días',cosecha:'🌾 Cosecha',roi:'📊 ROI',recompra:'🔄 Recompra',nota:'📝 Nota'};
-  const tipoColor={compra:'t-gr',recepcion:'t-bl',aplicacion:'t-bl',seg30:'t-am',seg60:'t-am',seg90:'t-am',cosecha:'t-am',roi:'t-gr',recompra:'t-gr',nota:'t-gy'};
-  return notes.map(n=>`<div id="ev-${n.tipo||'nota'}" style="border-left:2px solid var(--border);padding:8px 12px;margin-bottom:8px;font-size:12px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-      <span class="tag ${tipoColor[n.tipo]||'t-gy'}">${tipoLabel[n.tipo]||n.tipo||'Nota'}</span>
-      <span style="font-size:10px;color:var(--text3)">${n.fecha||n.f||''} · ${n.u||''}</span>
-    </div>
-    ${n.t?`<div style="color:var(--text);margin-bottom:4px">${n.t}</div>`:''}
-    ${n.ap_litros?`<div style="color:var(--text2)"><b>Litros:</b> ${n.ap_litros}L · <b>Dosis:</b> ${n.ap_dosis||'—'} · <b>Ha:</b> ${n.ap_ha||'—'}</div>`:''}
-    ${n.ap_etapa?`<div style="color:var(--text2)"><b>Etapa:</b> ${n.ap_etapa} · <b>Forma:</b> ${n.ap_forma||'—'}</div>`:''}
-    ${n.seg_resultado?`<div style="color:var(--text2)"><b>Resultado:</b> ${n.seg_resultado}</div>`:''}
-    ${n.seg_estado?`<div style="color:var(--text2)"><b>Estado cultivo:</b> ${n.seg_estado}</div>`:''}
-    ${n.cos_rend?`<div style="color:var(--amber)"><b>Rendimiento:</b> ${n.cos_rend} (esperado: ${n.cos_esp||'—'})</div>`:''}
-    ${n.cos_roi?`<div style="color:var(--green);font-weight:600"><b>ROI:</b> ${n.cos_roi}</div>`:''}
-    ${n.foto?'<span class="tag t-gy">📷 Con evidencia</span>':''}
-    ${n.caso?'<span class="tag t-gr">⭐ Caso de éxito</span>':''}
-  </div>`).join('');
-}
-
-function toggleCamposEvento(){
-  const tipoEl=document.getElementById('n-tipo-ev');if(!tipoEl)return;
-  const tipo=tipoEl.value;
-  const ca=document.getElementById('campos-aplicacion');if(ca)ca.style.display=(tipo==='aplicacion')?'block':'none';
-  const cs=document.getElementById('campos-seguimiento');if(cs)cs.style.display=(['seg30','seg60','seg90'].includes(tipo))?'block':'none';
-  const cc=document.getElementById('campos-cosecha');if(cc)cc.style.display=(['cosecha','roi'].includes(tipo))?'block':'none';
-}
-
-function saveEventoSeguimiento(id){
-  const tipoEl=document.getElementById('n-tipo-ev');
-  const tipo=tipoEl?tipoEl.value:'nota';
-  const txtEl=document.getElementById('nt');
-  const txt=txtEl?txtEl.value.trim():'';
-  const fechaEl=document.getElementById('n-fecha-ev');
-  const fecha=fechaEl?fechaEl.value:new Date().toISOString().slice(0,10);
-  const fotoEl=document.getElementById('n-foto');
-  const foto=fotoEl?fotoEl.checked:false;
-  const casoEl=document.getElementById('n-caso');
-  const caso=casoEl?casoEl.checked:false;
-  const ev={tipo,t:txt,fecha,u:user,
-    f:new Date(fecha).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'2-digit'}),
-    foto,caso};
-  if(tipo==='aplicacion'){
-    ev.ap_litros=document.getElementById('ap-litros')?.value||'';
-    ev.ap_dosis=document.getElementById('ap-dosis')?.value||'';
-    ev.ap_cultivo=document.getElementById('ap-cultivo')?.value||'';
-    ev.ap_ha=document.getElementById('ap-ha')?.value||'';
-    ev.ap_etapa=document.getElementById('ap-etapa')?.value||'';
-    ev.ap_forma=document.getElementById('ap-forma')?.value||'';
-    // Update inventory if litros entered
-    if(ev.ap_litros){
-      const ex=getExtra(id);
-      ex.litros=(parseFloat(ex.litros||0)+parseFloat(ev.ap_litros)).toString();
-      saveExtra(id,ex);
-    }
-  }
-  if(['seg30','seg60','seg90'].includes(tipo)){
-    ev.seg_dias=document.getElementById('seg-dias')?.value||'';
-    ev.seg_resultado=document.getElementById('seg-resultado')?.value||'';
-    ev.seg_estado=document.getElementById('seg-estado')?.value||'';
-  }
-  if(['cosecha','roi'].includes(tipo)){
-    ev.cos_rend=document.getElementById('cos-rend')?.value||'';
-    ev.cos_esp=document.getElementById('cos-esp')?.value||'';
-    ev.cos_mejora=document.getElementById('cos-mejora')?.value||'';
-    ev.cos_valor=document.getElementById('cos-valor')?.value||'';
-    ev.cos_roi=document.getElementById('cos-roi')?.value||'';
-  }
-  const notes=getNotes(id);
-  notes.unshift(ev);
-  saveNotes(id,notes);
-  // Auto-advance stage based on event type
-  const stageMap={compra:'compro',recepcion:'compro',aplicacion:'compro',seg30:'compro',seg60:'compro',seg90:'compro',cosecha:'recompra',roi:'recompra',recompra:'recompra'};
-  if(stageMap[tipo])setStage(id,stageMap[tipo]);
-  openDet(id);
-}
-
-function scrollToNote(tipo){
-  const el=document.getElementById('ev-'+tipo);
-  if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});
-}
-
-// ════════════════════════════════
+// ════════════════════════════════════════
 // BOOT
-// ════════════════════════════════
-try{initFilters();}catch(e){console.error('initFilters error:',e);}
+// ════════════════════════════════════════
 const total=CLIENTS.length;
-document.getElementById('login-stat').textContent=`${total} clientes cargados en el sistema`;
+document.getElementById('login-stat').textContent=`${total} clientes · ${Object.keys(MUNICIPIOS).length} estados · CDM + Odiseo Amezcua integrados`;
 </script>
 </body>
 </html>
