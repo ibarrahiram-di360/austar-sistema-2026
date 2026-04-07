@@ -132,25 +132,59 @@ select option{background:var(--bg2)}
 
 <!-- ═══════════════ LOGIN ═══════════════ -->
 <div id="sc-login" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg)">
-  <div class="login-card">
+  <div class="login-card" style="max-width:380px">
     <div class="login-logo">AUSTAR</div>
     <div style="font-size:10px;color:var(--text3);letter-spacing:1px;margin-bottom:4px">SISTEMA COMERCIAL INTEGRADO</div>
-    <div class="login-sub">México 2026 · Chemical Direct · Nueva Etapa BI</div>
-    <div class="user-cards">
-      <div class="ucard" onclick="login('yaneth')">
-        <div class="uav" style="background:#14532d;color:#86efac">YA</div>
-        <div style="font-weight:600;font-size:13px">Yaneth</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">Clientes B2C</div>
-        <span class="tag t-gr" style="margin-top:8px;display:inline-block">Activa</span>
-      </div>
-      <div class="ucard" onclick="login('vale')">
-        <div class="uav" style="background:#1e3a5f;color:#93c5fd">VA</div>
-        <div style="font-weight:600;font-size:13px">Vale</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">Nuevos B2B</div>
-        <span class="tag t-bl" style="margin-top:8px;display:inline-block">Nueva etapa</span>
+    <div class="login-sub" style="margin-bottom:22px">México 2026 · Chemical Direct · Nueva Etapa BI</div>
+
+    <!-- Step 1: Select user -->
+    <div id="step-user">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;text-align:left">Selecciona tu perfil:</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="ucard" onclick="selectUser('yaneth')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:left">
+          <div class="uav" style="background:#14532d;color:#86efac;width:38px;height:38px;font-size:13px;flex-shrink:0">YA</div>
+          <div style="flex:1"><div style="font-weight:600;font-size:13px">Yaneth</div><div style="font-size:11px;color:var(--text2)">Seguimiento clientes B2C</div></div>
+          <span style="color:var(--text3);font-size:18px">›</span>
+        </div>
+        <div class="ucard" onclick="selectUser('vale')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:left">
+          <div class="uav" style="background:#1e3a5f;color:#93c5fd;width:38px;height:38px;font-size:13px;flex-shrink:0">VA</div>
+          <div style="flex:1"><div style="font-weight:600;font-size:13px">Vale</div><div style="font-size:11px;color:var(--text2)">Prospección y nuevos B2B</div></div>
+          <span style="color:var(--text3);font-size:18px">›</span>
+        </div>
+        <div class="ucard" onclick="selectUser('contraloria')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:left">
+          <div class="uav" style="background:#2e1065;color:#c4b5fd;width:38px;height:38px;font-size:13px;flex-shrink:0">CT</div>
+          <div style="flex:1"><div style="font-weight:600;font-size:13px">Contraloría</div><div style="font-size:11px;color:var(--text2)">Monitoreo y reportes</div></div>
+          <span style="color:var(--text3);font-size:18px">›</span>
+        </div>
+        <div class="ucard" onclick="selectUser('hiram')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:left">
+          <div class="uav" style="background:#451a03;color:#fcd34d;width:38px;height:38px;font-size:13px;flex-shrink:0">HI</div>
+          <div style="flex:1"><div style="font-weight:600;font-size:13px">Hiram</div><div style="font-size:11px;color:var(--text2)">Acceso total — Director</div></div>
+          <span style="color:var(--text3);font-size:18px">›</span>
+        </div>
       </div>
     </div>
-    <div id="login-stat" style="font-size:11px;color:var(--text3)"></div>
+
+    <!-- Step 2: Password -->
+    <div id="step-pass" style="display:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+        <button onclick="backToUsers()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1">←</button>
+        <div id="pass-user-info" style="display:flex;align-items:center;gap:10px;flex:1">
+          <div id="pass-av" class="uav" style="width:36px;height:36px;font-size:12px"></div>
+          <div>
+            <div id="pass-name" style="font-weight:700;font-size:14px"></div>
+            <div id="pass-role" style="font-size:11px;color:var(--text2)"></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div class="lbl" style="text-align:left;margin-bottom:6px">Contraseña de acceso</div>
+        <input id="pass-input" type="password" placeholder="••••••••" style="font-size:18px;letter-spacing:4px;text-align:center" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div id="pass-error" style="font-size:11px;color:var(--red);margin-bottom:8px;min-height:16px"></div>
+      <button class="btn btn-g" style="width:100%;padding:11px" onclick="doLogin()">Ingresar</button>
+    </div>
+
+    <div id="login-stat" style="font-size:11px;color:var(--text3);margin-top:14px"></div>
   </div>
 </div>
 
@@ -172,11 +206,14 @@ select option{background:var(--bg2)}
     <div class="nav-item" onclick="gotoTab('nuevo')" id="nav-nuevo"><span class="ni">➕</span>Nuevo prospecto</div>
     <div class="nav-section">Internacional</div>
     <div class="nav-item" onclick="gotoTab('latam')" id="nav-latam"><span class="ni">🌎</span>Mercado LATAM</div>
+    <div class="nav-section">Admin</div>
+    <div class="nav-item" onclick="gotoTab('monitor')" id="nav-monitor"><span class="ni">👁️</span>Monitor</div>
     <div class="sb-footer">
       <div style="display:flex;align-items:center;gap:8px">
         <div id="user-av" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0"></div>
         <div>
           <div id="user-name" style="font-weight:600;font-size:12px"></div>
+          <div id="user-role-badge" style="display:none;font-size:9px;font-weight:600;padding:1px 6px;border-radius:10px;background:#2e1065;color:#c4b5fd;margin-top:2px">Solo lectura</div>
           <div style="font-size:10px;color:var(--text3);cursor:pointer" onclick="logout()">Cerrar sesión</div>
         </div>
       </div>
@@ -415,6 +452,15 @@ select option{background:var(--bg2)}
       </div>
       <div style="padding:14px 22px 22px" id="ldet-body"></div>
     </div>
+
+    <!-- ─── MONITOR ─── -->
+    <div id="tab-monitor" class="sc">
+      <div class="page-header">
+        <div class="page-title">Panel de monitoreo</div>
+        <div class="page-sub">Vista ejecutiva y contraloría del sistema</div>
+      </div>
+      <div style="padding:0 22px 22px" id="monitor-body"></div>
+    </div>
   </div><!-- /main -->
 </div><!-- /app -->
 
@@ -502,20 +548,81 @@ function loadMunicipios(){
 // ════════════════════════════════════════
 // LOGIN / NAV
 // ════════════════════════════════════════
+// ════════════════════════════════════════
+// AUTH SYSTEM
+// ════════════════════════════════════════
+// Contraseñas por defecto — cambiar en producción
+const USERS={
+  yaneth:{pass:'austar2026',av:'YA',bg:'#14532d',col:'#86efac',name:'Yaneth',role:'Clientes B2C',tabs:['dashboard','clientes','detalle','nuevo'],readOnly:false},
+  vale:{pass:'vale2026',av:'VA',bg:'#1e3a5f',col:'#93c5fd',name:'Vale',role:'Prospección B2B',tabs:['dashboard','clientes','detalle','nuevo','latam'],readOnly:false},
+  contraloria:{pass:'ctrl360',av:'CT',bg:'#2e1065',col:'#c4b5fd',name:'Contraloría',role:'Monitoreo y reportes',tabs:['dashboard','historico','clientes','detalle','inventario','latam','monitor'],readOnly:true},
+  hiram:{pass:'di360master',av:'HI',bg:'#451a03',col:'#fcd34d',name:'Hiram',role:'Director — Acceso total',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor'],readOnly:false}
+};
+let selectedUser=null;
+
+function selectUser(u){
+  selectedUser=u;
+  const cfg=USERS[u];
+  document.getElementById('step-user').style.display='none';
+  document.getElementById('step-pass').style.display='block';
+  const av=document.getElementById('pass-av');
+  av.textContent=cfg.av; av.style.background=cfg.bg; av.style.color=cfg.col;
+  document.getElementById('pass-name').textContent=cfg.name;
+  document.getElementById('pass-role').textContent=cfg.role;
+  document.getElementById('pass-input').value='';
+  document.getElementById('pass-error').textContent='';
+  setTimeout(()=>document.getElementById('pass-input').focus(),100);
+}
+
+function backToUsers(){
+  selectedUser=null;
+  document.getElementById('step-pass').style.display='none';
+  document.getElementById('step-user').style.display='block';
+}
+
+function doLogin(){
+  const input=document.getElementById('pass-input').value;
+  const cfg=USERS[selectedUser];
+  if(input!==cfg.pass){
+    document.getElementById('pass-error').textContent='Contraseña incorrecta. Intenta de nuevo.';
+    document.getElementById('pass-input').value='';
+    document.getElementById('pass-input').focus();
+    return;
+  }
+  login(selectedUser);
+}
+
 function login(u){
   user=u;
+  const cfg=USERS[u];
   document.getElementById('sc-login').style.display='none';
   document.getElementById('app').style.display='flex';
   const av=document.getElementById('user-av');
-  if(u==='yaneth'){av.style.background='#14532d';av.style.color='#86efac';av.textContent='YA';}
-  else{av.style.background='#1e3a5f';av.style.color='#93c5fd';av.textContent='VA';}
-  document.getElementById('user-name').textContent=u==='yaneth'?'Yaneth':'Vale';
+  av.style.background=cfg.bg; av.style.color=cfg.col; av.textContent=cfg.av;
+  document.getElementById('user-name').textContent=cfg.name;
+  // Show/hide nav items based on role
+  const allNavs='dashboard,historico,clientes,inventario,nuevo,latam,monitor'.split(',');
+  allNavs.forEach(t=>{
+    const n=document.getElementById('nav-'+t);
+    if(n)n.style.display=cfg.tabs.includes(t)?'flex':'none';
+  });
+  // Show readonly badge
+  if(cfg.readOnly){
+    const badge=document.getElementById('user-role-badge');
+    if(badge){badge.textContent='Solo lectura';badge.style.display='inline-block';}
+  }
   initSelects();
   gotoTab('dashboard');
 }
-function logout(){document.getElementById('app').style.display='none';document.getElementById('sc-login').style.display='flex';user=null;}
+function logout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('sc-login').style.display='flex';
+  document.getElementById('step-pass').style.display='none';
+  document.getElementById('step-user').style.display='block';
+  user=null; selectedUser=null;
+}
 
-const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det'];
+const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det','monitor'];
 function gotoTab(t){
   ALL_TABS.forEach(x=>{
     const el=document.getElementById('tab-'+x);if(el)el.classList.remove('on');
@@ -528,6 +635,7 @@ function gotoTab(t){
   if(t==='clientes'){renderCliMetrics();applyFilter();}
   if(t==='inventario'){renderInv();setTimeout(()=>{const d=document.getElementById('inv-fecha');if(d)d.value=new Date().toISOString().slice(0,10);},50);}
   if(t==='latam')renderLatam();
+  if(t==='monitor')renderMonitor();
 }
 
 // ════════════════════════════════════════
@@ -1095,6 +1203,100 @@ function saveLatamEvento(pid){
   }
   openLatamDet(pid);
 }
+
+// ════════════════════════════════════════
+// MONITOR / CONTRALORÍA
+// ════════════════════════════════════════
+function renderMonitor(){
+  var total=CLIENTS.length;
+  var byStage={};
+  Object.keys(ETAPAS).forEach(function(k){byStage[k]=CLIENTS.filter(function(c){return getStage(c)===k;}).length;});
+  var compro=byStage.compro+byStage.recompra;
+  var withNotes=CLIENTS.filter(function(c){return getNotes(c.id).length>0;}).length;
+  var withBadges=CLIENTS.filter(function(c){return getBadges(c.id).length>0;}).length;
+  var triple=CLIENTS.filter(function(c){return Object.keys(BADGES).every(function(k){return getBadges(c.id).includes(k);});}).length;
+  var inv=getInv();
+  var totalVend=(inv.mov||[]).filter(function(m){return m.tipo==='venta';}).reduce(function(s,m){return s+(parseFloat(m.lt)||0);},0);
+  var totalEntr=(inv.mov||[]).filter(function(m){return m.tipo==='entrada';}).reduce(function(s,m){return s+(parseFloat(m.lt)||0);},0);
+  var latamActivos=LATAM_PAISES.filter(function(p){return ['activo','distribuidor'].includes(getLatamStatus(p.id));}).length;
+  var latamNegoc=LATAM_PAISES.filter(function(p){return getLatamStatus(p.id)==='negociacion';}).length;
+  var allEvents=[];
+  CLIENTS.forEach(function(c){getNotes(c.id).forEach(function(n){allEvents.push({cliente:c.nombre,tipo:n.tipo||'nota',fecha:n.fecha||n.f||'—',u:n.u||'—'});});});
+  allEvents.sort(function(a,b){return b.fecha.localeCompare(a.fecha);});
+  var recent=allEvents.slice(0,10);
+
+  var html='';
+  // KPIs
+  html+='<div class="g4" style="margin-bottom:14px">';
+  html+='<div class="met gl"><div class="mv" style="color:var(--green)">'+total+'</div><div class="ml">Clientes en sistema</div></div>';
+  html+='<div class="met tl"><div class="mv" style="color:var(--teal)">'+compro+'</div><div class="ml">Con compra registrada</div></div>';
+  html+='<div class="met al"><div class="mv" style="color:var(--amber)">'+withNotes+'</div><div class="ml">Con seguimiento activo</div></div>';
+  html+='<div class="met pl"><div class="mv" style="color:var(--purple)">'+triple+'</div><div class="ml">Triple Corona</div></div>';
+  html+='</div>';
+  // Grid 3
+  html+='<div class="g3" style="margin-bottom:14px">';
+  // Pipeline
+  html+='<div class="card"><div class="ct">Pipeline detallado</div>';
+  Object.entries(ETAPAS).forEach(function(entry){
+    var k=entry[0];var v=entry[1];
+    var pct=total?Math.round(byStage[k]/total*100):0;
+    html+='<div class="row"><span class="tag '+v.c+'">'+v.l+'</span>';
+    html+='<div style="display:flex;align-items:center;gap:10px">';
+    html+='<div style="width:80px;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">';
+    html+='<div style="width:'+pct+'%;height:100%;background:var(--green);border-radius:3px"></div></div>';
+    html+='<span style="font-weight:600;min-width:20px;text-align:right">'+byStage[k]+'</span></div></div>';
+  });
+  html+='<div class="hr"></div>';
+  html+='<div class="row"><span style="color:var(--text2)">Con insignias</span><span style="font-weight:600;color:var(--amber)">'+withBadges+'</span></div>';
+  html+='</div>';
+  // Inventario
+  html+='<div class="card"><div class="ct">Estado del inventario</div>';
+  html+='<div class="row"><span style="color:var(--text2)">En almacen</span><span style="font-weight:600;color:var(--green)">'+fmt(inv.almacen)+'L</span></div>';
+  html+='<div class="row"><span style="color:var(--text2)">En distribucion</span><span style="font-weight:600;color:var(--amber)">'+fmt(inv.distribucion)+'L</span></div>';
+  html+='<div class="row"><span style="color:var(--text2)">Total vendido</span><span style="font-weight:600;color:var(--blue)">'+fmt(totalVend)+'L</span></div>';
+  html+='<div class="row"><span style="color:var(--text2)">Total entradas</span><span>'+fmt(totalEntr)+'L</span></div>';
+  html+='<div class="row"><span style="color:var(--text2)">Movimientos</span><span>'+(inv.mov||[]).length+'</span></div>';
+  html+='<div class="hr"></div><div class="ct" style="margin-top:8px">LATAM</div>';
+  html+='<div class="row"><span style="color:var(--text2)">Paises activos</span><span style="font-weight:600;color:var(--green)">'+latamActivos+'</span></div>';
+  html+='<div class="row"><span style="color:var(--text2)">En negociacion</span><span style="font-weight:600;color:var(--amber)">'+latamNegoc+'</span></div>';
+  html+='</div>';
+  // Actividad reciente
+  html+='<div class="card"><div class="ct">Actividad reciente del equipo</div>';
+  if(recent.length){
+    recent.forEach(function(e){
+      html+='<div class="row"><div style="flex:1;min-width:0"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px">'+e.cliente+'</div>';
+      html+='<div style="font-size:10px;color:var(--text3)">'+e.tipo+' · '+e.fecha+'</div></div>';
+      html+='<span style="font-size:10px;color:var(--text2);margin-left:8px">'+e.u+'</span></div>';
+    });
+  } else {
+    html+='<div style="font-size:12px;color:var(--text3)">Sin actividad registrada aun.</div>';
+  }
+  html+='</div></div>';
+  // Tabla historica
+  html+='<div class="card" style="margin-top:14px"><div class="ct">Resumen historico CDM + OA 2019-2025</div>';
+  html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+  html+='<thead><tr style="border-bottom:1px solid var(--border)">';
+  html+='<th style="text-align:left;padding:6px 8px;color:var(--text2);font-weight:500">Ano</th>';
+  html+='<th style="text-align:right;padding:6px 8px;color:var(--blue);font-weight:500">CDM (L)</th>';
+  html+='<th style="text-align:right;padding:6px 8px;color:var(--amber);font-weight:500">Odiseo OA (L)</th>';
+  html+='<th style="text-align:right;padding:6px 8px;color:var(--green);font-weight:500">Total (L)</th>';
+  html+='<th style="text-align:right;padding:6px 8px;color:var(--purple);font-weight:500">% OA</th>';
+  html+='<th style="text-align:right;padding:6px 8px;color:var(--teal);font-weight:500">Clientes CDM</th>';
+  html+='</tr></thead><tbody>';
+  BY_YEAR.forEach(function(r){
+    html+='<tr style="border-bottom:0.5px solid var(--bg3)">';
+    html+='<td style="padding:7px 8px;font-weight:600">'+r.year+'</td>';
+    html+='<td style="padding:7px 8px;text-align:right;color:var(--blue)">'+fmt(r.cdm)+'</td>';
+    html+='<td style="padding:7px 8px;text-align:right;color:var(--amber)">'+fmt(r.oa)+'</td>';
+    html+='<td style="padding:7px 8px;text-align:right;font-weight:700;color:var(--green)">'+fmt(r.total)+'</td>';
+    html+='<td style="padding:7px 8px;text-align:right;color:var(--purple)">'+r.pct_oa+'%</td>';
+    html+='<td style="padding:7px 8px;text-align:right;color:var(--teal)">'+(CDM_CLIENTES[r.year]||'—')+'</td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div>';
+  document.getElementById('monitor-body').innerHTML=html;
+}
+
 
 // ════════════════════════════════════════
 // BOOT
