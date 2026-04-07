@@ -272,6 +272,31 @@ window.onerror=function(msg,src,line,col,err){
 // DATA
 // ════════════════════════════════
 const ETAPAS={prospecto:{l:'Prospecto',c:'t-gy'},contactado:{l:'Contactado',c:'t-bl'},interesado:{l:'Interesado',c:'t-am'},compro:{l:'Compró ✓',c:'t-gr'},recompra:{l:'Recompra ✓',c:'t-gr'},no_compra:{l:'No compra',c:'t-rd'}};
+const BADGES={
+  gfg:{key:'gfg',icon:'🌾',label:'Grow for Gold',short:'GFG',color:'#f59e0b',bg:'#451a03'},
+  reto:{key:'reto',icon:'🏆',label:'Reto Austar',short:'Reto',color:'#22c55e',bg:'#14532d'},
+  academy:{key:'academy',icon:'🎓',label:'Austar Academy',short:'Academy',color:'#3b82f6',bg:'#1e3a5f'}
+};
+function getBadges(id){try{return JSON.parse(localStorage.getItem('as_bg_'+id)||'[]');}catch{return[];}}
+function toggleBadge(id,key){
+  let bg=getBadges(id);
+  if(bg.includes(key))bg=bg.filter(k=>k!==key);else bg.push(key);
+  localStorage.setItem('as_bg_'+id,JSON.stringify(bg));
+  openDet(id);
+}
+function renderBadgeBar(id,badges){
+  const all=Object.values(BADGES);
+  const tripleCorona=all.every(b=>badges.includes(b.key));
+  return`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    ${all.map(b=>{
+      const active=badges.includes(b.key);
+      return`<button onclick="toggleBadge('${id}','${b.key}')" style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:1.5px solid ${active?b.color:'var(--border)'};background:${active?b.bg:'var(--bg3)'};cursor:pointer;font-size:11px;font-weight:600;color:${active?b.color:'var(--text3)'};transition:all .2s">
+        <span>${b.icon}</span>${b.short}
+      </button>`;
+    }).join('')}
+    ${tripleCorona?`<span style="display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:20px;background:linear-gradient(135deg,#451a03,#14532d,#1e3a5f);font-size:11px;font-weight:700;color:#fcd34d;border:1.5px solid #f59e0b">🥇 Triple Corona</span>`:''}
+  </div>`;
+}
 const TIPO_LBL={agricultor:'Agricultor',socio_comercial:'Socio Comerc.',casa_agro:'Casa Agro',agroinfluencer:'Agroinfluencer'};
 
 const D2=[
@@ -713,11 +738,19 @@ function renderDashboard(){
   const compro=CLIENTS.filter(c=>['compro','recompra'].includes(getStage(c))).length;
   const pend=CLIENTS.filter(c=>['contactado','interesado'].includes(getStage(c))).length;
   const estados=[...new Set(CLIENTS.map(c=>c.estado).filter(Boolean))].length;
+  const gfg=CLIENTS.filter(c=>getBadges(c.id).includes('gfg')).length;
+  const reto=CLIENTS.filter(c=>getBadges(c.id).includes('reto')).length;
+  const academy=CLIENTS.filter(c=>getBadges(c.id).includes('academy')).length;
+  const triple=CLIENTS.filter(c=>Object.keys(BADGES).every(k=>getBadges(c.id).includes(k))).length;
   document.getElementById('dash-metrics').innerHTML=
     `<div class="met"><div class="mv" style="color:var(--teal)">${total}</div><div class="ml">Total clientes</div></div>`+
     `<div class="met"><div class="mv" style="color:var(--green)">${compro}</div><div class="ml">Compraron</div></div>`+
     `<div class="met"><div class="mv" style="color:var(--amber)">${pend}</div><div class="ml">En seguimiento</div></div>`+
-    `<div class="met"><div class="mv" style="color:var(--purple)">${estados}</div><div class="ml">Estados cubiertos</div></div>`;
+    `<div class="met"><div class="mv" style="color:var(--purple)">${estados}</div><div class="ml">Estados cubiertos</div></div>`+
+    `<div class="met" style="border-left:3px solid #f59e0b"><div class="mv" style="color:#f59e0b">🌾 ${gfg}</div><div class="ml">Grow for Gold</div></div>`+
+    `<div class="met" style="border-left:3px solid var(--green)"><div class="mv" style="color:var(--green)">🏆 ${reto}</div><div class="ml">Reto Austar</div></div>`+
+    `<div class="met" style="border-left:3px solid var(--blue)"><div class="mv" style="color:var(--blue)">🎓 ${academy}</div><div class="ml">Austar Academy</div></div>`+
+    `<div class="met" style="border-left:3px solid #fcd34d;background:linear-gradient(135deg,#1a1410,#101a10,#101018)"><div class="mv" style="color:#fcd34d">🥇 ${triple}</div><div class="ml">Triple Corona</div></div>`;
 
   // Pipeline chart
   const stages=['prospecto','contactado','interesado','compro','recompra','no_compra'];
@@ -790,12 +823,15 @@ function renderList(){
   document.getElementById('rc').textContent=`${filtered.length} clientes encontrados`;
   document.getElementById('clist').innerHTML=items.map(c=>{
     const ep=ETAPAS[getStage(c)]||ETAPAS.prospecto;
+    const bg=getBadges(c.id);
+    const tripleCorona=Object.keys(BADGES).every(k=>bg.includes(k));
+    const badgeIcons=bg.map(k=>BADGES[k]?BADGES[k].icon:'').join('');
     const tt=c.tipo!=='agricultor'?`<span class="tag t-pu">${TIPO_LBL[c.tipo]}</span>`:'';
     const cv=c.cultivos.slice(0,3).map(x=>`<span class="tag t-gy">${x}</span>`).join('');
-    return`<div class="card card-c" onclick="openDet('${c.id}')" style="padding:10px 14px">
+    return`<div class="card card-c" onclick="openDet('${c.id}')" style="padding:10px 14px;${tripleCorona?'border-color:#f59e0b;':''}"> 
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
         <div style="flex:1;min-width:0">
-          <div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nombre}</div>
+          <div style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nombre} ${badgeIcons?`<span style="font-size:12px">${badgeIcons}${tripleCorona?"🥇":""}</span>`:""}</div>
           <div style="font-size:11px;color:var(--text2);margin-top:1px">${[c.estado,c.municipio].filter(Boolean).join(' · ')}</div>
           <div style="margin-top:4px">${tt}${cv}</div>
         </div>
@@ -866,6 +902,7 @@ function openDet(id){
         </div>
       </div>
     </div>`;
+  document.getElementById('n-fecha-ev').value=new Date().toISOString().slice(0,10);
   gotoTab('detalle');
 }
 
@@ -957,6 +994,110 @@ function saveNuevo(){
   ['n-nm','n-tl','n-mn','n-cv','n-ob'].forEach(i=>document.getElementById(i).value='');
   alert(`✓ ${nm} registrado como prospecto.`);
   gotoTab('clientes');
+}
+
+// ════════════════════════════════
+// SEGUIMIENTO CICLO
+// ════════════════════════════════
+const CICLO_ETAPAS=[
+  {key:'compra',icon:'🛒',label:'Compra',color:'var(--green)'},
+  {key:'recepcion',icon:'📦',label:'Recepción',color:'var(--teal)'},
+  {key:'aplicacion',icon:'🌱',label:'Aplicación',color:'var(--blue)'},
+  {key:'seg30',icon:'📅',label:'30 días',color:'var(--amber)'},
+  {key:'seg60',icon:'📅',label:'60 días',color:'var(--amber)'},
+  {key:'seg90',icon:'📅',label:'90 días',color:'var(--amber)'},
+  {key:'cosecha',icon:'🌾',label:'Cosecha',color:'#f97316'},
+  {key:'roi',icon:'📊',label:'ROI',color:'var(--green)'}
+];
+
+function renderCycleTrack(notes){
+  const done=new Set(notes.map(n=>n.tipo));
+  return CICLO_ETAPAS.map((e,i)=>{
+    const isDone=done.has(e.key);
+    const note=notes.find(n=>n.tipo===e.key);
+    return`<div style="display:inline-flex;flex-direction:column;align-items:center;gap:3px;margin:0 4px 8px;min-width:52px;cursor:${isDone?'pointer':'default'}" ${isDone?`onclick="scrollToNote('${e.key}')"`:''}> 
+      <div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid ${isDone?e.color:'var(--border)'};background:${isDone?e.color+'22':'var(--bg3)'};">${e.icon}</div>
+      <div style="font-size:9px;text-align:center;color:${isDone?'var(--text)':'var(--text3)'};font-weight:${isDone?'600':'400'}">${e.label}</div>
+      ${note?`<div style="font-size:9px;color:var(--text3)">${note.f||''}</div>`:''}
+    </div>`;
+  }).join('<div style="display:inline-block;width:8px;height:2px;background:var(--border);margin:0 -2px 20px;vertical-align:middle"></div>');
+}
+
+function renderNotes(notes){
+  if(!notes.length)return'<div style="font-size:12px;color:var(--text3)">Sin eventos registrados aún.</div>';
+  const tipoLabel={compra:'🛒 Compra',recepcion:'📦 Recepción',aplicacion:'🌱 Aplicación',seg30:'📅 30 días',seg60:'📅 60 días',seg90:'📅 90 días',cosecha:'🌾 Cosecha',roi:'📊 ROI',recompra:'🔄 Recompra',nota:'📝 Nota'};
+  const tipoColor={compra:'t-gr',recepcion:'t-bl',aplicacion:'t-bl',seg30:'t-am',seg60:'t-am',seg90:'t-am',cosecha:'t-am',roi:'t-gr',recompra:'t-gr',nota:'t-gy'};
+  return notes.map(n=>`<div id="ev-${n.tipo||'nota'}" style="border-left:2px solid var(--border);padding:8px 12px;margin-bottom:8px;font-size:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <span class="tag ${tipoColor[n.tipo]||'t-gy'}">${tipoLabel[n.tipo]||n.tipo||'Nota'}</span>
+      <span style="font-size:10px;color:var(--text3)">${n.fecha||n.f||''} · ${n.u||''}</span>
+    </div>
+    ${n.t?`<div style="color:var(--text);margin-bottom:4px">${n.t}</div>`:''}
+    ${n.ap_litros?`<div style="color:var(--text2)"><b>Litros:</b> ${n.ap_litros}L · <b>Dosis:</b> ${n.ap_dosis||'—'} · <b>Ha:</b> ${n.ap_ha||'—'}</div>`:''}
+    ${n.ap_etapa?`<div style="color:var(--text2)"><b>Etapa:</b> ${n.ap_etapa} · <b>Forma:</b> ${n.ap_forma||'—'}</div>`:''}
+    ${n.seg_resultado?`<div style="color:var(--text2)"><b>Resultado:</b> ${n.seg_resultado}</div>`:''}
+    ${n.seg_estado?`<div style="color:var(--text2)"><b>Estado cultivo:</b> ${n.seg_estado}</div>`:''}
+    ${n.cos_rend?`<div style="color:var(--amber)"><b>Rendimiento:</b> ${n.cos_rend} (esperado: ${n.cos_esp||'—'})</div>`:''}
+    ${n.cos_roi?`<div style="color:var(--green);font-weight:600"><b>ROI:</b> ${n.cos_roi}</div>`:''}
+    ${n.foto?'<span class="tag t-gy">📷 Con evidencia</span>':''}
+    ${n.caso?'<span class="tag t-gr">⭐ Caso de éxito</span>':''}
+  </div>`).join('');
+}
+
+function toggleCamposEvento(){
+  const tipo=document.getElementById('n-tipo-ev').value;
+  document.getElementById('campos-aplicacion').style.display=(tipo==='aplicacion')?'block':'none';
+  document.getElementById('campos-seguimiento').style.display=(['seg30','seg60','seg90'].includes(tipo))?'block':'none';
+  document.getElementById('campos-cosecha').style.display=(['cosecha','roi'].includes(tipo))?'block':'none';
+}
+
+function saveEventoSeguimiento(id){
+  const tipo=document.getElementById('n-tipo-ev').value;
+  const txt=document.getElementById('nt').value.trim();
+  const fecha=document.getElementById('n-fecha-ev').value||new Date().toISOString().slice(0,10);
+  const foto=document.getElementById('n-foto').checked;
+  const caso=document.getElementById('n-caso').checked;
+  const ev={tipo,t:txt,fecha,u:user,
+    f:new Date(fecha).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'2-digit'}),
+    foto,caso};
+  if(tipo==='aplicacion'){
+    ev.ap_litros=document.getElementById('ap-litros').value;
+    ev.ap_dosis=document.getElementById('ap-dosis').value;
+    ev.ap_cultivo=document.getElementById('ap-cultivo').value;
+    ev.ap_ha=document.getElementById('ap-ha').value;
+    ev.ap_etapa=document.getElementById('ap-etapa').value;
+    ev.ap_forma=document.getElementById('ap-forma').value;
+    // Update inventory if litros entered
+    if(ev.ap_litros){
+      const ex=getExtra(id);
+      ex.litros=(parseFloat(ex.litros||0)+parseFloat(ev.ap_litros)).toString();
+      saveExtra(id,ex);
+    }
+  }
+  if(['seg30','seg60','seg90'].includes(tipo)){
+    ev.seg_dias=document.getElementById('seg-dias').value;
+    ev.seg_resultado=document.getElementById('seg-resultado').value;
+    ev.seg_estado=document.getElementById('seg-estado').value;
+  }
+  if(['cosecha','roi'].includes(tipo)){
+    ev.cos_rend=document.getElementById('cos-rend').value;
+    ev.cos_esp=document.getElementById('cos-esp').value;
+    ev.cos_mejora=document.getElementById('cos-mejora').value;
+    ev.cos_valor=document.getElementById('cos-valor').value;
+    ev.cos_roi=document.getElementById('cos-roi').value;
+  }
+  const notes=getNotes(id);
+  notes.unshift(ev);
+  saveNotes(id,notes);
+  // Auto-advance stage based on event type
+  const stageMap={compra:'compro',recepcion:'compro',aplicacion:'compro',seg30:'compro',seg60:'compro',seg90:'compro',cosecha:'recompra',roi:'recompra',recompra:'recompra'};
+  if(stageMap[tipo])setStage(id,stageMap[tipo]);
+  openDet(id);
+}
+
+function scrollToNote(tipo){
+  const el=document.getElementById('ev-'+tipo);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 // ════════════════════════════════
