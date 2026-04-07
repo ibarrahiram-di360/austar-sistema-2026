@@ -644,8 +644,8 @@ function loadMunicipios(){
 const USERS={
   yaneth:{pass:'austar2026',av:'YA',bg:'#14532d',col:'#86efac',name:'Yaneth',role:'Clientes B2C',tabs:['dashboard','clientes','detalle','nuevo'],readOnly:false},
   vale:{pass:'vale2026',av:'VA',bg:'#1e3a5f',col:'#93c5fd',name:'Vale',role:'Prospección B2B',tabs:['dashboard','clientes','detalle','nuevo','latam'],readOnly:false},
-  contraloria:{pass:'ctrl360',av:'CT',bg:'#2e1065',col:'#c4b5fd',name:'Contraloría',role:'Monitoreo y reportes',tabs:['dashboard','historico','clientes','detalle','inventario','latam','monitor'],readOnly:true},
-  hiram:{pass:'di360master',av:'HI',bg:'#451a03',col:'#fcd34d',name:'Hiram',role:'Director — Acceso total',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor'],readOnly:false}
+  contraloria:{pass:'ctrl360',av:'CT',bg:'#2e1065',col:'#c4b5fd',name:'Contraloría',role:'Monitoreo y reportes',tabs:['dashboard','historico','clientes','detalle','inventario','latam','monitor','backup'],readOnly:true},
+  hiram:{pass:'di360master',av:'HI',bg:'#451a03',col:'#fcd34d',name:'Hiram',role:'Director — Acceso total',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor','backup'],readOnly:false}
 };
 let selectedUser=null;
 
@@ -690,7 +690,7 @@ function login(u){
   av.style.background=cfg.bg; av.style.color=cfg.col; av.textContent=cfg.av;
   document.getElementById('user-name').textContent=cfg.name;
   // Show/hide nav items based on role
-  const allNavs='dashboard,historico,clientes,inventario,nuevo,latam,monitor'.split(',');
+  const allNavs='dashboard,historico,clientes,inventario,nuevo,latam,monitor,backup'.split(',');
   allNavs.forEach(t=>{
     const n=document.getElementById('nav-'+t);
     if(n)n.style.display=cfg.tabs.includes(t)?'flex':'none';
