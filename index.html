@@ -279,6 +279,7 @@ function toggleBadge(id,key){
   let bg=getBadges(id);
   if(bg.includes(key))bg=bg.filter(k=>k!==key);else bg.push(key);
   localStorage.setItem('as_bg_'+id,JSON.stringify(bg));
+  // Refresh only the badge section without full re-render
   openDet(id);
 }
 function renderBadgeBar(id,badges){
@@ -853,6 +854,39 @@ function openDet(id){
   const et=getStage(c);const ep=ETAPAS[et]||ETAPAS.prospecto;
   const notes=getNotes(id);const ex=getExtra(id);
   document.getElementById('det-body').innerHTML=`
+    <!-- BADGES - full width -->
+    <div class="card" style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="lbl">Programa Austar</div>
+        <div style="font-size:10px;color:var(--text3)">Toca para activar / desactivar</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        ${['gfg','reto','academy'].map(key=>{
+          const b=BADGES[key];
+          const active=getBadges(id).includes(key);
+          const triple=Object.keys(BADGES).every(k=>getBadges(id).includes(k));
+          return`<button onclick="toggleBadge('${id}','${key}')" style="display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:24px;border:2px solid ${active?b.color:'var(--border)'};background:${active?b.bg:'var(--bg3)'};cursor:pointer;font-size:12px;font-weight:600;color:${active?b.color:'var(--text3)'};transition:all .2s;min-width:140px">
+            <span style="font-size:18px">${b.icon}</span>
+            <div style="text-align:left">
+              <div>${b.label}</div>
+              <div style="font-size:10px;font-weight:400;opacity:.7">${active?'Activo':'Inactivo'}</div>
+            </div>
+            <span style="margin-left:auto">${active?'✓':''}</span>
+          </button>`;
+        }).join('')}
+        ${Object.keys(BADGES).every(k=>getBadges(id).includes(k))?
+          `<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:24px;border:2px solid #f59e0b;background:linear-gradient(135deg,#2a1800,#0a2a00,#00102a);min-width:140px">
+            <span style="font-size:18px">🥇</span>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#fcd34d">Triple Corona</div>
+              <div style="font-size:10px;color:#f59e0b">Descuento especial</div>
+            </div>
+          </div>`:
+          `<div style="font-size:11px;color:var(--text3);padding:8px">${3-Object.keys(BADGES).filter(k=>getBadges(id).includes(k)).length} insignia(s) para Triple Corona 🥇</div>`
+        }
+      </div>
+    </div>
+    <!-- 2-col layout -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div>
         <div class="card" style="margin-bottom:12px">
