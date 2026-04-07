@@ -170,6 +170,8 @@ select option{background:var(--bg2)}
     <div class="nav-item" onclick="gotoTab('clientes')" id="nav-clientes"><span class="ni">👥</span>Clientes</div>
     <div class="nav-item" onclick="gotoTab('inventario')" id="nav-inventario"><span class="ni">📦</span>Inventario</div>
     <div class="nav-item" onclick="gotoTab('nuevo')" id="nav-nuevo"><span class="ni">➕</span>Nuevo prospecto</div>
+    <div class="nav-section">Internacional</div>
+    <div class="nav-item" onclick="gotoTab('latam')" id="nav-latam"><span class="ni">🌎</span>Mercado LATAM</div>
     <div class="sb-footer">
       <div style="display:flex;align-items:center;gap:8px">
         <div id="user-av" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0"></div>
@@ -195,7 +197,7 @@ select option{background:var(--bg2)}
         <div class="oa-banner">
           <div>
             <div class="oa-name">🌵 Odiseo Amezcua · Socio Comercial Sureste</div>
-            <div class="oa-sub">Oaxaca · Guerrero · Chiapas</div>
+            <div class="oa-sub">Oaxaca · Guerrero · Chiapas · Sureste México</div>
           </div>
           <div class="oa-stats">
             <div><div class="oa-val">37,550 L</div><div class="oa-lbl">Litros 2025 (récord)</div></div>
@@ -390,6 +392,29 @@ select option{background:var(--bg2)}
       </div>
     </div>
 
+
+    <!-- ─── LATAM ─── -->
+    <div id="tab-latam" class="sc">
+      <div class="page-header">
+        <div class="page-title">Mercado LATAM</div>
+        <div class="page-sub">Expansión internacional Austar · Socios comerciales por país</div>
+      </div>
+      <div style="padding:0 22px 22px">
+        <!-- Metrics -->
+        <div class="g4" style="margin-bottom:14px" id="latam-metrics"></div>
+        <!-- Country cards -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px" id="latam-cards"></div>
+      </div>
+    </div>
+
+    <!-- ─── LATAM DETALLE ─── -->
+    <div id="tab-latam-det" class="sc">
+      <div style="display:flex;align-items:center;gap:10px;padding:18px 22px 0">
+        <button class="btn btn-sm" onclick="gotoTab('latam')">← Volver a LATAM</button>
+        <div id="ldet-ttl" style="font-size:18px;font-weight:700"></div>
+      </div>
+      <div style="padding:14px 22px 22px" id="ldet-body"></div>
+    </div>
   </div><!-- /main -->
 </div><!-- /app -->
 
@@ -490,7 +515,7 @@ function login(u){
 }
 function logout(){document.getElementById('app').style.display='none';document.getElementById('sc-login').style.display='flex';user=null;}
 
-const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo'];
+const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det'];
 function gotoTab(t){
   ALL_TABS.forEach(x=>{
     const el=document.getElementById('tab-'+x);if(el)el.classList.remove('on');
@@ -502,6 +527,7 @@ function gotoTab(t){
   if(t==='historico')renderHistorico('total');
   if(t==='clientes'){renderCliMetrics();applyFilter();}
   if(t==='inventario'){renderInv();setTimeout(()=>{const d=document.getElementById('inv-fecha');if(d)d.value=new Date().toISOString().slice(0,10);},50);}
+  if(t==='latam')renderLatam();
 }
 
 // ════════════════════════════════════════
@@ -877,6 +903,197 @@ function saveNuevo(){
   const st_el=document.getElementById('n-st');if(st_el)st_el.value='';
   alert(`✓ ${nm} registrado como prospecto.`);
   gotoTab('clientes');
+}
+
+
+// ════════════════════════════════════════
+// LATAM DATA
+// ════════════════════════════════════════
+const LATAM_PAISES=[
+  {id:'co',flag:'🇨🇴',pais:'Colombia',distribuidor:'Por definir',region:'Sudamérica',cultivos:['Aguacate','Mango','Café','Flores'],contacto:'',tel:'',status:'prospecto',litros_hist:[],notas:'Mercado prioritario. Aguacate Hass con alto potencial ROI.'},
+  {id:'pe',flag:'🇵🇪',pais:'Perú',distribuidor:'Por definir',region:'Sudamérica',cultivos:['Aguacate','Mango','Arándano','Espárrago'],contacto:'',tel:'',status:'prospecto',litros_hist:[],notas:'Exportador #1 aguacate LATAM. Alta receptividad a tecnología australiana.'},
+  {id:'gt',flag:'🇬🇹',pais:'Guatemala',distribuidor:'Por definir',region:'Centroamérica',cultivos:['Mango','Aguacate','Banano','Cardamomo'],contacto:'',tel:'',status:'prospecto',litros_hist:[],notas:'Puerta de entrada Centroamérica. Distribución potencial a El Salvador y Honduras.'},
+  {id:'pa',flag:'🇵🇦',pais:'Panamá',distribuidor:'Por definir',region:'Centroamérica',cultivos:['Mango','Papaya','Arroz','Sandía'],contacto:'',tel:'',status:'prospecto',litros_hist:[],notas:'Hub logístico regional. Conexión con estructura FILKHI / Consulting.'},
+  {id:'sv',flag:'🇸🇻',pais:'El Salvador',distribuidor:'Por definir',region:'Centroamérica',cultivos:['Mango','Caña','Hortalizas'],contacto:'',tel:'',status:'prospecto',litros_hist:[],notas:''},
+  {id:'hn',flag:'🇭🇳',pais:'Honduras',distribuidor:'Por definir',region:'Centroamérica',cultivos:['Mango','Banano','Papaya'],contacto:'',tel:'',status:'prospecto',litros_hist:[],notas:''},
+  {id:'cr',flag:'🇨🇷',pais:'Costa Rica',distribuidor:'Por definir',region:'Centroamérica',cultivos:['Piña','Aguacate','Banano'],contacto:'',tel:'',status:'prospecto',litros_hist:[],notas:''},
+  {id:'otros',flag:'🌎',pais:'Otros LATAM',distribuidor:'Nuevos prospectos',region:'LATAM',cultivos:[],contacto:'',tel:'',status:'prospecto',litros_hist:[],notas:'Región abierta para nuevos mercados y contactos internacionales.'}
+];
+const LATAM_STATUS={prospecto:{l:'Prospecto',c:'t-gy'},contactado:{l:'Contactado',c:'t-bl'},negociacion:{l:'En negociación',c:'t-am'},activo:{l:'Activo ✓',c:'t-gr'},distribuidor:{l:'Distribuidor oficial',c:'t-gr'}};
+function getLatamStatus(id){try{return localStorage.getItem('as_ltst_'+id)||'prospecto';}catch{return'prospecto';}}
+function setLatamStatus(id,s){try{localStorage.setItem('as_ltst_'+id,s);}catch{}}
+function getLatamData(id){try{return JSON.parse(localStorage.getItem('as_ltd_'+id)||'{}');}catch{return{};}}
+function saveLatamData(id,d){try{localStorage.setItem('as_ltd_'+id,JSON.stringify(d));}catch{}}
+function getLatamNotes(id){try{return JSON.parse(localStorage.getItem('as_ltn_'+id)||'[]');}catch{return[];}}
+function saveLatamNotes(id,n){try{localStorage.setItem('as_ltn_'+id,JSON.stringify(n));}catch{}}
+
+// ════════════════════════════════════════
+// LATAM
+// ════════════════════════════════════════
+function renderLatam(){
+  // Metrics
+  const activos=LATAM_PAISES.filter(p=>['activo','distribuidor'].includes(getLatamStatus(p.id))).length;
+  const negoc=LATAM_PAISES.filter(p=>getLatamStatus(p.id)==='negociacion').length;
+  const totalL=LATAM_PAISES.reduce((s,p)=>{const d=getLatamData(p.id);return s+(parseFloat(d.litros_acum)||0);},0);
+  const mEl=document.getElementById('latam-metrics');
+  if(mEl)mEl.innerHTML=
+    `<div class="met gl"><div class="mv" style="color:var(--green)">${LATAM_PAISES.length-1}</div><div class="ml">Países objetivo</div></div>`+
+    `<div class="met tl"><div class="mv" style="color:var(--teal)">${activos}</div><div class="ml">Activos / Dist. oficial</div></div>`+
+    `<div class="met al"><div class="mv" style="color:var(--amber)">${negoc}</div><div class="ml">En negociación</div></div>`+
+    `<div class="met bl"><div class="mv" style="color:var(--blue)">${fmt(totalL)}L</div><div class="ml">Litros LATAM acumulados</div></div>`;
+  // Country cards
+  const cEl=document.getElementById('latam-cards');
+  if(!cEl)return;
+  cEl.innerHTML=LATAM_PAISES.map(p=>{
+    const st=getLatamStatus(p.id);
+    const sc=LATAM_STATUS[st]||LATAM_STATUS.prospecto;
+    const d=getLatamData(p.id);
+    const notes=getLatamNotes(p.id);
+    const isOtros=p.id==='otros';
+    return`<div class="card card-c" onclick="openLatamDet('${p.id}')" style="padding:14px 16px${st==='activo'||st==='distribuidor'?';border-color:var(--green)':st==='negociacion'?';border-color:var(--amber)':''}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:28px">${p.flag}</span>
+          <div>
+            <div style="font-weight:700;font-size:14px">${p.pais}</div>
+            <div style="font-size:10px;color:var(--text3)">${p.region}</div>
+          </div>
+        </div>
+        <span class="tag ${sc.c}">${sc.l}</span>
+      </div>
+      <div class="hr"></div>
+      <div style="font-size:12px;margin-top:8px">
+        <div class="row"><span style="color:var(--text2)">Distribuidor</span><span style="font-weight:500;max-width:150px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.distribuidor||p.distribuidor}</span></div>
+        <div class="row"><span style="color:var(--text2)">Contacto</span><span>${d.contacto||p.contacto||'—'}</span></div>
+        <div class="row"><span style="color:var(--text2)">Litros acumulados</span><span style="font-weight:600;color:${parseFloat(d.litros_acum||0)>0?'var(--green)':'var(--text3)'}">${fmt(parseFloat(d.litros_acum||0))}L</span></div>
+        <div class="row"><span style="color:var(--text2)">Eventos registrados</span><span>${notes.length}</span></div>
+      </div>
+      ${!isOtros&&p.cultivos.length?`<div style="margin-top:8px">${p.cultivos.slice(0,4).map(c=>`<span class="tag t-gy">${c}</span>`).join('')}</div>`:''}
+      ${p.notas&&!d.distribuidor?`<div style="margin-top:8px;font-size:10px;color:var(--text3);font-style:italic">${p.notas.slice(0,80)}${p.notas.length>80?'...':''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function openLatamDet(pid){
+  const p=LATAM_PAISES.find(x=>x.id===pid);if(!p)return;
+  document.getElementById('ldet-ttl').textContent=p.flag+' '+p.pais;
+  const st=getLatamStatus(pid);
+  const sc=LATAM_STATUS[st]||LATAM_STATUS.prospecto;
+  const d=getLatamData(pid);
+  const notes=getLatamNotes(pid);
+  const TMAP={contacto:'📞 Contacto',reunion:'🤝 Reunión',propuesta:'📋 Propuesta enviada',negociacion:'⚖️ Negociación',contrato:'📄 Contrato',pedido:'🛒 Pedido',venta:'✅ Venta',seguimiento:'📅 Seguimiento',nota:'📝 Nota'};
+  const TCOL={contacto:'t-bl',reunion:'t-bl',propuesta:'t-am',negociacion:'t-am',contrato:'t-gr',pedido:'t-gr',venta:'t-gr',seguimiento:'t-am',nota:'t-gy'};
+  const notesHtml=notes.length?notes.map(n=>`<div style="border-left:2px solid var(--border);padding:8px 12px;margin-bottom:8px;font-size:12px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span class="tag ${TCOL[n.tipo]||'t-gy'}">${TMAP[n.tipo]||n.tipo}</span><span style="font-size:10px;color:var(--text3)">${n.fecha||''} · ${n.u||''}</span></div>
+    ${n.t?`<div>${n.t}</div>`:''}
+    ${n.litros?`<div style="color:var(--green);font-weight:600;margin-top:4px">${n.litros}L · ${n.precio?'$'+parseFloat(n.precio).toLocaleString('es-MX')+'/L':''}</div>`:''}
+  </div>`).join(''):'<div style="font-size:12px;color:var(--text3)">Sin eventos registrados.</div>';
+  document.getElementById('ldet-body').innerHTML=`
+    <div class="g2">
+      <div>
+        <!-- Info card -->
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+            <span style="font-size:40px">${p.flag}</span>
+            <div>
+              <div style="font-size:16px;font-weight:700">${p.pais}</div>
+              <div style="font-size:11px;color:var(--text2)">${p.region}</div>
+              <span class="tag ${sc.c}" style="margin-top:4px;display:inline-block">${sc.l}</span>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;margin-top:10px">
+            <div><div class="lbl">Distribuidor</div><input id="ld-dist" value="${d.distribuidor||p.distribuidor||''}" placeholder="Nombre del distribuidor" style="margin-top:4px"></div>
+            <div><div class="lbl">Contacto</div><input id="ld-cont" value="${d.contacto||p.contacto||''}" placeholder="Nombre de contacto" style="margin-top:4px"></div>
+            <div><div class="lbl">Teléfono / WhatsApp</div><input id="ld-tel" value="${d.tel||p.tel||''}" placeholder="+57 300 000 0000" style="margin-top:4px"></div>
+            <div><div class="lbl">Email</div><input id="ld-email" value="${d.email||''}" placeholder="correo@ejemplo.com" style="margin-top:4px"></div>
+            <div><div class="lbl">Litros acumulados</div><input id="ld-litros" type="number" value="${d.litros_acum||0}" placeholder="0" style="margin-top:4px"></div>
+            <div><div class="lbl">Precio acordado MXN/L</div><input id="ld-precio" value="${d.precio||''}" placeholder="Ej: 1,477" style="margin-top:4px"></div>
+            <div style="grid-column:span 2"><div class="lbl">Cultivos objetivo</div><input id="ld-cultivos" value="${d.cultivos||p.cultivos.join(', ')}" placeholder="Aguacate, Mango..." style="margin-top:4px"></div>
+            <div style="grid-column:span 2"><div class="lbl">Notas estratégicas</div><textarea id="ld-notas" rows="2" style="margin-top:4px">${d.notas||p.notas||''}</textarea></div>
+          </div>
+          <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+            <select id="ld-status" style="flex:1;margin-right:8px">
+              ${Object.entries(LATAM_STATUS).map(([k,v])=>`<option value="${k}"${st===k?' selected':''}>${v.l}</option>`).join('')}
+            </select>
+            <button class="btn btn-g" onclick="saveLatamInfo('${pid}')">Guardar</button>
+          </div>
+        </div>
+        <!-- Cultivos potential -->
+        ${p.id!=='otros'?`<div class="card">
+          <div class="ct">Potencial por cultivo</div>
+          ${(d.cultivos||p.cultivos.join(', ')).split(',').filter(c=>c.trim()).map(c=>`<div class="row"><span style="color:var(--text2)">${c.trim()}</span><span class="tag t-gy">Por explorar</span></div>`).join('')}
+        </div>`:'<div class="card"><div class="ct">Región abierta</div><div style="font-size:12px;color:var(--text2)">Espacio para registrar nuevos países o mercados LATAM no clasificados en la lista principal.</div></div>'}
+      </div>
+      <div class="card">
+        <div class="ct">Registrar evento</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><div class="lbl">Tipo de evento</div>
+            <select id="lt-tipo">
+              <option value="contacto">📞 Primer contacto</option>
+              <option value="reunion">🤝 Reunión / Llamada</option>
+              <option value="propuesta">📋 Propuesta enviada</option>
+              <option value="negociacion">⚖️ Negociación</option>
+              <option value="contrato">📄 Contrato / Acuerdo</option>
+              <option value="pedido">🛒 Pedido confirmado</option>
+              <option value="venta">✅ Venta / Despacho</option>
+              <option value="seguimiento">📅 Seguimiento</option>
+              <option value="nota">📝 Nota general</option>
+            </select>
+          </div>
+          <div><div class="lbl">Fecha</div><input id="lt-fecha" type="date"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><div class="lbl">Litros (si aplica)</div><input id="lt-litros" type="number" placeholder="0" min="0"></div>
+          <div><div class="lbl">Precio MXN/L</div><input id="lt-precio" placeholder="Ej: 1,477"></div>
+        </div>
+        <div style="margin-bottom:8px"><div class="lbl">Descripción / Notas</div><textarea id="lt-nota" rows="3" placeholder="Detalle del evento, acuerdos, próximos pasos..."></textarea></div>
+        <div style="text-align:right"><button class="btn btn-g btn-sm" onclick="saveLatamEvento('${pid}')">Registrar evento</button></div>
+        <div class="hr"></div>
+        <div class="ct">Historial</div>
+        <div style="max-height:320px;overflow-y:auto">${notesHtml}</div>
+      </div>
+    </div>`;
+  setTimeout(()=>{const d=document.getElementById('lt-fecha');if(d)d.value=new Date().toISOString().slice(0,10);},50);
+  document.getElementById('tab-latam-det').classList.add('on');
+  ALL_TABS.forEach(t=>{if(t!=='latam-det'){const el=document.getElementById('tab-'+t);if(el)el.classList.remove('on');}});
+  const n=document.getElementById('nav-latam');if(n)n.classList.add('act');
+}
+
+function saveLatamInfo(pid){
+  const d={
+    distribuidor:document.getElementById('ld-dist')?.value||'',
+    contacto:document.getElementById('ld-cont')?.value||'',
+    tel:document.getElementById('ld-tel')?.value||'',
+    email:document.getElementById('ld-email')?.value||'',
+    litros_acum:document.getElementById('ld-litros')?.value||0,
+    precio:document.getElementById('ld-precio')?.value||'',
+    cultivos:document.getElementById('ld-cultivos')?.value||'',
+    notas:document.getElementById('ld-notas')?.value||''
+  };
+  saveLatamData(pid,d);
+  const st=document.getElementById('ld-status')?.value||'prospecto';
+  setLatamStatus(pid,st);
+  openLatamDet(pid);
+}
+
+function saveLatamEvento(pid){
+  const tipo=document.getElementById('lt-tipo')?.value||'nota';
+  const txt=document.getElementById('lt-nota')?.value?.trim()||'';
+  const fecha=document.getElementById('lt-fecha')?.value||new Date().toISOString().slice(0,10);
+  const litros=document.getElementById('lt-litros')?.value||'';
+  const precio=document.getElementById('lt-precio')?.value||'';
+  if(!txt&&!litros){alert('Agrega una descripción o los litros del evento');return;}
+  const ev={tipo,t:txt,fecha,litros,precio,u:user};
+  const notes=getLatamNotes(pid);
+  notes.unshift(ev);
+  saveLatamNotes(pid,notes);
+  if(litros){
+    const d=getLatamData(pid);
+    d.litros_acum=(parseFloat(d.litros_acum||0)+parseFloat(litros)).toString();
+    saveLatamData(pid,d);
+  }
+  openLatamDet(pid);
 }
 
 // ════════════════════════════════════════
