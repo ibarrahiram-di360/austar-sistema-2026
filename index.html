@@ -264,10 +264,7 @@
 </div><!-- /app-shell -->
 
 <script>
-window.onerror=function(msg,src,line,col,err){
-  document.body.innerHTML='<div style="padding:40px;color:#ef4444;font-family:monospace;background:#0f1117;min-height:100vh"><h2>Error JS</h2><p>'+msg+'</p><p>Línea: '+line+'</p><pre>'+err+'</pre></div>';
-  return true;
-};
+// error logging active
 // ════════════════════════════════
 // DATA
 // ════════════════════════════════
@@ -902,7 +899,12 @@ function openDet(id){
         </div>
       </div>
     </div>`;
-  document.getElementById('n-fecha-ev').value=new Date().toISOString().slice(0,10);
+  setTimeout(()=>{
+    const df=document.getElementById('n-fecha-ev');
+    if(df)df.value=new Date().toISOString().slice(0,10);
+    const ts=document.getElementById('n-tipo-ev');
+    if(ts)ts.addEventListener('change',toggleCamposEvento);
+  },50);
   gotoTab('detalle');
 }
 
@@ -1045,28 +1047,34 @@ function renderNotes(notes){
 }
 
 function toggleCamposEvento(){
-  const tipo=document.getElementById('n-tipo-ev').value;
-  document.getElementById('campos-aplicacion').style.display=(tipo==='aplicacion')?'block':'none';
-  document.getElementById('campos-seguimiento').style.display=(['seg30','seg60','seg90'].includes(tipo))?'block':'none';
-  document.getElementById('campos-cosecha').style.display=(['cosecha','roi'].includes(tipo))?'block':'none';
+  const tipoEl=document.getElementById('n-tipo-ev');if(!tipoEl)return;
+  const tipo=tipoEl.value;
+  const ca=document.getElementById('campos-aplicacion');if(ca)ca.style.display=(tipo==='aplicacion')?'block':'none';
+  const cs=document.getElementById('campos-seguimiento');if(cs)cs.style.display=(['seg30','seg60','seg90'].includes(tipo))?'block':'none';
+  const cc=document.getElementById('campos-cosecha');if(cc)cc.style.display=(['cosecha','roi'].includes(tipo))?'block':'none';
 }
 
 function saveEventoSeguimiento(id){
-  const tipo=document.getElementById('n-tipo-ev').value;
-  const txt=document.getElementById('nt').value.trim();
-  const fecha=document.getElementById('n-fecha-ev').value||new Date().toISOString().slice(0,10);
-  const foto=document.getElementById('n-foto').checked;
-  const caso=document.getElementById('n-caso').checked;
+  const tipoEl=document.getElementById('n-tipo-ev');
+  const tipo=tipoEl?tipoEl.value:'nota';
+  const txtEl=document.getElementById('nt');
+  const txt=txtEl?txtEl.value.trim():'';
+  const fechaEl=document.getElementById('n-fecha-ev');
+  const fecha=fechaEl?fechaEl.value:new Date().toISOString().slice(0,10);
+  const fotoEl=document.getElementById('n-foto');
+  const foto=fotoEl?fotoEl.checked:false;
+  const casoEl=document.getElementById('n-caso');
+  const caso=casoEl?casoEl.checked:false;
   const ev={tipo,t:txt,fecha,u:user,
     f:new Date(fecha).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'2-digit'}),
     foto,caso};
   if(tipo==='aplicacion'){
-    ev.ap_litros=document.getElementById('ap-litros').value;
-    ev.ap_dosis=document.getElementById('ap-dosis').value;
-    ev.ap_cultivo=document.getElementById('ap-cultivo').value;
-    ev.ap_ha=document.getElementById('ap-ha').value;
-    ev.ap_etapa=document.getElementById('ap-etapa').value;
-    ev.ap_forma=document.getElementById('ap-forma').value;
+    ev.ap_litros=document.getElementById('ap-litros')?.value||'';
+    ev.ap_dosis=document.getElementById('ap-dosis')?.value||'';
+    ev.ap_cultivo=document.getElementById('ap-cultivo')?.value||'';
+    ev.ap_ha=document.getElementById('ap-ha')?.value||'';
+    ev.ap_etapa=document.getElementById('ap-etapa')?.value||'';
+    ev.ap_forma=document.getElementById('ap-forma')?.value||'';
     // Update inventory if litros entered
     if(ev.ap_litros){
       const ex=getExtra(id);
@@ -1075,16 +1083,16 @@ function saveEventoSeguimiento(id){
     }
   }
   if(['seg30','seg60','seg90'].includes(tipo)){
-    ev.seg_dias=document.getElementById('seg-dias').value;
-    ev.seg_resultado=document.getElementById('seg-resultado').value;
-    ev.seg_estado=document.getElementById('seg-estado').value;
+    ev.seg_dias=document.getElementById('seg-dias')?.value||'';
+    ev.seg_resultado=document.getElementById('seg-resultado')?.value||'';
+    ev.seg_estado=document.getElementById('seg-estado')?.value||'';
   }
   if(['cosecha','roi'].includes(tipo)){
-    ev.cos_rend=document.getElementById('cos-rend').value;
-    ev.cos_esp=document.getElementById('cos-esp').value;
-    ev.cos_mejora=document.getElementById('cos-mejora').value;
-    ev.cos_valor=document.getElementById('cos-valor').value;
-    ev.cos_roi=document.getElementById('cos-roi').value;
+    ev.cos_rend=document.getElementById('cos-rend')?.value||'';
+    ev.cos_esp=document.getElementById('cos-esp')?.value||'';
+    ev.cos_mejora=document.getElementById('cos-mejora')?.value||'';
+    ev.cos_valor=document.getElementById('cos-valor')?.value||'';
+    ev.cos_roi=document.getElementById('cos-roi')?.value||'';
   }
   const notes=getNotes(id);
   notes.unshift(ev);
