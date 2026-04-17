@@ -162,6 +162,11 @@ select option{background:var(--bg2)}
           <div style="flex:1"><div style="font-weight:600;font-size:13px">Hiram</div><div style="font-size:11px;color:var(--text2)">Acceso total — Director</div></div>
           <span style="color:var(--text3);font-size:18px">›</span>
         </div>
+        <div class="ucard" onclick="selectUser('telemarketing')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:left">
+          <div class="uav" style="background:#134e4a;color:#99f6e4;width:38px;height:38px;font-size:13px;flex-shrink:0">TM</div>
+          <div style="flex:1"><div style="font-weight:600;font-size:13px">Telemarketing</div><div style="font-size:11px;color:var(--text2)">Atención al cliente</div></div>
+          <span style="color:var(--text3);font-size:18px">›</span>
+        </div>
       </div>
     </div>
 
@@ -330,7 +335,10 @@ select option{background:var(--bg2)}
       <div style="padding:0 22px 22px">
         <div class="g4" style="margin-bottom:12px" id="cli-metrics"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-          <input id="f-s" placeholder="Buscar nombre, estado, cultivo..." style="flex:2;min-width:150px" oninput="applyFilter()">
+          <div style="flex:2;min-width:200px;position:relative">
+            <input id="f-s" placeholder="🔍  Buscar por nombre, estado, municipio, cultivo, teléfono..." style="width:100%;padding-left:12px" oninput="applyFilter();showSuggestions()" onblur="setTimeout(hideSuggestions,200)">
+            <div id="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;z-index:100;max-height:200px;overflow-y:auto;margin-top:2px"></div>
+          </div>
           <select id="f-e" style="flex:1;min-width:100px" onchange="applyFilter()"><option value="">Todos los estados</option></select>
           <select id="f-c" style="flex:1;min-width:110px" onchange="applyFilter()"><option value="">Todos los cultivos</option></select>
           <select id="f-t" style="flex:1;min-width:120px" onchange="applyFilter()">
@@ -339,6 +347,7 @@ select option{background:var(--bg2)}
             <option value="interesado">Interesado</option><option value="compro">Compró</option>
             <option value="recompra">Recompra</option><option value="no_compra">No compra</option>
           </select>
+          <button class="btn btn-sm" onclick="clearSearch()" title="Limpiar búsqueda">✕ Limpiar</button>
         </div>
         <div id="rc" style="font-size:11px;color:var(--text2);margin-bottom:8px"></div>
         <div id="clist" style="display:flex;flex-direction:column;gap:6px"></div>
@@ -370,17 +379,49 @@ select option{background:var(--bg2)}
         <div class="card" style="margin-bottom:14px">
           <div class="ct">Registrar movimiento</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-            <div><div class="lbl">Tipo</div>
+            <div><div class="lbl">Tipo de movimiento</div>
               <select id="inv-tipo" onchange="toggleInvFields()">
-                <option value="entrada">Entrada — llegada de Australia</option>
-                <option value="venta">Venta — salida a cliente</option>
-                <option value="traslado_pv">Traslado a punto de venta</option>
-                <option value="devolucion">Devolución a almacén</option>
+                <optgroup label="Entradas">
+                  <option value="entrada">📥 Entrada — llegada de Australia</option>
+                </optgroup>
+                <optgroup label="Salidas — Ventas">
+                  <option value="venta">💰 Venta directa — cliente contado</option>
+                  <option value="credito_odiseo">🤝 Crédito Odiseo (90 días) — no es venta aún</option>
+                  <option value="cobro_odiseo">✅ Cobro Odiseo — se convierte en venta</option>
+                </optgroup>
+                <optgroup label="Puntos de venta">
+                  <option value="traslado_dasam">🏪 Traslado → Agrícola Dasam</option>
+                  <option value="traslado_pv">🏪 Traslado → Otro punto de venta</option>
+                </optgroup>
+                <optgroup label="Otros">
+                  <option value="devolucion">↩️ Devolución a almacén</option>
+                  <option value="ajuste">⚙️ Ajuste de inventario</option>
+                </optgroup>
               </select>
             </div>
-            <div><div class="lbl">Litros</div><input id="inv-lt" type="number" min="1" placeholder="Ej: 200"></div>
+            <div><div class="lbl">Presentación</div>
+              <select id="inv-pres">
+                <option value="garrafa_5">Garrafa 5L</option>
+                <option value="litro_1">Presentación 1L</option>
+                <option value="granel">Granel (litros)</option>
+              </select>
+            </div>
+            <div><div class="lbl">Cantidad</div>
+              <div style="display:flex;gap:6px;align-items:center">
+                <input id="inv-cant" type="number" min="1" placeholder="Unidades/Litros" style="flex:1" oninput="calcLitrosInv()">
+                <span style="font-size:11px;color:var(--text2)" id="inv-lt-preview">= 0L</span>
+              </div>
+            </div>
+            <input type="hidden" id="inv-lt" value="0">
             <div id="inv-lote-w"><div class="lbl">No. lote / factura</div><input id="inv-lote" placeholder="Ej: LOT-2026-001"></div>
             <div id="inv-cli-w" style="display:none"><div class="lbl">Cliente</div><input id="inv-cli" placeholder="Nombre del cliente"></div>
+            <div id="inv-odiseo-w" style="display:none;grid-column:span 2;background:var(--bg3);border-radius:8px;padding:10px">
+              <div style="font-size:11px;font-weight:600;color:var(--amber);margin-bottom:8px">🤝 Crédito Odiseo Amezcua — 90 días</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div><div class="lbl">Fecha de vencimiento</div><input id="inv-venc" type="date"></div>
+                <div><div class="lbl">No. de remisión</div><input id="inv-remision" placeholder="REM-2026-001"></div>
+              </div>
+            </div>
             <div><div class="lbl">Fecha</div><input id="inv-fecha" type="date"></div>
             <div><div class="lbl">Precio MXN/L</div><input id="inv-precio" type="number" placeholder="Ej: 1477"></div>
           </div>
@@ -545,6 +586,15 @@ select option{background:var(--bg2)}
                   </div>
                 </div>
               </div>
+              <div class="card" style="padding:12px;cursor:pointer" onclick="exportCSV('seguimientos')">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <span style="font-size:22px">📅</span>
+                  <div>
+                    <div style="font-weight:600;font-size:13px">Seguimientos (.csv)</div>
+                    <div style="font-size:11px;color:var(--text2)">Todos los eventos: aplicaciones, 30/60/90 días, cosecha, ROI</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -645,7 +695,8 @@ const USERS={
   yaneth:{pass:'austar2026',av:'YA',bg:'#14532d',col:'#86efac',name:'Yaneth',role:'Clientes B2C',tabs:['dashboard','clientes','detalle','nuevo'],readOnly:false},
   vale:{pass:'vale2026',av:'VA',bg:'#1e3a5f',col:'#93c5fd',name:'Vale',role:'Prospección B2B',tabs:['dashboard','clientes','detalle','nuevo','latam'],readOnly:false},
   contraloria:{pass:'ctrl360',av:'CT',bg:'#2e1065',col:'#c4b5fd',name:'Contraloría',role:'Monitoreo y reportes',tabs:['dashboard','historico','clientes','detalle','inventario','latam','monitor','backup'],readOnly:true},
-  hiram:{pass:'di360master',av:'HI',bg:'#451a03',col:'#fcd34d',name:'Hiram',role:'Director — Acceso total',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor','backup'],readOnly:false}
+  hiram:{pass:'di360master',av:'HI',bg:'#451a03',col:'#fcd34d',name:'Hiram',role:'Director — Acceso total',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor','backup'],readOnly:false},
+  telemarketing:{pass:'telemark26',av:'TM',bg:'#134e4a',col:'#99f6e4',name:'Telemarketing',role:'Atención al cliente',tabs:['clientes','detalle','inventario','latam'],readOnly:false}
 };
 let selectedUser=null;
 
@@ -690,7 +741,7 @@ function login(u){
   av.style.background=cfg.bg; av.style.color=cfg.col; av.textContent=cfg.av;
   document.getElementById('user-name').textContent=cfg.name;
   // Show/hide nav items based on role
-  const allNavs='dashboard,historico,clientes,inventario,nuevo,latam,monitor,backup'.split(',');
+  const allNavs='dashboard,historico,clientes,inventario,nuevo,latam,monitor,backup,telemarketing'.split(',');
   allNavs.forEach(t=>{
     const n=document.getElementById('nav-'+t);
     if(n)n.style.display=cfg.tabs.includes(t)?'flex':'none';
@@ -1080,7 +1131,7 @@ function renderInv(){
   const histEl=document.getElementById('inv-hist');
   if(!histEl)return;
   if(!movs.length){histEl.innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px">Sin movimientos registrados.</div>';return;}
-  histEl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Tipo</th><th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Litros</th><th style="text-align:left;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Cliente/Lote</th><th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">$/L</th><th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Fecha</th></tr></thead><tbody>${movs.slice(0,30).map(m=>{const tc=TMAP2[m.tipo]||{l:m.tipo,c:'t-gy'};return`<tr style="border-bottom:0.5px solid var(--bg3)"><td style="padding:7px 4px"><span class="tag ${tc.c}">${tc.l}</span></td><td style="padding:7px 4px;text-align:right;font-weight:600">${m.lt}</td><td style="padding:7px 4px;color:var(--text2)">${m.cli||m.lote||'—'}</td><td style="padding:7px 4px;text-align:right;color:var(--text2)">${m.precio?'$'+parseFloat(m.precio).toLocaleString('es-MX'):'—'}</td><td style="padding:7px 4px;text-align:right;color:var(--text3)">${m.fecha}</td></tr>`;}).join('')}</tbody></table>`;
+  histEl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Tipo</th><th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Litros</th><th style="text-align:left;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Cliente/Lote</th><th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">$/L</th><th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;font-size:11px">Fecha</th></tr></thead><tbody>${movs.slice(0,30).map(m=>{const tc=TMAP2[m.tipo]||{l:m.tipo,c:'t-gy'};return`<tr style="border-bottom:0.5px solid var(--bg3)"><td style="padding:7px 4px"><span class="tag ${tc.c}">${tc.l}</span></td><td style="padding:7px 4px;text-align:right;font-weight:600">${m.lt}L</td><td style="padding:7px 4px;color:var(--text2);font-size:11px">${m.presLabel||m.pres||'—'}</td><td style="padding:7px 4px;color:var(--text2)">${m.cli||m.lote||'—'}${m.venc?'<br><span style="font-size:10px;color:var(--amber)">Vence: '+m.venc+'</span>':''}</td><td style="padding:7px 4px;text-align:right;color:var(--text2)">${m.precio?'$'+parseFloat(m.precio).toLocaleString('es-MX'):'—'}</td><td style="padding:7px 4px;text-align:right;color:var(--text3)">${m.fecha}</td></tr>`;}).join('')}</tbody></table>`;
 }
 
 // ════════════════════════════════════════
@@ -1214,7 +1265,7 @@ function openLatamDet(pid){
             <select id="ld-status" style="flex:1;margin-right:8px">
               ${Object.entries(LATAM_STATUS).map(([k,v])=>`<option value="${k}"${st===k?' selected':''}>${v.l}</option>`).join('')}
             </select>
-            <button class="btn btn-g" onclick="saveLatamInfo('${pid}')">Guardar</button>
+            <button class="btn btn-g" id="ldet-save-btn" onclick="saveLatamInfo('${pid}')">Guardar cambios</button>
           </div>
         </div>
         <!-- Cultivos potential -->
@@ -1491,6 +1542,13 @@ function exportCSV(tipo){
     (inv.mov||[]).forEach(function(m){
       rows.push([m.tipo,m.lt,m.cli||m.lote||'',m.precio||'',m.lt&&m.precio?(parseFloat(m.lt)*parseFloat(m.precio)).toFixed(2):'',m.fecha,m.user||'',m.obs||'']);
     });
+  } else if(tipo==='seguimientos'){
+    rows.push(['Cliente','Estado','Municipio','Cultivo','Tipo evento','Fecha','Descripcion','Litros aplicados','Dosis L/ha','Hectareas','Etapa fenologica','Forma aplicacion','Dias desde aplicacion','Resultado observado','Estado cultivo','Rendimiento obtenido','Rendimiento esperado','Mejora %','ROI','Evidencia fotografica','Caso de exito','Usuario']);
+    CLIENTS.forEach(function(c){
+      getNotes(c.id).forEach(function(n){
+        rows.push([c.nombre,c.estado,c.municipio,c.cultivos.join('|'),n.tipo||'nota',n.fecha||n.f||'',n.t||'',n.ap_litros||'',n.ap_dosis||'',n.ap_ha||'',n.ap_etapa||'',n.ap_forma||'',n.seg_dias||'',n.seg_resultado||'',n.seg_estado||'',n.cos_rend||'',n.cos_esp||'',n.cos_mejora||'',n.cos_roi||'',n.foto?'SI':'NO',n.caso?'SI':'NO',n.u||'']);
+      });
+    });
   } else if(tipo==='latam'){
     rows.push(['Pais','Region','Distribuidor','Contacto','Telefono','Email','Estatus','Litros acumulados','Precio MXN/L','Cultivos','Notas','Eventos registrados']);
     LATAM_PAISES.forEach(function(p){
@@ -1537,6 +1595,14 @@ function exportExcel(){
   var ws4data=[['Tipo','Litros','Cliente/Lote','Precio MXN/L','Fecha','Usuario','Observaciones']];
   (inv.mov||[]).forEach(function(m){ws4data.push([m.tipo,m.lt,m.cli||m.lote||'',m.precio||'',m.fecha,m.user||'',m.obs||'']);});
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ws4data),'Inventario');
+  // Sheet 3b: Seguimientos detallados (replace existing or add)
+  var ws3b_data=[['Cliente','Estado','Tipo','Fecha','Descripcion','Litros','Dosis','Ha','Etapa','Resultado','ROI','Caso Exito','Usuario']];
+  CLIENTS.forEach(function(c){
+    getNotes(c.id).forEach(function(n){
+      ws3b_data.push([c.nombre,c.estado,n.tipo||'',n.fecha||n.f||'',n.t||'',n.ap_litros||'',n.ap_dosis||'',n.ap_ha||'',n.ap_etapa||'',n.seg_resultado||'',n.cos_roi||'',n.caso?'SI':'NO',n.u||'']);
+    });
+  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ws3b_data),'Seguimientos Detalle');
   // Sheet 5: LATAM
   var ws5data=[['Pais','Region','Distribuidor','Contacto','Telefono','Estatus','Litros acum.','Eventos']];
   LATAM_PAISES.forEach(function(p){
@@ -1549,6 +1615,84 @@ function exportExcel(){
   BY_YEAR.forEach(function(r){ws6data.push([r.year,r.cdm,r.oa,r.total,r.pct_oa+'%',CDM_CLIENTES[r.year]||'']);});
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ws6data),'Historico');
   XLSX.writeFile(wb,'austar-reporte-'+getTodayStr()+'.xlsx');
+}
+
+
+// ════════════════════════════════════════
+// UNIVERSAL SEARCH
+// ════════════════════════════════════════
+function showSuggestions(){
+  var q=(document.getElementById('f-s')||{}).value||'';
+  var box=document.getElementById('search-suggestions');
+  if(!box||q.length<2){hideSuggestions();return;}
+  var ql=q.toLowerCase();
+  var matches=CLIENTS.filter(function(c){
+    return (c.nombre||'').toLowerCase().includes(ql)||
+           (c.estado||'').toLowerCase().includes(ql)||
+           (c.municipio||'').toLowerCase().includes(ql)||
+           (c.cultivos||[]).some(function(cv){return cv.toLowerCase().includes(ql);})||
+           (c.tel||'').includes(q);
+  }).slice(0,8);
+  if(!matches.length){hideSuggestions();return;}
+  box.style.display='block';
+  box.innerHTML=matches.map(function(c){
+    var ep=ETAPAS[getStage(c)]||ETAPAS.prospecto;
+    return '<div onclick="selectSuggestion(\''+c.id+'\')" style="padding:8px 12px;cursor:pointer;border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center" onmouseenter="this.style.background=\'var(--bg3)\'" onmouseleave="this.style.background=\'\'">'+
+      '<div><div style="font-size:12px;font-weight:500">'+c.nombre+'</div>'+
+      '<div style="font-size:10px;color:var(--text3)">'+[c.estado,c.municipio,c.cultivos.slice(0,2).join(', ')].filter(Boolean).join(' · ')+'</div></div>'+
+      '<span class="tag '+ep.c+'" style="font-size:10px">'+ep.l+'</span></div>';
+  }).join('');
+}
+function hideSuggestions(){
+  var box=document.getElementById('search-suggestions');
+  if(box)box.style.display='none';
+}
+function selectSuggestion(id){
+  hideSuggestions();
+  openDet(id);
+}
+function clearSearch(){
+  var fs=document.getElementById('f-s');if(fs)fs.value='';
+  var fe=document.getElementById('f-e');if(fe)fe.value='';
+  var fc=document.getElementById('f-c');if(fc)fc.value='';
+  var ft=document.getElementById('f-t');if(ft)ft.value='';
+  hideSuggestions();
+  applyFilter();
+}
+
+// ════════════════════════════════════════
+// INVENTORY HELPERS
+// ════════════════════════════════════════
+function calcLitrosInv(){
+  var pres=(document.getElementById('inv-pres')||{}).value||'garrafa_5';
+  var cant=parseFloat((document.getElementById('inv-cant')||{}).value)||0;
+  var litros=pres==='garrafa_5'?cant*5:pres==='litro_1'?cant*1:cant;
+  var hidden=document.getElementById('inv-lt');
+  if(hidden)hidden.value=litros;
+  var prev=document.getElementById('inv-lt-preview');
+  if(prev){
+    var label=pres==='garrafa_5'?cant+' garrafas × 5L':pres==='litro_1'?cant+' frascos × 1L':cant+'L granel';
+    prev.textContent='= '+litros+'L ('+label+')';
+  }
+}
+
+function toggleInvFields(){
+  var t=(document.getElementById('inv-tipo')||{}).value||'';
+  var cw=document.getElementById('inv-cli-w');
+  var lw=document.getElementById('inv-lote-w');
+  var ow=document.getElementById('inv-odiseo-w');
+  if(cw)cw.style.display=['venta','credito_odiseo','cobro_odiseo'].includes(t)?'block':'none';
+  if(lw)lw.style.display='block';
+  if(ow)ow.style.display=['credito_odiseo'].includes(t)?'block':'none';
+  // Auto-fill Odiseo name
+  var cli=document.getElementById('inv-cli');
+  if(cli&&t==='credito_odiseo')cli.value='Odiseo Amezcua';
+  if(cli&&t==='cobro_odiseo')cli.value='Odiseo Amezcua';
+  // Set vencimiento 90 days
+  if(t==='credito_odiseo'){
+    var venc=document.getElementById('inv-venc');
+    if(venc){var d=new Date();d.setDate(d.getDate()+90);venc.value=d.toISOString().slice(0,10);}
+  }
 }
 
 // ════════════════════════════════════════
