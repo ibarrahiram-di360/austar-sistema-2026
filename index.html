@@ -2018,6 +2018,80 @@ function getLatamData(id){try{return JSON.parse(localStorage.getItem('as_ltd_'+i
 function saveLatamData(id,d){try{localStorage.setItem('as_ltd_'+id,JSON.stringify(d));}catch{}}
 function getLatamNotes(id){try{return JSON.parse(localStorage.getItem('as_ltn_'+id)||'[]');}catch{return[];}}
 function saveLatamNotes(id,n){try{localStorage.setItem('as_ltn_'+id,JSON.stringify(n));}catch{}}
+function getLatamProspectos(id){try{return JSON.parse(localStorage.getItem('as_ltp_'+id)||'[]');}catch{return[];}}
+function saveLatamProspectos(id,arr){try{localStorage.setItem('as_ltp_'+id,JSON.stringify(arr));}catch{}}
+function addLatamProspecto(pid){
+  const nombre=prompt('Nombre del prospecto / empresa:');
+  if(!nombre||!nombre.trim())return;
+  const arr=getLatamProspectos(pid);
+  arr.push({id:'lp_'+Date.now(),nombre:nombre.trim(),contacto:'',tel:'',email:'',litros_acum:0,precio:'',cultivos:'',status:'prospecto',notas:'',fecha:new Date().toISOString().slice(0,10)});
+  saveLatamProspectos(pid,arr);
+  openLatamDet(pid);
+}
+function deleteLatamProspecto(pid,lpid){
+  if(!confirm('Eliminar este prospecto?'))return;
+  const arr=getLatamProspectos(pid).filter(p=>p.id!==lpid);
+  saveLatamProspectos(pid,arr);
+  openLatamDet(pid);
+}
+function openLatamProspecto(pid,lpid){
+  const arr=getLatamProspectos(pid);
+  const p=arr.find(x=>x.id===lpid);if(!p)return;
+  const country=LATAM_PAISES.find(x=>x.id===pid);
+  const body=document.getElementById('ldet-body');
+  if(!body)return;
+  body.innerHTML=`<div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="ct">Editar prospecto - ${country.flag} ${country.pais}</div>
+      <button class="btn btn-sm" onclick="openLatamDet('${pid}')">Volver</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><div class="lbl">Nombre / Empresa</div><input id="lp-nombre" value="${p.nombre||''}"></div>
+      <div><div class="lbl">Contacto</div><input id="lp-contacto" value="${p.contacto||''}"></div>
+      <div><div class="lbl">Telefono / WhatsApp</div><input id="lp-tel" value="${p.tel||''}"></div>
+      <div><div class="lbl">Email</div><input id="lp-email" value="${p.email||''}"></div>
+      <div><div class="lbl">Litros acumulados</div><input id="lp-litros" type="number" value="${p.litros_acum||0}"></div>
+      <div><div class="lbl">Precio MXN/L</div><input id="lp-precio" value="${p.precio||''}"></div>
+      <div style="grid-column:span 2"><div class="lbl">Cultivos de interes</div><input id="lp-cultivos" value="${p.cultivos||''}"></div>
+      <div style="grid-column:span 2"><div class="lbl">Notas</div><textarea id="lp-notas" rows="3">${p.notas||''}</textarea></div>
+      <div><div class="lbl">Estatus</div>
+        <select id="lp-status">${Object.entries(LATAM_STATUS).map(([k,v])=>`<option value="${k}"${p.status===k?' selected':''}>${v.l}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div style="margin-top:14px;display:flex;justify-content:space-between">
+      <button class="btn" style="border-color:var(--red);color:var(--red)" onclick="deleteLatamProspecto('${pid}','${lpid}')">Eliminar</button>
+      <button class="btn btn-g" onclick="saveLatamProspectoFull('${pid}','${lpid}')">Guardar cambios</button>
+    </div>
+  </div>`;
+}
+function saveLatamProspectoFull(pid,lpid){
+  const arr=getLatamProspectos(pid);
+  const p=arr.find(x=>x.id===lpid);if(!p)return;
+  p.nombre=document.getElementById('lp-nombre').value||p.nombre;
+  p.contacto=document.getElementById('lp-contacto').value;
+  p.tel=document.getElementById('lp-tel').value;
+  p.email=document.getElementById('lp-email').value;
+  p.litros_acum=document.getElementById('lp-litros').value||0;
+  p.precio=document.getElementById('lp-precio').value;
+  p.cultivos=document.getElementById('lp-cultivos').value;
+  p.notas=document.getElementById('lp-notas').value;
+  p.status=document.getElementById('lp-status').value;
+  saveLatamProspectos(pid,arr);
+  openLatamDet(pid);
+}
+function seedLatamProspectos(){
+  try{
+    if(getLatamProspectos('co').length===0){
+      saveLatamProspectos('co',[
+        {id:'lp_seed1',nombre:'Colomich S.A.S.',contacto:'Luis David Castro Corrales',tel:'',email:'',litros_acum:0,precio:'56',cultivos:'Mango',status:'contactado',notas:'Pereira/Risaralda. Solicitud urgente 3000L via aerea.',fecha:'2026-01-01'},
+        {id:'lp_seed2',nombre:'Ing. Jeffrey',contacto:'',tel:'',email:'',litros_acum:0,precio:'',cultivos:'Mango Tommy',status:'contactado',notas:'400L mango Tommy.',fecha:'2026-01-01'},
+        {id:'lp_seed3',nombre:'Ayapel Andares',contacto:'Ing. Juan Carlos',tel:'',email:'',litros_acum:0,precio:'',cultivos:'',status:'negociacion',notas:'400L confirmado, 2000L potencial regional.',fecha:'2026-01-01'},
+        {id:'lp_seed4',nombre:'EPM (Empresas Publicas de Medellin)',contacto:'Ing. Jose',tel:'',email:'',litros_acum:0,precio:'',cultivos:'Forestal',status:'prospecto',notas:'Piloto forestal urbano. Tesis academica en desarrollo.',fecha:'2026-01-01'}
+      ]);
+    }
+  }catch(e){}
+}
+
 
 // ════════════════════════════════════════
 // LATAM
@@ -2116,7 +2190,26 @@ function openLatamDet(pid){
           <div class="ct">Potencial por cultivo</div>
           ${(d.cultivos||p.cultivos.join(', ')).split(',').filter(c=>c.trim()).map(c=>`<div class="row"><span style="color:var(--text2)">${c.trim()}</span><span class="tag t-gy">Por explorar</span></div>`).join('')}
         </div>`:'<div class="card"><div class="ct">Región abierta</div><div style="font-size:12px;color:var(--text2)">Espacio para registrar nuevos países o mercados LATAM no clasificados en la lista principal.</div></div>'}
-      </div>
+
+        <div class="card" style="margin-top:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div class="ct" style="margin:0">Otros prospectos en ${p.pais}</div>
+            <button class="btn btn-sm btn-g" onclick="addLatamProspecto('${pid}')">+ Agregar prospecto</button>
+          </div>
+          ${getLatamProspectos(pid).length?getLatamProspectos(pid).map(lp=>{
+            const lsc=LATAM_STATUS[lp.status]||LATAM_STATUS.prospecto;
+            return `<div class="card-c" style="padding:10px 12px;margin-bottom:8px;cursor:pointer" onclick="openLatamProspecto('${pid}','${lp.id}')">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-weight:600;font-size:13px">${lp.nombre}</div>
+                  <div style="font-size:11px;color:var(--text3)">${lp.contacto||'Sin contacto'}${lp.tel?' . '+lp.tel:''}</div>
+                </div>
+                <span class="tag ${lsc.c}">${lsc.l}</span>
+              </div>
+              ${parseFloat(lp.litros_acum||0)>0?`<div style="font-size:11px;color:var(--green);margin-top:4px;font-weight:600">${fmt(parseFloat(lp.litros_acum))}L acumulados</div>`:''}
+            </div>`;
+          }).join(''):'<div style="font-size:12px;color:var(--text3);text-align:center;padding:12px">Sin prospectos adicionales. Usa el boton + para agregar nuevos contactos en este pais.</div>'}
+        </div>      </div>
       <div class="card">
         <div class="ct">Registrar evento</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
@@ -7313,6 +7406,7 @@ function mergeBackups(){
 // ════════════════════════════════════════
 const total=CLIENTS.length;
 document.getElementById('login-stat').textContent=`${total} clientes · ${Object.keys(MUNICIPIOS).length} estados · CDM + Odiseo Amezcua integrados`;
+seedLatamProspectos();
 </script>
 </body>
 </html>
