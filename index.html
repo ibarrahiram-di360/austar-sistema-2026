@@ -768,7 +768,12 @@ select option{background:var(--bg2)}
             <div id="pass-name" style="font-weight:700;font-size:14px"></div>
             <div id="pass-role" style="font-size:11px;color:var(--text2)"></div>
           </div>
-        </div>
+        </div
+        <div class="ucard" onclick="selectUser('austar2030')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:left;border:1px solid #e2b96f33">
+          <div class="uav" style="background:#1a1a2e;color:#e2b96f;width:38px;height:38px;font-size:13px;flex-shrink:0">A3</div>
+          <div style="flex:1"><div style="font-weight:600;font-size:13px">Austar2030</div><div style="font-size:11px;color:var(--text2)">Equipo Planner & Operaciones</div></div>
+          <span style="color:var(--text3);font-size:18px">›</span>
+        </div>>
       </div>
       <div style="margin-bottom:12px">
         <div class="lbl" style="text-align:left;margin-bottom:6px">Contraseña de acceso</div>
@@ -803,7 +808,11 @@ select option{background:var(--bg2)}
     <div class="nav-section">Admin</div>
     <div class="nav-item" onclick="gotoTab('monitor')" id="nav-monitor"><span class="ni">👁️</span>Monitor</div>
     <div class="nav-item" onclick="gotoTab('certificados')" id="nav-certificados"><span class="ni">🏆</span>Certificados</div>
-    <div class="nav-item" onclick="gotoTab('backup')" id="nav-backup"><span class="ni">💾</span>Respaldo</div>
+    <div class="nav-item" onclick="gotoTab('backup')" id="
+    <div class="nav-item" onclick="gotoTab('planner')" id="nav-planner"><span class="ni">📅</span>Planner</div>
+    <div class="nav-item" onclick="gotoTab('acciones')" id="nav-acciones"><span class="ni">✅</span>Plan de Acción</div>
+    <div class="nav-item" onclick="gotoTab('alianzas')" id="nav-alianzas"><span class="ni">🤝</span>Alianzas</div>
+    <div class="nav-item" onclick="gotoTab('comunidades')" id="nav-comunidades"><span class="ni">🌱</span>Comunidades</div>nav-backup"><span class="ni">💾</span>Respaldo</div>
     <div class="sb-footer">
       <div style="display:flex;align-items:center;gap:8px">
         <div id="user-av" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0"></div>
@@ -1417,7 +1426,11 @@ select option{background:var(--bg2)}
         </div>
       </div>
     </div>
-  </div><!-- /main -->
+  
+    <div id="tab-planner" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">📅 Planner Mensual — Austar2030</div><div style="display:flex;gap:8px"><select id="pl-year" onchange="renderPlanner()" style="width:90px"><option>2025</option><option selected>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select><select id="pl-mes" onchange="renderPlanner()" style="width:100px"><option value="Ene">Enero</option><option value="Feb">Febrero</option><option value="Mar">Marzo</option><option value="Abr">Abril</option><option value="May">Mayo</option><option value="Jun">Junio</option><option value="Jul">Julio</option><option value="Ago">Agosto</option><option value="Sep" selected>Sep</option><option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dic">Dic</option></select><button class="btn btn-g btn-sm" onclick="addPlannerRow()">+ Agregar estado</button></div></div><div class="page-sub">Un estado por fila · Real vs Planeado · Canales de activación mensual</div></div><div style="padding:0 22px 22px" id="planner-body"><div style="text-align:center;padding:40px;color:var(--text3)">Selecciona el mes y el año para ver el planner.</div></div></div>
+    <div id="tab-acciones" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">✅ Plan de Acción Mensual</div><div style="display:flex;gap:8px"><select id="ac-year" onchange="renderAcciones()" style="width:90px"><option>2025</option><option selected>2026</option><option>2027</option></select><select id="ac-mes" onchange="renderAcciones()" style="width:100px"><option value="Ene">Enero</option><option value="Feb">Febrero</option><option value="Mar">Marzo</option><option value="Abr">Abril</option><option value="May">Mayo</option><option value="Jun">Junio</option><option value="Jul">Julio</option><option value="Ago">Agosto</option><option value="Sep" selected>Sep</option><option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dic">Dic</option></select><button class="btn btn-g btn-sm" onclick="addAccion()">+ Nueva acción</button></div></div><div class="page-sub">Tareas del mes con responsable, fecha límite y estatus</div></div><div style="padding:0 22px 22px" id="acciones-body"></div></div>
+    <div id="tab-alianzas" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">🤝 Alianzas Institucionales</div><button class="btn btn-g btn-sm" onclick="addAlianza()">+ Nueva alianza</button></div><div class="page-sub">BNI · CDAAJ · ANFACA · APEAJAL · IPADE · OLAJ · AMCHAM</div></div><div style="padding:0 22px 22px" id="alianzas-body"></div></div>
+    <div id="tab-comunidades" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">🌱 Comunidades por Cultivo</div><button class="btn btn-g btn-sm" onclick="addComunidad()">+ Nueva comunidad</button></div><div class="page-sub">Grupos WhatsApp por cultivo · región · miembros · responsable</div></div><div style="padding:0 22px 22px" id="comunidades-body"></div></div></div><!-- /main -->
 </div><!-- /app -->
 
 <script>
@@ -1523,7 +1536,8 @@ const USERS={
   vale:{pass:'vale2026',av:'VA',bg:'#1e3a5f',col:'#93c5fd',name:'Vale',role:'Prospección B2B',tabs:['clientes','detalle','nuevo','latam','certificados','backup'],readOnly:false},
   contraloria:{pass:'ctrl360',av:'CT',bg:'#2e1065',col:'#c4b5fd',name:'Contraloría',role:'Visión total — solo lectura',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor','certificados','backup'],readOnly:true},
   hiram:{pass:'di360master',av:'HI',bg:'#451a03',col:'#fcd34d',name:'Hiram',role:'Director — Acceso total',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor','backup','certificados'],readOnly:false},
-  telemarketing:{pass:'telemark26',av:'TM',bg:'#134e4a',col:'#99f6e4',name:'Telemarketing',role:'Atención al cliente',tabs:['clientes','detalle','nuevo','certificados','backup'],readOnly:false}
+  telemarketing:{pass:'telemark26',av:'TM',bg:'#134e4a',col:'#99f6e4',name:'Telemarketing',role:'Atención al cliente',tabs:['clientes','detalle','nuevo','certificados','backup'],readOnly:false},
+  austar2030:{pass:'austar2030',av:'A3',bg:'#1a1a2e',col:'#e2b96f',name:'Austar2030',role:'Equipo Planner & Operaciones',tabs:['planner','acciones','alianzas','comunidades','clientes','detalle','nuevo','latam','certificados','backup'],readOnly:false}
 };
 let selectedUser=null;
 
@@ -1589,7 +1603,7 @@ function logout(){
   user=null; selectedUser=null;
 }
 
-const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det','monitor','backup','certificados'];
+const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det','monitor','backup','certificados','planner','acciones','alianzas','comunidades'];
 function gotoTab(t){
   ALL_TABS.forEach(x=>{
     const el=document.getElementById('tab-'+x);if(el)el.classList.remove('on');
@@ -1604,6 +1618,10 @@ function gotoTab(t){
   if(t==='latam')renderLatam();
   if(t==='monitor')renderMonitor();
   if(t==='backup')initBackupTab();
+  if(t==='planner')renderPlanner();
+  if(t==='acciones')renderAcciones();
+  if(t==='alianzas')renderAlianzas();
+  if(t==='comunidades')renderComunidades();
   if(t==='certificados'){certInitTab();setTimeout(certCalc,100);}
 }
 
@@ -7197,8 +7215,419 @@ var D3=[
 ];
 
 // ════════════════════════════════════════
+// PLANNER MENSUAL
+var RESPONSABLES=['Hiram','Chio','Valeria','Yaneth','Uriel','Leopoldo','Equipo'];
+var CANALES=['Redes Sociales','Agronetwork','OLAJ','Agroamigo','BNI','WhatsApp','Visita directa'];
+var BIMESTRES={'Ene':'B1','Feb':'B1','Mar':'B2','Abr':'B2','May':'B3','Jun':'B3','Jul':'B4','Ago':'B4','Sep':'B5','Oct':'B5','Nov':'B6','Dic':'B6'};
+var ESTATUS_AC={Pendiente:{c:'t-gy',l:'Pendiente'},Proceso:{c:'t-am',l:'En proceso'},Hecho:{c:'t-gr',l:'Hecho'},Bloqueado:{c:'t-rd',l:'Bloqueado'}};
+
+function getPlannerKey(year,mes){return 'apl_'+year+'_'+mes;}
+function getPlannerData(year,mes){try{return JSON.parse(localStorage.getItem(getPlannerKey(year,mes))||'[]');}catch{return[];}}
+function savePlannerData(year,mes,arr){try{localStorage.setItem(getPlannerKey(year,mes),JSON.stringify(arr));}catch{}}
+
+function addPlannerRow(){
+  var year=(document.getElementById('pl-year')||{}).value||'2026';
+  var mes=(document.getElementById('pl-mes')||{}).value||'Sep';
+  var arr=getPlannerData(year,mes);
+  arr.push({
+    id:'pl_'+Date.now(),estado:'',municipios:'',cultivo:'',ha:0,
+    litros_obj:0,litros_real:0,prospectos:0,clientes:0,
+    canales:[],responsable:'Hiram',notas:'',bimestre:BIMESTRES[mes]||''
+  });
+  savePlannerData(year,mes,arr);
+  renderPlanner();
+}
+
+function savePlannerRow(year,mes,id){
+  var arr=getPlannerData(year,mes);
+  var row=arr.find(function(r){return r.id===id;});
+  if(!row)return;
+  var get=function(s){var el=document.getElementById(s+'_'+id);return el?el.value:'';};
+  row.estado=get('pl_est');
+  row.municipios=get('pl_mun');
+  row.cultivo=get('pl_cul');
+  row.ha=parseFloat(get('pl_ha'))||0;
+  row.litros_obj=parseFloat(get('pl_lobj'))||0;
+  row.litros_real=parseFloat(get('pl_lreal'))||0;
+  row.prospectos=parseFloat(get('pl_pros'))||0;
+  row.clientes=parseFloat(get('pl_cli'))||0;
+  row.responsable=get('pl_resp');
+  row.notas=get('pl_notas');
+  row.canales=CANALES.filter(function(c){var cb=document.getElementById('pl_can_'+c.replace(/\s/g,'_')+'_'+id);return cb&&cb.checked;});
+  savePlannerData(year,mes,arr);
+  renderPlanner();
+}
+
+function deletePlannerRow(year,mes,id){
+  if(!confirm('Eliminar esta fila del planner?'))return;
+  var arr=getPlannerData(year,mes).filter(function(r){return r.id!==id;});
+  savePlannerData(year,mes,arr);
+  renderPlanner();
+}
+
+function renderPlanner(){
+  var year=(document.getElementById('pl-year')||{}).value||'2026';
+  var mes=(document.getElementById('pl-mes')||{}).value||'Sep';
+  var arr=getPlannerData(year,mes);
+  var bim=BIMESTRES[mes]||'';
+  var body=document.getElementById('planner-body');
+  if(!body)return;
+
+  var totLObj=arr.reduce(function(s,r){return s+(r.litros_obj||0);},0);
+  var totLReal=arr.reduce(function(s,r){return s+(r.litros_real||0);},0);
+  var totHa=arr.reduce(function(s,r){return s+(r.ha||0);},0);
 // BACKUP MERGE / CONSOLIDATION
-// ════════════════════════════════════════
+// ════════════  var totPros=arr.reduce(function(s,r){return s+(r.prospectos||0);},0);
+  var pct=totLObj>0?Math.round(totLReal/totLObj*100):0;
+
+  var html='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">'+
+    '<div class="met gl"><div class="mv" style="color:var(--green)">'+fmt(totLReal)+'L</div><div class="ml">Real del mes</div></div>'+
+    '<div class="met al"><div class="mv" style="color:var(--amber)">'+fmt(totLObj)+'L</div><div class="ml">Objetivo del mes</div></div>'+
+    '<div class="met bl"><div class="mv" style="color:'+(pct>=80?'var(--green)':'var(--amber)')+'">'+pct+'%</div><div class="ml">Cumplimiento</div></div>'+
+    '<div class="met tl"><div class="mv" style="color:var(--teal)">'+fmt(totHa)+'ha</div><div class="ml">Hect\u00e1reas en ruta</div></div>'+
+    '</div>';
+
+  if(!arr.length){
+    html+='<div class="card" style="text-align:center;padding:40px;color:var(--text3)">Sin filas para '+mes+' '+year+'. Usa el bot\u00f3n + para agregar estados a la ruta.</div>';
+  } else {
+    html+='<div class="card" style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'+
+═══      '<thead><tr style="border-bottom:1px solid var(--border);background:var(--bg3)">'+
+      '<th style="padding:8px;text-align:left;color:var(--text2);font-weight:500">Estado</th>'+
+      '<th style="padding:8px;text-align:left;color:var(--text2);font-weight:500">Municipios</th>'+
+      '<th style="padding:8px;text-align:left;color:var(--text2);font-weight:500">Cultivo</th>'+
+      '<th style="padding:8px;text-align:right;color:var(--text2);font-weight:500">Ha</th>'+
+      '<th style="padding:8px;text-align:right;color:var(--amber);font-weight:500">L.Obj</th>'+
+      '<th style="padding:8px;text-align:right;color:var(--green);font-weight:500">L.Real</th>'+
+      '<th style="padding:8px;text-align:right;color:var(--text2);font-weight:500">Prosp.</th>'+
+      '<th style="padding:8px;text-align:left;color:var(--text2);font-weight:500">Canales</th>'+
+      '<th style="padding:8px;text-align:left;color:var(--text2);font-weight:500">Responsable</th>'+
+      '<th style="padding:8px;text-align:left;color:var(--text2);font-weight:500">Notas</th>'+
+      '<th style="padding:8px"></th>'+
+      '</tr></thead><tbody>';
+
+    arr.forEach(function(row){
+        '<td style="padding:6px 8px"><input value="'+(row.estado||'')+'>" id="pl_est_'+row.id+'" style="width:110px;font-size:11px" placeholder="Estado"></td>'+
+        '<td style="padding:6px 8px"><input value="'+(row.municipios||'')+'>" id="pl_mun_'+row.id+'" style="width:80px;font-size:11px" placeholder="Mun."></td>'+
+        '<td style="padding:6px 8px"><input value="'+(row.cultivo||'')+'>" id="pl_cul_'+row.id+'" style="width:80px;font-size:11px" placeholder="Cultivo"></td>'+
+        '<td style="padding:6px 8px"><input type="number" value="'+(row.ha||0)+'" id="pl_ha_'+row.id+'" style="width:55px;font-size:11px;text-align:right"></td>'+
+        '<td style="padding:6px 8px"><input type="number" value="'+(row.litros_obj||0)+'" id="pl_lobj_'+row.id+'" style="width:60px;font-size:11px;text-align:right;border-color:var(--amber)"></td>'+
+        '<td style="padding:6px 8px"><input type="number" value="'+(row.litros_real||0)+'" id="pl_lreal_'+row.id+'" style="width:60px;font-size:11px;text-ali        '<td style="padding:6px 8px">'+
+          CANALES.map(function(c){
+            var ck=row.canales&&row.canales.includes(c);
+            return '<label style="font-size:10px;display:flex;align-items:center;gap:3px;white-space:nowrap"><input type="checkbox" id="pl_can_'+c.replace(/\s/g,'_')+'_'+row.id+'"'+(ck?' checked':'')+'>'+c+'</label>';
+          }).join('')+
+        '</td>'+
+        '<td style="padding:6px 8px">'+
+          '<select id="pl_resp_'+row.id+'" style="width:90px;font-size:11px">'+
+          RESPONSABLES.map(function(r){return '<option value="'+r+'"'+(row.responsable===r?' selected':'')+'>'+r+'</option>';}).join('')+
+          '</select>'+
+        '</td>'+
+        '<td style="padding:6px 8px"><input value="'+(row.notas||'')+'>" id="pl_notas_'+row.id+'" style="width:110px;font-size:11px" placeholder="Notas..."></td>'+
+        '<td style="padding:6px 8px;white-space:nowrap">'+
+          '<button onclick="savePlannerRow(\''+year+'\',\''+mes+'\',\''+row.id+'\')">💾</button>'+
+          '<button onclick="deletePlannerRow(\''+year// PLAN DE ACCION
+function getAccionesKey(year,mes){return 'aac_'+year+'_'+mes;}
+function getAcciones(year,mes){try{return JSON.parse(localStorage.getItem(getAccionesKey(year,mes))||'[]');}catch{return[];}}
+function saveAcciones(year,mes,arr){try{localStorage.setItem(getAccionesKey(year,mes),JSON.stringify(arr));}catch{}}
+function addAccion(){
+  var year=(document.getElementById('ac-year')||{}).value||'2026';
+  var mes=(document.getElementById('ac-mes')||{}).value||'Sep';
+  var arr=getAcciones(year,mes);
+  arr.push({id:'ac_'+Date.now(),accion:'',frente:'',responsable:'Hiram',fecha:'',estatus:'Pendiente',notas:''});
+  saveAcciones(year,mes,arr);
+  renderAcciones();
+}
+function saveAccion(year,mes,id){
+  var arr=getAcciones(year,mes);
+  var row=arr.find(function(r){return r.id===id;});
+  if(!row)return;
+  var get=function(s){var el=document.getElementById(s+'_'+id);return el?el.value:'';};
+  row.accion=get('ac_acc');row.frente=get('ac_fr');row.responsable=get('ac_resp');
+  row.fecha=get('ac_fecha');row.estatus=get('ac_est');row.notas=get('ac_notas');
+  saveAcciones(year,mes,arr)function renderAcciones(){
+  var year=(document.getElementById('ac-year')||{}).value||'2026';
+  var mes=(document.getElementById('ac-mes')||{}).value||'Sep';
+  var arr=getAcciones(year,mes);
+  var body=document.getElementById('acciones-body');
+  if(!body)return;
+  var pending=arr.filter(function(a){return a.estatus==='Pendiente';}).length;
+  var doing=arr.filter(function(a){return a.estatus==='Proceso';}).length;
+  var done=arr.filter(function(a){return a.estatus==='Hecho';}).length;
+  var html='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">'+
+    '<div class="met gl"><div class="mv" style="color:var(--green)">'+done+'</div><div class="ml">Completadas</div></div>'+
+    '<div class="met al"><div class="mv" style="color:var(--amber)">'+doing+'</div><div class="ml">En proceso</div></div>'+
+    '<div class="met" style="border-left:3px solid var(--red)"><div class="mv" style="color:var(--red)">'+pending+'</div><div class="ml">Pendientes</div></div>'+
+    '<div class="met bl"><div class="mv" style="color:var(--blue)">'+arr.length+'</div><div class="ml">Total del mes</div></div>'+
+    '</di    arr.forEach(function(row){
+      var st=ESTATUS_AC[row.estatus]||ESTATUS_AC.Pendiente;
+      html+='<div class="card-c" style="padding:10px 14px">'+
+        '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:center;margin-bottom:6px">'+
+          '<input value="'+(row.accion||'')+'>" id="ac_acc_'+row.id+'" placeholder="Accion especifica..." style="font-size:12px">'+
+          '<input value="'+(row.frente||'')+'>" id="ac_fr_'+row.id+'" placeholder="Frente/Estado" style="font-size:12px">'+
+          '<select id="ac_resp_'+row.id+'" style="font-size:12px">'+
+            RESPONSABLES.map(function(r){return '<option'+(row.responsable===r?' selected':'')+'>'+r+'</option>';}).join('')+
+          '</select>'+
+          '<input type="date" value="'+(row.fecha||'')+'>" id="ac_fecha_'+row.id+'" style="font-size:12px">'+
+          '<div style="display:flex;gap:4px">'+
+            '<button onclick="saveAccion(\''+year+'\',\''+mes+'\',\''+row.id+'\')" style="font-size:10px;padding:3px 7px;background:var(--green2);border:none;color:white;border-radius:4px;cursor:pointer">💾</button>'+
+            '<b        '<div style="display:flex;gap:8px;align-items:center">'+
+          '<select id="ac_est_'+row.id+'" style="font-size:11px;width:130px">'+
+            Object.keys(ESTATUS_AC).map(function(k){return '<option value="'+k+'"'+(row.estatus===k?' selected':'')+'>'+ESTATUS_AC[k].l+'</option>';}).join('')+
+          '</select>'+
+          '<input value="'+(row.notas||'')+'>" id="ac_notas_'+row.id+'" placeholder="Notas..." style="font-size:11px;flex:1">'+
+          '<span class="tag '+st.c+'">'+st.l+'</span>'+
+        '</div>'+
+      '</div>';
+    });
+    html+='</div></div>';
+  }
+  body.innerHTML=html;
+}
+
+// ALIANZAS
+var ALIANZAS_DEFAULT=[
+  {id:'bni',nombre:'BNI',tipo:'Red empresarial',responsable:'Leopoldo',socio:'',estatus:'',proxima:'',notas:''},
+  {id:'cdaaj',nombre:'CDAAJ',tipo:'Camara',responsable:'Leopoldo',socio:'',estatus:'',proxima:'',notas:''},
+  {id:'anfaca',nombre:'ANFACA',tipo:'Asociacion',responsable:'Leopoldo',socio:'Odiseo',estatus:'',proxima:'',notas:''},
+  {id:'apeajal',nombre:'APEAJAL',tipo:'Asociacion',responsable:'Leopoldo',socio:'',estatus:'',proxima:'',notas:''},
+  {id:'ipade',nombre:'IPADE',tipo:'Academia',responsable:'Leopoldo',socio:'',estafunction getAlianzas(){try{var d=JSON.parse(localStorage.getItem('austar_alianzas')||'null');return d||JSON.parse(JSON.stringify(ALIANZAS_DEFAULT));}catch{return JSON.parse(JSON.stringify(ALIANZAS_DEFAULT));}}
+function saveAlianzas(arr){try{localStorage.setItem('austar_alianzas',JSON.stringify(arr));}catch{}}
+function addAlianza(){
+  var arr=getAlianzas();
+  arr.push({id:'al_'+Date.now(),nombre:'',tipo:'',responsable:'Hiram',socio:'',estatus:'',proxima:'',notas:''});
+  saveAlianzas(arr);renderAlianzas();
+}
+function saveAlianza(id){
+  var arr=getAlianzas();
+  var row=arr.find(function(r){return r.id===id;});if(!row)return;
+  var get=function(s){var el=document.getElementById(s+'_'+id);return el?el.value:'';};
+  row.nombre=get('al_nm');row.tipo=get('al_tipo');row.responsable=get('al_resp');
+  row.socio=get('al_socio');row.estatus=get('al_est');row.proxima=get('al_prox');row.notas=get('al_notas');
+  saveAlianzas(arr);renderAlianzas();
+}
+function deleteAlianza(id){
+  if(!confirm('Eliminar esta alianza?'))return;
+  saveAlianzas(getAlianzas().filter(function(r){return r.id!==id;}));renderAlianzas();
+}
+function renderAlianzas(){
+  var arr=getAlianzas();
+  var body=document.getElementB  var html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">'+
+    '<div class="met gl"><div class="mv" style="color:var(--green)">'+activas+'</div><div class="ml">Activas</div></div>'+
+    '<div class="met bl"><div class="mv" style="color:var(--blue)">'+arr.length+'</div><div class="ml">Total</div></div>'+
+    '<div class="met al"><div class="mv" style="color:var(--amber)">'+(arr.length-activas)+'</div><div class="ml">Por activar</div></div>'+
+    '</div><div style="display:flex;flex-direction:column;gap:10px">';
+  arr.forEach(function(row){
+    html+='<div class="card">'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:8px;align-items:center;margin-bottom:8px">'+
+        '<div><div class="lbl">Alianza</div><input value="'+(row.nombre||'')+'>" id="al_nm_'+row.id+'" placeholder="Nombre"></div>'+
+        '<div><div class="lbl">Tipo</div><input value="'+(row.tipo||'')+'>" id="al_tipo_'+row.id+'" placeholder="Red/Asociacion"></div>'+
+        '<div><div class="lbl">Responsable</div><select id="al_resp_'+row.id+'">'+RESPONSABLES.map(function(r){return '<option'+(row.responsable===r?' selected':'')        '<div style="display:flex;gap:4px;margin-top:16px">'+
+          '<button onclick="saveAlianza(\''+row.id+'\')" style="font-size:10px;padding:3px 7px;background:var(--green2);border:none;color:white;border-radius:4px;cursor:pointer">💾</button>'+
+          '<button onclick="deleteAlianza(\''+row.id+'\')" style="font-size:10px;padding:3px 7px;background:none;border:1px solid var(--red);color:var(--red);border-radius:4px;cursor:pointer">✕</button>'+
+        '</div>'+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+        '<div><div class="lbl">Proxima accion</div><input value="'+(row.proxima||'')+'>" id="al_prox_'+row.id+'" placeholder="Que sigue..."></div>'+
+        '<div><div class="lbl">Notas</div><input value="'+(row.notas||'')+'>" id="al_notas_'+row.id+'" placeholder="Notas..."></div>'+
+      '</div>'+
+    '</div>';
+  });
+  html+='</div>';
+  body.innerHTML=html;
+}
+
+// COMUNIDADES WHATSAPP
+var CULTIVOS_COM=['Mango','Aguacate','Nogal','Citricos','Tomate','Forestal','Generalista'];
+function getComunidades(){try{return JSON.parse(localStorage.getItem('austar_comunidades')||'[]');}catch{return[];}}
+function saveComunidadesfunction saveComunidad(id){
+  var arr=getComunidades();
+  var row=arr.find(function(r){return r.id===id;});if(!row)return;
+  var get=function(s){var el=document.getElementById(s+'_'+id);return el?el.value:'';};
+  row.nombre=get('com_nm');row.cultivo=get('com_cul');row.region=get('com_reg');
+  row.miembros=parseInt(get('com_miem'))||0;row.responsable=get('com_resp');
+  row.link=get('com_link');row.notas=get('com_notas');
+  var actEl=document.getElementById('com_act_'+id);
+  row.activa=actEl?actEl.checked:true;
+  saveComunidades(arr);renderComunidades();
+}
+function deleteComunidad(id){
+  if(!confirm('Eliminar esta comunidad?'))return;
+  saveComunidades(getComunidades().filter(function(r){return r.id!==id;}));renderComunidades();
+}
+function renderComunidades(){
+  var arr=getComunidades();
+  var body=document.getElementById('comunidades-body');if(!body)return;
+  var totalMiembros=arr.reduce(function(s,c){return s+(c.miembros||0);},0);
+  var activas=arr.filter(function(c){return c.activa;}).length;
+  var html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">'+
+    '<div class=  if(!arr.length){
+    html+='<div class="card" style="text-align:center;padding:40px;color:var(--text3)">Sin comunidades. Agrega los grupos de WhatsApp por cultivo.</div>';
+  } else {
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+    arr.forEach(function(row){
+      html+='<div class="card">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
+          '<div style="font-weight:600;font-size:14px">'+(row.nombre||'Sin nombre')+'</div>'+
+          '<div style="display:flex;gap:6px;align-items:center">'+
+            '<span class="tag '+(row.activa?'t-gr':'t-gy')+'">'+(row.activa?'Activa':'Inactiva')+'</span>'+
+            '<button onclick="saveComunidad(\''+row.id+'\')" style="font-size:10px;padding:2px 6px;background:var(--green2);border:none;color:white;border-radius:4px;cursor:pointer">💾</button>'+
+            '<button onclick="deleteComunidad(\''+row.id+'\')" style="font-size:10px;padding:2px 6px;background:none;border:1px solid var(--red);color:var(--red);border-radius:4px;cursor:pointer">✕</button>'+
+          '<div><div class="lbl">Region / Estado</div><input value="'+(row.region||'')+'>" id="com_reg_'+row.id+'" placeholder="Nayarit, Sinaloa..."></div>'+
+          '<div><div class="lbl">Miembros</div><input type="number" value="'+(row.miembros||0)+'" id="com_miem_'+row.id+'"></div>'+
+          '<div><div class="lbl">Responsable</div><select id="com_resp_'+row.id+'">'+RESPONSABLES.map(function(r){return '<option'+(row.responsable===r?' selected':'')+'>'+r+'</option>';}).join('')+'</select></div>'+
+          '<div><div class="lbl">Activa</div><label style="display:flex;align-items:center;gap:6px;margin-top:6px"><input type="checkbox" id="com_act_'+row.id+'"'+(row.activa?' checked':'')+'>Si, activa</label></div>'+
+          '<div style="grid-column:span 2"><div class="lbl">Link WhatsApp</div><input value="'+(row.link||'')+'>" id="com_link_'+row.id+'" placeholder="https://chat.whatsapp.com/..."></div>'+
+          '<div style="grid-column:span 2"><div class="lbl">Notas</div><input value="'+(row.notas||'')+'>" id="com_notas_'+row.id+'" placeholder="Descripcion del grupo..."></div>'+
+        '</div>'+
+      '</div>';
+    });
+    html+='</div>';
+  }
+  b// SEED COLOMBIA LATAM PROSPECTS
+function seedLatamProspectosColombia(){
+  try{
+    if(typeof getLatamProspectos==='undefined')return;
+    if(getLatamProspectos('co').length===0){
+      saveLatamProspectos('co',[
+        {id:'lp_seed1',nombre:'Colomich S.A.S.',contacto:'Luis David Castro Corrales',tel:'',email:'',litros_acum:0,precio:'56',cultivos:'Mango',status:'contactado',notas:'Pereira/Risaralda. Solicitud urgente 3000L via aerea.',fecha:'2026-01-01'},
+        {id:'lp_seed2',nombre:'Ing. Jeffrey',contacto:'',tel:'',email:'',litros_acum:0,precio:'',cultivos:'Mango Tommy',status:'contactado',notas:'400L mango Tommy.',fecha:'2026-01-01'},
+        {id:'lp_seed3',nombre:'Ayapel Andares',contacto:'Ing. Juan Carlos',tel:'',email:'',litros_acum:0,precio:'',cultivos:'',status:'negociacion',notas:'400L confirmado, 2000L potencial regional.',fecha:'2026-01-01'},
+        {id:'lp_seed4',nombre:'EPM Empresas Publicas Medellin',contacto:'Ing. Jose',tel:'',email:'',litros_acum:0,precio:'',cultivos:'Forestal',status:'prospecto',notas:'Piloto forestal urbano. Tesis academica en desarrollo.',f// AUSTAR2030 NAV SIDEBAR LABEL
+function updateSidebarForUser(){
+  var navSections={
+    planner:document.getElementById('nav-planner'),
+    acciones:document.getElementById('nav-acciones'),
+    alianzas:document.getElementById('nav-alianzas'),
+    comunidades:document.getElementById('nav-comunidades')
+  };
+  if(!user)return;
+  var tabs=USERS[user]&&USERS[user].tabs||[];
+  Object.keys(navSections).forEach(function(k){
+    var el=navSections[k];
+    if(el)el.style.display=tabs.includes(k)?'':'none';
+  });
+}
+
+// Override gotoTab to update sidebar first time
+var _origGotoTab=gotoTab;
+function gotoTab(t){
+  _origGotoTab(t);
+  if(t==='planner'){renderPlanner();}
+  else if(t==='acciones'){renderAcciones();}
+  else if(t==='alianzas'){renderAlianzas();}
+  else if(t==='comunidades'){renderComunidades();}
+}
+
+echa:'2026-01-01'}
+      ]);
+    }
+  }catch(e){}
+}
+
+ody.innerHTML=html;
+}
+
+// HOOK NEW TABS INTO gotToTab
+          '</div>'+
+        '</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+          '<div><div class="lb// PLANNER EXPORT TO EXCEL
+function exportPlannerExcel(){
+  var year=(document.getElementById('pl-year')||{}).value||'2026';
+  var mes=(document.getElementById('pl-mes')||{}).value||'Sep';
+  var arr=getPlannerData(year,mes);
+  if(!arr.length){alert('No hay datos en el planner para '+mes+' '+year);return;}
+  var rows=[['Estado','Municipios','Cultivo','Ha','L.Objetivo','L.Real','Prospectos','Clientes','Canales','Bimestre','Responsable','Notas']];
+  arr.forEach(function(r){
+    rows.push([r.estado,r.municipios,r.cultivo,r.ha,r.litros_obj,r.litros_real,r.prospectos,r.clientes,(r.canales||[]).join('|'),r.bimestre,r.responsable,r.notas]);
+  });
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),'Planner '+mes+' '+year);
+  var acRows=[['Accion','Frente','Responsable','Fecha','Estatus','Notas']];
+  getAcciones(year,mes).forEach(function(a){
+    acRows.push([a.accion,a.frente,a.responsable,a.fecha,a.estatus,a.notas]);
+  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(acRows),'Plan de Accion '+mes);
+  XLSX.writeFile(wb,'Austar_Planner_'+year+'_'+mes+'.xlsx');
+}
+
+// BOOT SEED
+seedLatamProspectosColombia();
+
+l">Nombre del grupo</// PLANNER SIDEBAR GROUP LABEL
+function initPlannerNav(){
+  var pGroup=document.getElementById('nav-planner');
+  if(pGroup&&pGroup.previousElementSibling&&pGroup.previousElementSibling.className!=='nav-group'){
+    var grp=document.createElement('div');
+    grp.className='nav-group';
+    grp.textContent='AUSTAR2030';
+    pGroup.parentNode.insertBefore(grp,pGroup);
+  }
+}
+
+// EXPORT BUTTON IN PLANNER
+function addPlannerExportBtn(){
+  var body=document.getElementById('planner-body');
+  if(!body||body.querySelector('.pl-export-btn'))return;
+  var btn=document.createElement('button');
+  btn.className='btn btn-sm pl-export-btn';
+  btn.style.cssText='margin-bottom:10px;float:right';
+  btn.textContent='📊 Exportar Excel';
+  btn.onclick=exportPlannerExcel;
+  body.insertBefore(btn,body.firstChild);
+}
+
+div><input value="'+(row.nombre||'')+'>" id="com_nm_'+row.id+'" placeholder="Ej: Mango Nayarit"></div>'+
+          '<div><div class="lbl">Cultivo</div><select id="com_cul_'+row.id+'">'+CULTIVOS_COM.map(function(c){return '<option'+(row.cultivo===c?' selected':'')+'>'+c+'</option>';}).join('')+'</select></div>'+
+"met gl"><div class="mv" style="color:var(--green)">'+activas+'</div><div class="ml">Activas</div></div>'+
+    '<div class="met bl"><div class="mv" style="color:var(--blue)">'+totalMiembros+'</div><div class="ml">Total miembros</div></div>'+
+    '<div class="met tl"><div class="mv" style="color:var(--teal)">'+arr.length+'</div><div class="ml">Comunidades</div></div>'+
+    '</div>';
+(arr){try{localStorage.setItem('austar_comunidades',JSON.stringify(arr));}catch{}}
+function addComunidad(){
+  var arr=getComunidades();
+  arr.push({id:'com_'+Date.now(),nombre:'',cultivo:'Mango',region:'',miembros:0,responsable:'Hiram',link:'',activa:true,notas:''});
+  saveComunidades(arr);renderComunidades();
+}
++'>'+r+'</option>';}).join('')+'</select></div>'+
+        '<div><div class="lbl">Socio CDM</div><input value="'+(row.socio||'')+'>" id="al_socio_'+row.id+'" placeholder="Ej: Odiseo"></div>'+
+        '<div><div class="lbl">Estatus</div><select id="al_est_'+row.id+'">'+['Activo','En proceso','Pendiente','Pausado'].map(function(s){return '<option'+(row.estatus===s?' selected':'')+'>'+s+'</option>';}).join('')+'</select></div>'+
+yId('alianzas-body');if(!body)return;
+  var activas=arr.filter(function(a){return a.estatus==='Activo';}).length;
+tus:'',proxima:'',notas:''},
+  {id:'olaj',nombre:'OLAJ',tipo:'Comunidad',responsable:'Hiram',socio:'',estatus:'Activo',proxima:'',notas:'300+ miembros'},
+  {id:'amcham',nombre:'AMCHAM',tipo:'Camara',responsable:'Leopoldo',socio:'',estatus:'',proxima:'',notas:''}
+];
+utton onclick="deleteAccion(\''+year+'\',\''+mes+'\',\''+row.id+'\')" style="font-size:10px;padding:3px 7px;background:none;border:1px solid var(--red);color:var(--red);border-radius:4px;cursor:pointer">✕</button>'+
+          '</div>'+
+        '</div>'+
+v>';
+  if(!arr.length){
+    html+='<div class="card" style="text-align:center;padding:40px;color:var(--text3)">Sin acciones para '+mes+' '+year+'. Usa el botón + para agregar.</div>';
+  } else {
+    html+='<div class="card"><div style="display:flex;flex-direction:column;gap:8px">';
+;
+  renderAcciones();
+}
+function deleteAccion(year,mes,id){
+  if(!confirm('Eliminar esta accion?'))return;
+  saveAcciones(year,mes,getAcciones(year,mes).filter(function(r){return r.id!==id;}));
+  renderAcciones();
+}
++'\',\''+mes+'\',\''+row.id+'\')" style="margin-left:4px">✕</button>'+
+        '</td>'+
+      '</tr>';
+    });
+    html+='</tbody></table></div>';
+  }
+  body.innerHTML=html;
+}
+
+gn:right;border-color:var(--green)"></td>'+
+        '<td style="padding:6px 8px"><input type="number" value="'+(row.prospectos||0)+'" id="pl_pros_'+row.id+'" style="width:45px;font-size:11px;text-align:right"></td>'+
+      var pctRow=row.litros_obj>0?Math.round((row.litros_real||0)/row.litros_obj*100):0;
+      html+='<tr style="border-bottom:0.5px solid var(--bg3)">'+
+═════════════════════════
 var pendingMergeData = [];
 
 function previewMerge(){
