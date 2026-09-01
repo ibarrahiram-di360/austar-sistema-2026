@@ -813,7 +813,8 @@ select option{background:var(--bg2)}
     <div class="nav-item" onclick="gotoTab('calendario')" id="nav-calendario"><span class="ni">🗓️</span>Calendario</div>nav-planner"><span class="ni">📅</span>Planner</div>
     <div class="nav-item" onclick="gotoTab('acciones')" id="nav-acciones"><span class="ni">✅</span>Plan de Acción</div>
     <div class="nav-item" onclick="gotoTab('alianzas')" id="nav-alianzas"><span class="ni">🤝</span>Alianzas</div>
-    <div class="nav-item" onclick="gotoTab('comunidades')" id="nav-comunidades"><span class="ni">🌱</span>Comunidades</div>nav-backup"><span class="ni">💾</span>Respaldo</div>
+    <div class="nav-item" onclick="gotoTab('comunidades')" id="nav-comunidades"><span class="ni">🌱</span>Comunidades</div>
+    <div class="nav-item" onclick="gotoTab('calendario')" id="nav-calendario"><span class="ni">📆</span>Calendario</div>nav-backup"><span class="ni">💾</span>Respaldo</div>
     <div class="sb-footer">
       <div style="display:flex;align-items:center;gap:8px">
         <div id="user-av" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0"></div>
@@ -1447,7 +1448,8 @@ select option{background:var(--bg2)}
         <div class="page-sub">Vision anual · Plan vs Real · Click en cualquier mes para abrir su planner</div>
       </div>
       <div style="padding:0 22px 22px" id="calendario-body"></div>
-    </div></div><!-- /main -->
+    </div>
+    <div id="tab-calendario" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">📆 Calendario — Austar2030</div><div style="display:flex;gap:8px;align-items:center"><button class="btn btn-sm" onclick="calPrevMonth()">‹</button><div id="cal-title" style="font-weight:700;font-size:15px;min-width:160px;text-align:center">Sep 2026</div><button class="btn btn-sm" onclick="calNextMonth()">›</button><button class="btn btn-g btn-sm" onclick="gotoTab('acciones')">+ Nueva acción</button></div></div><div class="page-sub">Vista mensual de acciones · Colores por responsable · Clic en día para ver detalle</div></div><div style="padding:0 22px 22px"><div id="cal-legend" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:11px"></div><div class="card" style="padding:0;overflow:hidden"><div style="display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border)"><div style="padding:10px 8px;text-align:center;font-weight:600;font-size:12px;color:var(--text2)">Lun</div><div style="padding:10px 8px;text-align:center;font-weight:600;font-size:12px;color:var(--text2)">Mar</div><div style="padding:10px 8px;text-align:center;font-weight:600;font-size:12px;color:var(--text2)">Mié</div><div style="padding:10px 8px;text-align:center;font-weight:600;font-size:12px;color:var(--text2)">Jue</div><div style="padding:10px 8px;text-align:center;font-weight:600;font-size:12px;color:var(--text2)">Vie</div><div style="padding:10px 8px;text-align:center;font-weight:600;font-size:12px;color:var(--text2)">Sáb</div><div style="padding:10px 8px;text-align:center;font-weight:600;font-size:12px;color:var(--text2)">Dom</div></div><div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr)"></div></div><div id="cal-detail" style="display:none;margin-top:12px"></div><div id="cal-summary" style="margin-top:12px"></div></div></div></div><!-- /main -->
 </div><!-- /app -->
 
 <script>
@@ -1554,7 +1556,7 @@ const USERS={
   contraloria:{pass:'ctrl360',av:'CT',bg:'#2e1065',col:'#c4b5fd',name:'Contraloría',role:'Visión total — solo lectura',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor','certificados','backup'],readOnly:true},
   hiram:{pass:'di360master',av:'HI',bg:'#451a03',col:'#fcd34d',name:'Hiram',role:'Director — Acceso total',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor','backup','certificados'],readOnly:false},
   telemarketing:{pass:'telemark26',av:'TM',bg:'#134e4a',col:'#99f6e4',name:'Telemarketing',role:'Atención al cliente',tabs:['clientes','detalle','nuevo','certificados','backup'],readOnly:false},
-  austar2030:{pass:'austar2030',av:'A3',bg:'#1a1a2e',col:'#e2b96f',name:'Austar2030',role:'Equipo Planner & Operaciones',tabs:['planner','acciones','alianzas','comunidades','calendario','clientes','detalle','nuevo','latam','certificados','backup'],readOnly:false}
+  austar2030:{pass:'austar2030',av:'A3',bg:'#1a1a2e',col:'#e2b96f',name:'Austar2030',role:'Equipo Planner & Operaciones',tabs:['planner','acciones','alianzas','comunidades','calendario','calendario','clientes','detalle','nuevo','latam','certificados','backup'],readOnly:false}
 };
 let selectedUser=null;
 
@@ -1640,6 +1642,7 @@ function gotoTab(t){
   if(t==='acciones')renderAcciones();
   if(t==='alianzas')renderAlianzas();
   if(t==='comunidades')renderComunidades();
+  if(t==='calendario'){CAL_YEAR=new Date().getFullYear();CAL_MONTH=new Date().getMonth();renderCalendario();}
   if(t==='certificados'){certInitTab();setTimeout(certCalc,100);}
 }
 
@@ -7390,9 +7393,208 @@ function goToPlannerMes(year,mes){
   gotoTab('planner');
 }
 
+var RESP_COLORS = {
+  'Hiram':   '#D8AE3C',
+  'Chio':    '#3b82f6',
+  'Valeria': '#a855f7',
+  'Yaneth':  '#22c55e',
+  'Uriel':   '#f97316',
+  'Leopoldo':'#14b8a6',
+  'Equipo':  '#8b5cf6'
+};
+
+var MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var MESES_SHORT = ['Ene','Feb','Mar','Abr','May','Jun',
+                   'Jul','Ago','Sep','Oct','Nov','Dic'];
+var EST_COLORS = {Pendiente:'#6b7280',Proceso:'#f59e0b',Hecho:'#22c55e',Bloqueado:'#ef4444'};
+
+function calPrevMonth(){
+  CAL_MONTH--;
+  if(CAL_MONTH < 0){CAL_MONTH = 11; CAL_YEAR--;}
+  renderCalendario();
+}
+function calNextMonth(){
+  CAL_MONTH++;
+  if(CAL_MONTH > 11){CAL_MONTH = 0; CAL_YEAR++;}
+  renderCalendario();
+}
+
+function getCalAcciones(){
+  var all = [];
+  var mes = MESES_SHORT[CAL_MONTH];
+  var year = CAL_YEAR.toString();
+  var arr = getAcciones(year, mes);
+  arr.forEach(function(a){ if(a.fecha) all.push(a); });
+  return all;
+}
+
+function getAccionesForDate(dateStr){
 // BACKUP MERGE / CONSOLIDATION
 // ════════════  var totPros=arr.reduce(function(s,r){return s+(r.prospectos||0);},0);
-  var pct=totLObj>0?Math.round(totLReal/totLObj*100):0;
+  var pct=totLObj>0?Math.r  var all = [];
+  var d = new Date(dateStr);
+  var mes = MESES_SHORT[d.getMonth()];
+  var year = d.getFullYear().toString();
+  var arr = getAcciones(year, mes);
+  arr.forEach(function(a){
+    if(a.fecha === dateStr) all.push(a);
+  });
+  return all;
+}
+
+function getAllAccionesInMonth(year, month){
+  var mes = MESES_SHORT[month];
+  return getAcciones(year.toString(), mes).filter(function(a){ return !!a.fecha; });
+}
+
+function renderCalendario(){
+  var titleEl = document.getElementById('cal-title');
+  if(titleEl) titleEl.textContent = MESES_ES[CAL_MONTH] + ' ' + CAL_YEAR;
+  var grid = document.getElementById('cal-grid');
+  if(!grid) return;
+  var firstDay = new Date(CAL_YEAR, CAL_MONTH, 1).getDay();
+  firstDay = (firstDay + 6) % 7;
+  var daysInMonth = new Date(CAL_YEAR, CAL_MONTH + 1, 0).getDate();
+  var today = new Date();
+  var monthAcciones = getAllAccionesInMonth(CAL_YEAR, CAL_MONTH);
+  var mes = MESES_SHORT[CAL_MONTH];
+  var plannerRows = getPlannerData(CAL_YEAR.toString(), mes);
+  var byDate = {};
+  monthAcciones.forEach(function(a){
+    if(!byDate[a.fecha]) byDate[a.fecha] = [];
+    byDate[a.fecha].push(a);
+  });
+  var cells = '';
+  var totalCells = Math.ceil((firstDay + day  for(var i = 0; i < totalCells; i++){
+    var dayNum = i - firstDay + 1;
+    var isCurrentMonth = dayNum >= 1 && dayNum <= daysInMonth;
+    var dateStr = isCurrentMonth ?
+      CAL_YEAR + '-' + String(CAL_MONTH+1).padStart(2,'0') + '-' + String(dayNum).padStart(2,'0') : '';
+    var isToday = isCurrentMonth &&
+      today.getFullYear() === CAL_YEAR &&
+      today.getMonth() === CAL_MONTH &&
+      today.getDate() === dayNum;
+    var dayAcciones = dateStr && byDate[dateStr] ? byDate[dateStr] : [];
+    var isWeekend = (i % 7 >= 5);
+    cells += '<div onclick="calClickDay(\'' + dateStr + '\',' + dayNum + ')" style="'+
+      'min-height:90px;padding:6px;border-right:0.5px solid var(--bg3);border-bottom:0.5px solid var(--bg3);'+
+      'background:' + (isToday ? 'var(--bg3)' : isWeekend ? 'rgba(0,0,0,0.02)' : 'transparent') + ';'+
+      'cursor:' + (isCurrentMonth ? 'pointer' : 'default') + '">'; 
+    if(isCurrentMonth){
+      cells += '<div style="font-weight:' + (isToday?'700':'500') + ';font-size:13px;margin-bottom:4px;color:' +
+        (isToday ? 'var(--amber)' : 'var(--text)') + '">' + dayNum + '</div>';
+      dayAcciones.slice(0,3).forEach(function(a){
+             if(dayAcciones.length > 3){
+        cells += '<div style="font-size:10px;color:var(--text3)">+' + (dayAcciones.length-3) + ' mas</div>';
+      }
+    }
+    cells += '</div>';
+  }
+  grid.innerHTML = cells;
+  var legend = document.getElementById('cal-legend');
+  if(legend){
+    var usedResp = {};
+    monthAcciones.forEach(function(a){ usedResp[a.responsable] = true; });
+    legend.innerHTML = Object.keys(RESP_COLORS).filter(function(r){ return usedResp[r]; }).map(function(r){
+      return '<span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:' + RESP_COLORS[r] + ';display:inline-block"></span>' + r + '</span>';
+    }).join('') +
+    '<span style="margin-left:auto;color:var(--text3)">' + monthAcciones.length + ' acciones este mes</span>';
+  }
+  renderCalSummary(plannerRows, monthAcciones, mes);
+  var det = document.getElementById('cal-detail');
+  if(det) det.style.display = 'none';
+}
+
+function calClickDay(dateStr, dayNum){
+  if(!dateStr) return;
+  var det = document.getElementById('cal-detail');
+  if(!det) return;
+  var d = new Date(dateStr);
+  var mes = MESES_SHORT[d.getMonth()];
+  var year = d.getFullYear().toS  var html = '<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">' +
+    '<div class="ct" style="margin:0">📅 ' + dayNum + ' de ' + MESES_ES[CAL_MONTH] + ' ' + CAL_YEAR + '</div>' +
+    '<button class="btn btn-sm btn-g" onclick="calAddAccionForDate(\'' + dateStr + '\')" >+ Accion este dia</button>' +
+    '</div>';
+  if(!arr.length){
+    html += '<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px">Sin acciones programadas para este dia.</div>';
+  } else {
+    arr.forEach(function(a){
+      var col = RESP_COLORS[a.responsable] || '#6b7280';
+      var estCl = {Pendiente:'t-gy',Proceso:'t-am',Hecho:'t-gr',Bloqueado:'t-rd'}[a.estatus]||'t-gy';
+      html += '<div style="padding:10px;border-radius:8px;border-left:3px solid ' + col + ';background:var(--bg3);margin-bottom:8px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">' +
+          '<div style="font-weight:600;font-size:13px">' + (a.accion||'Sin titulo') + '</div>' +
+          '<span class="tag ' + estCl + '">' + a.estatus + '</span>' +
+        '</div>' +
+        '<div style="font-size:1function calAddAccionForDate(dateStr){
+  var d = new Date(dateStr);
+  var mes = MESES_SHORT[d.getMonth()];
+  var year = d.getFullYear().toString();
+  var arr = getAcciones(year, mes);
+  arr.push({id:'ac_'+Date.now(),accion:'',frente:'',responsable:'Hiram',fecha:dateStr,estatus:'Pendiente',notas:''});
+  saveAcciones(year, mes, arr);
+  gotoTab('acciones');
+  var acMes = document.getElementById('ac-mes');
+  var acYear = document.getElementById('ac-year');
+  if(acMes) acMes.value = mes;
+  if(acYear) acYear.value = year;
+  renderAcciones();
+}
+
+function renderCalSummary(plannerRows, acciones, mes){
+  var summary = document.getElementById('cal-summary');
+  if(!summary) return;
+  var done = acciones.filter(function(a){return a.estatus==='Hecho';}).length;
+  var pending = acciones.filter(function(a){return a.estatus==='Pendiente';}).length;
+  var inProgress = acciones.filter(function(a){return a.estatus==='Proceso';}).length;
+  var totalLObj = plannerRows.reduce(function(s,r){return s+(r.litros_obj||0);},0);
+  var totalLReal = plannerRows.reduce(function(s,r){return s+(r.litros_real||0);},0);
+  var pct = totalLObj > 0 ? Math.round(totalLReal/totalLObj*10      '<div class="met" style="border-left:3px solid var(--red)"><div class="mv" style="font-size:16px;color:var(--red)">' + pending + '</div><div class="ml">Pendientes</div></div>' +
+      '<div class="met bl"><div class="mv" style="font-size:16px;color:var(--blue)">' + fmt(totalLReal) + 'L</div><div class="ml">Real vs ' + fmt(totalLObj) + 'L obj</div></div>' +
+      '<div class="met tl"><div class="mv" style="font-size:16px;color:' + (pct>=80?'var(--green)':'var(--amber)') + '">' + pct + '%</div><div class="ml">Cumplimiento</div></div>' +
+    '</div>' +
+    (plannerRows.length ? '<div style="margin-top:12px"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px">RUTA DEL MES</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:6px">' +
+      plannerRows.map(function(r){
+        var p2 = r.litros_obj>0 ? Math.round((r.litros_real||0)/r.litros_obj*100) : 0;
+        var col2 = p2>=80?'var(--green)':p2>=50?'var(--amber)':'var(--red)';
+        return '<div style="background:var(--bg3);border-radius:6px;padding:6px 10px;font-size:11px;border-left:3px solid '+col2+'">' +
+          '<div style="font-weight:600">' + (r.estado||'—') + '</div>' +
+          '<div style="color:var(--text2)">' + (r.cultivo||'') + ' · ' + fmt(r.litros_real||0) + '/' + fmt(r.litros_obj||0) + 'L</div>' +
+        '</div>';
+      }).join('') +
+      '</div></div>' : '') +
+    '</div>';
+}
+
+var CAL_YEAR = 2026;
+var CAL_MONTH = 8;
+
+0) : 0;
+  summary.innerHTML = '<div class="card"><div class="ct">Resumen del mes — ' + MESES_ES[CAL_MONTH] + ' ' + CAL_YEAR + '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">' +
+      '<div class="met gl"><div class="mv" style="font-size:16px;color:var(--green)">' + done + '</div><div class="ml">Completadas</div></div>' +
+      '<div class="met al"><div class="mv" style="font-size:16px;color:var(--amber)">' + inProgress + '</div><div class="ml">En proceso</div></div>' +
+1px;color:var(--text2)">' +
+          (a.frente ? '📍 ' + a.frente + ' · ' : '') + '👤 ' + (a.responsable||'—') +
+          (a.notas ? '<br><span style="color:var(--text3)">' + a.notas + '</span>' : '') +
+        '</div></div>';
+    });
+  }
+  html += '</div>';
+  det.innerHTML = html;
+  det.style.display = 'block';
+  det.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+tring();
+  var arr = getAcciones(year, mes).filter(function(a){ return a.fecha === dateStr; });
+ var col = RESP_COLORS[a.responsable] || '#6b7280';
+        cells += '<div style="background:' + col + '22;border-left:2px solid ' + col + ';padding:2px 5px;border-radius:3px;font-size:10px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">' +
+          (a.accion||'Sin titulo').substring(0,25) + '</div>';
+      });
+sInMonth) / 7) * 7;
+ound(totLReal/totLObj*100):0;
 
   var html='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">'+
     '<div class="met gl"><div class="mv" style="color:var(--green)">'+fmt(totLReal)+'L</div><div class="ml">Real del mes</div></div>'+
