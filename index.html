@@ -809,7 +809,8 @@ select option{background:var(--bg2)}
     <div class="nav-item" onclick="gotoTab('monitor')" id="nav-monitor"><span class="ni">👁️</span>Monitor</div>
     <div class="nav-item" onclick="gotoTab('certificados')" id="nav-certificados"><span class="ni">🏆</span>Certificados</div>
     <div class="nav-item" onclick="gotoTab('backup')" id="
-    <div class="nav-item" onclick="gotoTab('planner')" id="nav-planner"><span class="ni">📅</span>Planner</div>
+    <div class="nav-item" onclick="gotoTab('planner')" id="
+    <div class="nav-item" onclick="gotoTab('calendario')" id="nav-calendario"><span class="ni">🗓️</span>Calendario</div>nav-planner"><span class="ni">📅</span>Planner</div>
     <div class="nav-item" onclick="gotoTab('acciones')" id="nav-acciones"><span class="ni">✅</span>Plan de Acción</div>
     <div class="nav-item" onclick="gotoTab('alianzas')" id="nav-alianzas"><span class="ni">🤝</span>Alianzas</div>
     <div class="nav-item" onclick="gotoTab('comunidades')" id="nav-comunidades"><span class="ni">🌱</span>Comunidades</div>nav-backup"><span class="ni">💾</span>Respaldo</div>
@@ -1430,7 +1431,23 @@ select option{background:var(--bg2)}
     <div id="tab-planner" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">📅 Planner Mensual — Austar2030</div><div style="display:flex;gap:8px"><select id="pl-year" onchange="renderPlanner()" style="width:90px"><option>2025</option><option selected>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select><select id="pl-mes" onchange="renderPlanner()" style="width:100px"><option value="Ene">Enero</option><option value="Feb">Febrero</option><option value="Mar">Marzo</option><option value="Abr">Abril</option><option value="May">Mayo</option><option value="Jun">Junio</option><option value="Jul">Julio</option><option value="Ago">Agosto</option><option value="Sep" selected>Sep</option><option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dic">Dic</option></select><button class="btn btn-g btn-sm" onclick="addPlannerRow()">+ Agregar estado</button></div></div><div class="page-sub">Un estado por fila · Real vs Planeado · Canales de activación mensual</div></div><div style="padding:0 22px 22px" id="planner-body"><div style="text-align:center;padding:40px;color:var(--text3)">Selecciona el mes y el año para ver el planner.</div></div></div>
     <div id="tab-acciones" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">✅ Plan de Acción Mensual</div><div style="display:flex;gap:8px"><select id="ac-year" onchange="renderAcciones()" style="width:90px"><option>2025</option><option selected>2026</option><option>2027</option></select><select id="ac-mes" onchange="renderAcciones()" style="width:100px"><option value="Ene">Enero</option><option value="Feb">Febrero</option><option value="Mar">Marzo</option><option value="Abr">Abril</option><option value="May">Mayo</option><option value="Jun">Junio</option><option value="Jul">Julio</option><option value="Ago">Agosto</option><option value="Sep" selected>Sep</option><option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dic">Dic</option></select><button class="btn btn-g btn-sm" onclick="addAccion()">+ Nueva acción</button></div></div><div class="page-sub">Tareas del mes con responsable, fecha límite y estatus</div></div><div style="padding:0 22px 22px" id="acciones-body"></div></div>
     <div id="tab-alianzas" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">🤝 Alianzas Institucionales</div><button class="btn btn-g btn-sm" onclick="addAlianza()">+ Nueva alianza</button></div><div class="page-sub">BNI · CDAAJ · ANFACA · APEAJAL · IPADE · OLAJ · AMCHAM</div></div><div style="padding:0 22px 22px" id="alianzas-body"></div></div>
-    <div id="tab-comunidades" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">🌱 Comunidades por Cultivo</div><button class="btn btn-g btn-sm" onclick="addComunidad()">+ Nueva comunidad</button></div><div class="page-sub">Grupos WhatsApp por cultivo · región · miembros · responsable</div></div><div style="padding:0 22px 22px" id="comunidades-body"></div></div></div><!-- /main -->
+    <div id="tab-comunidades" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">🌱 Comunidades por Cultivo</div><button class="btn btn-g btn-sm" onclick="addComunidad()">+ Nueva comunidad</button></div><div class="page-sub">Grupos WhatsApp por cultivo · región · miembros · responsable</div></div><div style="padding:0 22px 22px" id="comunidades-body"></div></div>
+    <!-- CALENDARIO AUSTAR2030 -->
+    <div id="tab-calendario" class="sc">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+          <div class="page-title">🗓️ Calendario Austar2030</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="cal-year" onchange="renderCalendario()" style="width:90px">
+              <option>2025</option><option selected>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option>
+            </select>
+            <button class="btn btn-sm" onclick="renderCalendario()">↺ Actualizar</button>
+          </div>
+        </div>
+        <div class="page-sub">Vision anual · Plan vs Real · Click en cualquier mes para abrir su planner</div>
+      </div>
+      <div style="padding:0 22px 22px" id="calendario-body"></div>
+    </div></div><!-- /main -->
 </div><!-- /app -->
 
 <script>
@@ -1537,7 +1554,7 @@ const USERS={
   contraloria:{pass:'ctrl360',av:'CT',bg:'#2e1065',col:'#c4b5fd',name:'Contraloría',role:'Visión total — solo lectura',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor','certificados','backup'],readOnly:true},
   hiram:{pass:'di360master',av:'HI',bg:'#451a03',col:'#fcd34d',name:'Hiram',role:'Director — Acceso total',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor','backup','certificados'],readOnly:false},
   telemarketing:{pass:'telemark26',av:'TM',bg:'#134e4a',col:'#99f6e4',name:'Telemarketing',role:'Atención al cliente',tabs:['clientes','detalle','nuevo','certificados','backup'],readOnly:false},
-  austar2030:{pass:'austar2030',av:'A3',bg:'#1a1a2e',col:'#e2b96f',name:'Austar2030',role:'Equipo Planner & Operaciones',tabs:['planner','acciones','alianzas','comunidades','clientes','detalle','nuevo','latam','certificados','backup'],readOnly:false}
+  austar2030:{pass:'austar2030',av:'A3',bg:'#1a1a2e',col:'#e2b96f',name:'Austar2030',role:'Equipo Planner & Operaciones',tabs:['planner','acciones','alianzas','comunidades','calendario','clientes','detalle','nuevo','latam','certificados','backup'],readOnly:false}
 };
 let selectedUser=null;
 
@@ -1619,6 +1636,7 @@ function gotoTab(t){
   if(t==='monitor')renderMonitor();
   if(t==='backup')initBackupTab();
   if(t==='planner')renderPlanner();
+  if(t==='calendario')renderCalendario();
   if(t==='acciones')renderAcciones();
   if(t==='alianzas')renderAlianzas();
   if(t==='comunidades')renderComunidades();
@@ -7276,6 +7294,102 @@ function renderPlanner(){
   var totLObj=arr.reduce(function(s,r){return s+(r.litros_obj||0);},0);
   var totLReal=arr.reduce(function(s,r){return s+(r.litros_real||0);},0);
   var totHa=arr.reduce(function(s,r){return s+(r.ha||0);},0);
+// CALENDARIO AUSTAR2030
+var MESES_CAL=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+var MESES_FULL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var BIM_COLOR={B1:'#1e3a5f',B2:'#14532d',B3:'#451a03',B4:'#2e1065',B5:'#1a3a1a',B6:'#3a1a1a'};
+
+function getMesData(year,mes){
+  var pl=getPlannerData(year,mes);
+  var ac=getAcciones(year,mes);
+  var totalObj=pl.reduce(function(s,r){return s+(r.litros_obj||0);},0);
+  var totalReal=pl.reduce(function(s,r){return s+(r.litros_real||0);},0);
+  var totalHa=pl.reduce(function(s,r){return s+(r.ha||0);},0);
+  var totalPros=pl.reduce(function(s,r){return s+(r.prospectos||0);},0);
+  var acDone=ac.filter(function(a){return a.estatus==='Hecho';}).length;
+  var acTotal=ac.length;
+  var pct=totalObj>0?Math.round(totalReal/totalObj*100):0;
+  var bim=BIMESTRES[mes]||'';
+  return {mes,year,totalObj,totalReal,totalHa,totalPros,acDone,acTotal,pct,bim,hasData:totalObj>0||acTotal>0};
+}
+
+function renderCalendario(){
+  var year=(document.getElementById('cal-year')||{}).value||'2026';
+  var body=document.getElementById('calendario-body');if(!body)return;
+  var data=MESES_CAL.map(function(m){return getMesData(year,m);});
+  var totalObjYear=data.reduce(function(s,d){return s+d.totalObj;},0);
+  var totalRealYear=data.reduce(function(s,d){return s+d.totalReal;},0);
+  var pctYear=totalObjYear>0?Math.round(totalRealYear/totalObjYear*100):0;
+  var mesesConDatos=data.filter(function(d){return d.hasData;}).length;
+
+  var html='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">'+
+    '<div class="met gl"><div class="mv" style="color:var(--green)">'+fmt(totalRealYear)+'L</div><div class="ml">Real '+year+'</div></div>'+
+    '<div class="met al"><div class="mv" style="color:var(--amber)">'+fmt(totalObjYear)+'L</div><div class="ml">Objetivo '+year+'</div></div>'+
+    '<div class="met bl"><div class="mv" style="color:'+(pctYear>=80?'var(--green)':pctYear>=50?'var(--amber)':'var(--red)')+'">'+pctYear+'%</div><div class="ml">Avance anual</div></div>'+
+    '<div class="met tl"><div class="mv" style="color:var(--teal)">'+mesesConDatos+'/12</div><div class="ml">Meses planeados</div></div>'+
+    '</div>';
+  // Bimestral summary bar
+  var bimData={};
+  data.forEach(function(d){
+    if(!bimData[d.bim])bimData[d.bim]={obj:0,real:0,meses:[]};
+    bimData[d.bim].obj+=d.totalObj;
+    bimData[d.bim].real+=d.totalReal;
+    bimData[d.bim].meses.push(d.mes);
+  });
+  html+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:20px">';
+  ['B1','B2','B3','B4','B5','B6'].forEach(function(b){
+    var bd=bimData[b]||{obj:0,real:0,meses:[]};
+    var bp=bd.obj>0?Math.round(bd.real/bd.obj*100):0;
+    var bc=BIM_COLOR[b]||'#1a1a2e';
+    html+='<div style="background:'+bc+';border-radius:10px;padding:10px;cursor:pointer" onclick="gotoTab(\'planner\')">';
+    html+='<div style="font-size:11px;font-weight:700;color:#e2b96f;margin-bottom:4px">'+b+'</div>';
+    html+='<div style="font-size:12px;color:white;font-weight:600">'+fmt(bd.real)+'L</div>';
+    html+='<div style="font-size:10px;color:rgba(255,255,255,.6)">de '+fmt(bd.obj)+'L obj</div>';
+    html+='<div style="margin-top:6px;background:rgba(255,255,255,.15);border-radius:3px;height:4px">';
+    html+='<div style="background:#e2b96f;width:'+Math.min(bp,100)+'%;height:4px;border-radius:3px"></div></div>';
+    html+='<div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:3px">'+bd.meses.join(' · ')+'</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  // 12 month grid
+  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">';
+  data.forEach(function(d,i){
+    var clr=d.pct>=90?'var(--green)':d.pct>=60?'var(--amber)':d.totalObj>0?'var(--red)':'var(--text3)';
+    var bimBg=BIM_COLOR[d.bim]||'#1a1a2e';
+    var border=d.hasData?'2px solid '+clr:'1px solid var(--border)';
+    html+='<div class="card" style="cursor:pointer;border:'+border+';position:relative" onclick="goToPlannerMes(\''+year+'\',\''+d.mes+'\')">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    html+='<div style="font-weight:700;font-size:15px">'+MESES_FULL[i]+'</div>';
+    html+='<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:'+bimBg+';color:#e2b96f">'+d.bim+'</span>';
+    html+='</div>';
+    if(d.hasData){
+      html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">';
+      html+='<div><div style="font-size:10px;color:var(--text3)">Objetivo</div><div style="font-weight:600;color:var(--amber)">'+fmt(d.totalObj)+'L</div></div>';
+      html+='<div><div style="font-size:10px;color:var(--text3)">Real</div><div style="font-weight:600;color:var(--green)">'+fmt(d.totalReal)+'L</div></div>';
+      html+='<div><div style="font-size:10px;color:var(--text3)">Hectareas</div><div style="font-weight:600">'+fmt(d.totalHa)+'ha</div></div>';
+      html+='<div><div style="font-size:10px;color:var(--text3)">Prospectos</div><div style="font-weight:600;color:var(--teal)">'+d.totalPros+'</div></div>';
+      html+='</div>';
+      html+='<div style="background:var(--bg3);border-radius:4px;height:6px;margin-bottom:6px">';
+      html+='<div style="background:'+clr+';width:'+Math.min(d.pct,100)+'%;height:6px;border-radius:4px"></div></div>';
+      html+='<div style="display:flex;justify-content:space-between;font-size:11px">';
+      html+='<span style="color:'+clr+';font-weight:700">'+d.pct+'% cumpl.</span>';
+      html+='<span style="color:var(--text3)">'+d.acDone+'/'+d.acTotal+' acciones</span>';
+      html+='</div>';
+    } else {
+      html+='<div style="text-align:center;padding:16px 0;color:var(--text3);font-size:12px">Sin planear<br><span style="font-size:10px">Clic para agregar</span></div>';
+    }
+    html+='</div>';
+  });
+  html+='</div>';
+  body.innerHTML=html;
+}
+
+function goToPlannerMes(year,mes){
+  var ys=document.getElementById('pl-year');if(ys)ys.value=year;
+  var ms=document.getElementById('pl-mes');if(ms)ms.value=mes;
+  gotoTab('planner');
+}
+
 // BACKUP MERGE / CONSOLIDATION
 // ════════════  var totPros=arr.reduce(function(s,r){return s+(r.prospectos||0);},0);
   var pct=totLObj>0?Math.round(totLReal/totLObj*100):0;
