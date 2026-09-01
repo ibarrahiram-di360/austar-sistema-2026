@@ -8120,8 +8120,9 @@ function mergeBackups(){
 // BOOT
 // ════════════════════════════════════════
 const total=CLIENTS.length;
-document.getElementById('login-stat').textContent=`${total} clientes · ${Object.keys(MUNICIPIOS).length} estados · CDM + Odiseo Amezcua integrados`;
-seedLatamProspectos();
+var _ls=document.getElementById('login-stat');
+if(_ls)_ls.textContent='Austar2030 · '+total+' clientes · '+Object.keys(MUNICIPIOS).length+' estados · LATAM';
+if(typeof seedLatamProspectos==='function')seedLatamProspectos();
 </script>
 </body>
 </html>
