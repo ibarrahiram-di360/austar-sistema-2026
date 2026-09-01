@@ -7691,7 +7691,8 @@ function deleteAlianza(id){
 }
 function renderAlianzas(){
   var arr=getAlianzas();
-  var body=document.getElementB  var html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">'+
+  var body=document.getElementB
+  var html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">'+
     '<div class="met gl"><div class="mv" style="color:var(--green)">'+activas+'</div><div class="ml">Activas</div></div>'+
     '<div class="met bl"><div class="mv" style="color:var(--blue)">'+arr.length+'</div><div class="ml">Total</div></div>'+
     '<div class="met al"><div class="mv" style="color:var(--amber)">'+(arr.length-activas)+'</div><div class="ml">Por activar</div></div>'+
