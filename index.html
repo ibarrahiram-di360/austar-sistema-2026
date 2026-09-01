@@ -7431,7 +7431,8 @@ function getCalAcciones(){
 
 function getAccionesForDate(dateStr){
 // BACKUP MERGE / CONSOLIDATION
-// ════════════  var totPros=arr.reduce(function(s,r){return s+(r.prospectos||0);},0);
+// ════════════
+  var totPros=arr.reduce(function(s,r){return s+(r.prospectos||0);},0);
   var pct=totLObj>0?Math.r  var all = [];
   var d = new Date(dateStr);
   var mes = MESES_SHORT[d.getMonth()];
