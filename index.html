@@ -7976,13 +7976,15 @@ function mergeBackups(){
   pendingMergeData.forEach(function(backup, idx){
     // Merge extra clients (new ones only)
     Object.entries(backup.clientes||{}).forEach(function(entry){
-      var id = entry[0]; var c = entry[1];
+      var id = entry[0];
+ var c = entry[1];
       if(!master.clientes[id]) master.clientes[id] = c;
     });
 
     // Merge notes - combine arrays, deduplicate by timestamp
     Object.entries(backup.notas||{}).forEach(function(entry){
-      var id = entry[0]; var notes = entry[1];
+      var id = entry[0];
+ var notes = entry[1];
       if(!master.notas[id]) master.notas[id] = [];
       var existing = master.notas[id].map(function(n){return n.fecha+'_'+n.tipo+'_'+(n.t||'').slice(0,20);});
       notes.forEach(function(n){
@@ -7996,7 +7998,8 @@ function mergeBackups(){
 
     // Merge extras - take latest litros value
     Object.entries(backup.extras||{}).forEach(function(entry){
-      var id = entry[0]; var ex = entry[1];
+      var id = entry[0];
+ var ex = entry[1];
       if(!master.extras[id]) master.extras[id] = ex;
       else if(parseFloat(ex.litros||0) > parseFloat(master.extras[id].litros||0)){
         master.extras[id] = ex;
@@ -8005,7 +8008,8 @@ function mergeBackups(){
 
     // Merge badges - union
     Object.entries(backup.badges||{}).forEach(function(entry){
-      var id = entry[0]; var bg = entry[1];
+      var id = entry[0];
+ var bg = entry[1];
       if(!master.badges[id]) master.badges[id] = bg;
       else {
         bg.forEach(function(b){if(!master.badges[id].includes(b)) master.badges[id].push(b);});
@@ -8015,7 +8019,8 @@ function mergeBackups(){
     // Merge stages - keep most advanced stage
     var stageOrder = ['prospecto','contactado','interesado','compro','recompra','no_compra'];
     Object.entries(backup.etapas||{}).forEach(function(entry){
-      var id = entry[0]; var st = entry[1];
+      var id = entry[0];
+ var st = entry[1];
       if(!master.etapas[id]) master.etapas[id] = st;
       else {
         var currentIdx = stageOrder.indexOf(master.etapas[id]);
@@ -8042,7 +8047,8 @@ function mergeBackups(){
 
     // Merge LATAM - take most advanced status and combine notes
     Object.entries(backup.latam||{}).forEach(function(entry){
-      var id = entry[0]; var ld = entry[1];
+      var id = entry[0];
+ var ld = entry[1];
       if(!master.latam[id]){master.latam[id]=ld;return;}
       var latamStatusOrder=['prospecto','contactado','negociacion','activo','distribuidor'];
       var ci=latamStatusOrder.indexOf(master.latam[id].status||'prospecto');
