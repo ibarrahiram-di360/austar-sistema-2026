@@ -7384,7 +7384,8 @@ function getAccionesForDate(dateStr){
 // BACKUP MERGE / CONSOLIDATION
 // ════════════
   var totPros=arr.reduce(function(s,r){return s+(r.prospectos||0);},0);
-  var pct=totLObj>0?Math.r  var all = [];
+  var pct=totLObj>0?Math.r
+  var all = [];
   var d = new Date(dateStr);
   var mes = MESES_SHORT[d.getMonth()];
   var year = d.getFullYear().toString();
@@ -7464,7 +7465,8 @@ function calClickDay(dateStr, dayNum){
   if(!det) return;
   var d = new Date(dateStr);
   var mes = MESES_SHORT[d.getMonth()];
-  var year = d.getFullYear().toS  var html = '<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">' +
+  var year = d.getFullYear().toS
+  var html = '<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">' +
     '<div class="ct" style="margin:0">📅 ' + dayNum + ' de ' + MESES_ES[CAL_MONTH] + ' ' + CAL_YEAR + '</div>' +
     '<button class="btn btn-sm btn-g" onclick="calAddAccionForDate(\'' + dateStr + '\')" >+ Accion este dia</button>' +
     '</div>';
