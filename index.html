@@ -730,58 +730,14 @@ select option{background:var(--bg2)}
     <div id="step-user">
       <div style="font-size:11px;color:var(--text2);margin-bottom:10px;text-align:left">Selecciona tu perfil:</div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="ucard" onclick="selectUser('yaneth')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:left">
-          <div class="uav" style="background:#14532d;color:#86efac;width:38px;height:38px;font-size:13px;flex-shrink:0">YA</div>
-          <div style="flex:1"><div style="font-weight:600;font-size:13px">Yaneth</div><div style="font-size:11px;color:var(--text2)">Seguimiento clientes B2C</div></div>
-          <span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="ucard" onclick="selectUser('vale')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:left">
-          <div class="uav" style="background:#1e3a5f;color:#93c5fd;width:38px;height:38px;font-size:13px;flex-shrink:0">VA</div>
-          <div style="flex:1"><div style="font-weight:600;font-size:13px">Vale</div><div style="font-size:11px;color:var(--text2)">Prospección y nuevos B2B</div></div>
-          <span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="ucard" onclick="selectUser('contraloria')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:left">
-          <div class="uav" style="background:#2e1065;color:#c4b5fd;width:38px;height:38px;font-size:13px;flex-shrink:0">CT</div>
-          <div style="flex:1"><div style="font-weight:600;font-size:13px">Contraloría</div><div style="font-size:11px;color:var(--text2)">Monitoreo y reportes</div></div>
-          <span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="ucard" onclick="selectUser('hiram')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:left">
-          <div class="uav" style="background:#451a03;color:#fcd34d;width:38px;height:38px;font-size:13px;flex-shrink:0">HI</div>
-          <div style="flex:1"><div style="font-weight:600;font-size:13px">Hiram</div><div style="font-size:11px;color:var(--text2)">Acceso total — Director</div></div>
-          <span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-        <div class="ucard" onclick="selectUser('telemarketing')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:left">
-          <div class="uav" style="background:#134e4a;color:#99f6e4;width:38px;height:38px;font-size:13px;flex-shrink:0">TM</div>
-          <div style="flex:1"><div style="font-weight:600;font-size:13px">Telemarketing</div><div style="font-size:11px;color:var(--text2)">Atención al cliente</div></div>
-          <span style="color:var(--text3);font-size:18px">›</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 2: Password -->
-    <div id="step-pass" style="display:none">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
-        <button onclick="backToUsers()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1">←</button>
-        <div id="pass-user-info" style="display:flex;align-items:center;gap:10px;flex:1">
-          <div id="pass-av" class="uav" style="width:36px;height:36px;font-size:12px"></div>
-          <div>
-            <div id="pass-name" style="font-weight:700;font-size:14px"></div>
-            <div id="pass-role" style="font-size:11px;color:var(--text2)"></div>
+                <div class="ucard" onclick="selectUser('austar2030')" style="display:flex;align-items:center;gap:14px;padding:16px 20px;text-align:left;border:1px solid #e2b96f55;border-radius:12px;background:linear-gradient(135deg,#1a1a2e,#16213e)">
+          <div class="uav" style="background:#e2b96f;color:#1a1a2e;width:48px;height:48px;font-size:16px;font-weight:700;flex-shrink:0;border-radius:50%">A3</div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:16px;color:#e2b96f">Austar2030</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px">Sistema Comercial & Planner - Equipo completo</div>
           </div>
-        </div
-        <div class="ucard" onclick="selectUser('austar2030')" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:left;border:1px solid #e2b96f33">
-          <div class="uav" style="background:#1a1a2e;color:#e2b96f;width:38px;height:38px;font-size:13px;flex-shrink:0">A3</div>
-          <div style="flex:1"><div style="font-weight:600;font-size:13px">Austar2030</div><div style="font-size:11px;color:var(--text2)">Equipo Planner & Operaciones</div></div>
-          <span style="color:var(--text3);font-size:18px">›</span>
-        </div>>
-      </div>
-      <div style="margin-bottom:12px">
-        <div class="lbl" style="text-align:left;margin-bottom:6px">Contraseña de acceso</div>
-        <input id="pass-input" type="password" placeholder="••••••••" style="font-size:18px;letter-spacing:4px;text-align:center" onkeydown="if(event.key==='Enter')doLogin()">
-      </div>
-      <div id="pass-error" style="font-size:11px;color:var(--red);margin-bottom:8px;min-height:16px"></div>
-      <button class="btn btn-g" style="width:100%;padding:11px" onclick="doLogin()">Ingresar</button>
-    </div>
+          <span style="color:#e2b96f;font-size:22px">›</span>
+        </div>
 
     <div id="login-stat" style="font-size:11px;color:var(--text3);margin-top:14px"></div>
   </div>
@@ -1551,12 +1507,7 @@ function loadMunicipios(){
 // ════════════════════════════════════════
 // Contraseñas por defecto — cambiar en producción
 const USERS={
-  yaneth:{pass:'austar2026',av:'YA',bg:'#14532d',col:'#86efac',name:'Yaneth',role:'Seguimiento B2C',tabs:['clientes','detalle','nuevo','certificados','backup'],readOnly:false},
-  vale:{pass:'vale2026',av:'VA',bg:'#1e3a5f',col:'#93c5fd',name:'Vale',role:'Prospección B2B',tabs:['clientes','detalle','nuevo','latam','certificados','backup'],readOnly:false},
-  contraloria:{pass:'ctrl360',av:'CT',bg:'#2e1065',col:'#c4b5fd',name:'Contraloría',role:'Visión total — solo lectura',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor','certificados','backup'],readOnly:true},
-  hiram:{pass:'di360master',av:'HI',bg:'#451a03',col:'#fcd34d',name:'Hiram',role:'Director — Acceso total',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor','backup','certificados'],readOnly:false},
-  telemarketing:{pass:'telemark26',av:'TM',bg:'#134e4a',col:'#99f6e4',name:'Telemarketing',role:'Atención al cliente',tabs:['clientes','detalle','nuevo','certificados','backup'],readOnly:false},
-  austar2030:{pass:'austar2030',av:'A3',bg:'#1a1a2e',col:'#e2b96f',name:'Austar2030',role:'Equipo Planner & Operaciones',tabs:['planner','acciones','alianzas','comunidades','calendario','calendario','clientes','detalle','nuevo','latam','certificados','backup'],readOnly:false}
+  austar2030:{pass:'austar2030',av:'A3',bg:'#1a1a2e',col:'#e2b96f',name:'Austar2030',role:'Sistema Comercial & Planner - Equipo',tabs:['dashboard','historico','clientes','detalle','inventario','nuevo','latam','monitor','backup','certificados','planner','acciones','alianzas','comunidades','calendario'],readOnly:false}
 };
 let selectedUser=null;
 
