@@ -7391,6 +7391,15 @@ function getCalAcciones(){
 }
 
 function getAccionesForDate(dateStr){
+  var all=[];
+  var d=new Date(dateStr);
+  var mes=MESES_SHORT[d.getMonth()];
+  var year=d.getFullYear().toString();
+  var arr=getAcciones(year,mes);
+  arr.forEach(function(a){if(a.fecha===dateStr)all.push(a);});
+  return all;
+}
+
 // BACKUP MERGE / CONSOLIDATION
 // ════════════
   var totPros=arr.reduce(function(s,r){return s+(r.prospectos||0);},0);
