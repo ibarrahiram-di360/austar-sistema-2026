@@ -749,7 +749,7 @@ select option{background:var(--bg2)}
       </div>
       <div style="font-size:10px;color:var(--text3);letter-spacing:1px;margin-bottom:8px">CONTRASENA DE ACCESO</div>
       <input type="password" id="pass-input" placeholder="••••••••" style="width:100%;margin-bottom:12px" onkeydown="if(event.key==='Enter')doLogin()" oninput="document.getElementById('pass-err').style.display='none'">
-      <div id="pass-err" style="display:none;color:var(--red);font-size:11px;margin-bottom:8px;text-align:center">Contrasena incorrecta</div>
+      <div id="pass-error" style="display:none;color:var(--red);font-size:11px;margin-bottom:8px;text-align:center">Contrasena incorrecta</div>
       <button onclick="doLogin()" class="btn btn-g" style="width:100%;padding:12px;font-size:14px">Ingresar</button>
     </div>
 
