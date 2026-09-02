@@ -2513,12 +2513,124 @@ function getAllAccionesInMonth(year, month){
   return getAcciones(year.toString(), mes).filter(function(a){ return !!a.fecha; });
 }
 
+
+
+// ════════════════════════════════════════════
+// POTENCIAL POR ESTADO — datos Excel 2026
+// ════════════════════════════════════════════
+var ESTADO_POTENCIAL = {
+  'Chihuahua':       {l:411800,  v:60323, c:23, cult:'Nogal · Alfalfa · Algodón',   mun:'Camargo (alfalfa)'},
+  'Sonora':          {l:457250,  v:38595, c:0,  cult:'Trigo · Uva',                  mun:'Cajeme (trigo)'},
+  'Veracruz':        {l:526550,  v:38382, c:0,  cult:'Limón · Naranja · Café',        mun:'Martínez de la Torre (limón)'},
+  'Coahuila':        {l:232450,  v:32698, c:14, cult:'Nogal · Alfalfa · Algodón',   mun:'Jiménez (nogal)'},
+  'Nuevo León':      {l:329925,  v:27318, c:0,  cult:'Naranja · Sorgo',               mun:'Linares (naranja)'},
+  'Chiapas':         {l:431310,  v:24074, c:6,  cult:'Maíz · Mango · Café',           mun:'Villaflores (maíz)'},
+  'Sinaloa':         {l:173000,  v:21263, c:24, cult:'Maíz · Tomate · Mango',         mun:'Guasave (maíz)'},
+  'Zacatecas':       {l:350000,  v:20905, c:0,  cult:'Frijol · Guayaba',              mun:'Fresnillo (frijol)'},
+  'Durango':         {l:250400,  v:20146, c:0,  cult:'Nogal · Frijol · Alfalfa',      mun:'Lerdo (nogal)'},
+  'San Luis Potosí': {l:236200,  v:18638, c:11, cult:'Caña · Naranja · Café',         mun:'Cd. Valles (caña)'},
+  'Tamaulipas':      {l:304550,  v:17371, c:0,  cult:'Sorgo · Maíz',                  mun:'Valle Hermoso (sorgo)'},
+  'Jalisco':         {l:175300,  v:17269, c:15, cult:'Caña · Aguacate · Chile',        mun:'Autlán (caña)'},
+  'Guanajuato':      {l:185250,  v:10965, c:0,  cult:'Maíz · Fresa · Uva',            mun:'Salamanca (maíz)'},
+  'Oaxaca':          {l:193950,  v:9778,  c:0,  cult:'Caña · Mango · Café',           mun:'San Juan Mixtepec (caña)'},
+  'Colima':          {l:55500,   v:9435,  c:0,  cult:'Limón',                         mun:'Tecomán (limón)'},
+  'Michoacán':       {l:79000,   v:8781,  c:64, cult:'Aguacate · Limón',              mun:'Apatzingán (limón)'},
+  'Guerrero':        {l:168615,  v:6675,  c:0,  cult:'Mango · Café',                  mun:'Tecpan (mango)'},
+  'Baja California': {l:45900,   v:6641,  c:0,  cult:'Trigo · Tomate · Fresa',        mun:'Mexicali (trigo)'},
+  'Estado de México':{l:70475,   v:6327,  c:0,  cult:'Aguacate · Maíz',              mun:'Coatepec Harinas (aguacate)'},
+  'Yucatán':         {l:129450,  v:4054,  c:0,  cult:'Naranja · Maíz',                mun:'Oxkutzcab (naranja)'},
+  'Hidalgo':         {l:89200,   v:4032,  c:0,  cult:'Chile · Alfalfa · Naranja',     mun:'Actopan (chile)'},
+  'Morelos':         {l:20050,   v:3890,  c:0,  cult:'Tomate · Caña',                 mun:'Yecapixtla (tomate)'},
+  'Puebla':          {l:95275,   v:3597,  c:0,  cult:'Café · Maíz',                   mun:'Huauchinango (café)'},
+  'Querétaro':       {l:39150,   v:1934,  c:0,  cult:'Uva · Café',                    mun:'Ezequiel Montes (uva)'},
+  'Nayarit':         {l:5050,    v:207,   c:93, cult:'Mango · Caña',                  mun:'Tepic (mango)'},
+  'Aguascalientes':  {l:34600,   v:2327,  c:0,  cult:'Guayaba · Maíz',               mun:'Calvillo (guayaba)'},
+  'Campeche':        {l:52250,   v:2301,  c:0,  cult:'Maíz',                          mun:'Hopelchén (maíz)'},
+  'Quintana Roo':    {l:20050,   v:2227,  c:0,  cult:'Caña · Papaya',                 mun:'Othón P. Blanco (caña)'},
+  'Tlaxcala':        {l:49700,   v:1834,  c:0,  cult:'Maíz · Frijol',                 mun:'—'},
+  'Tabasco':         {l:14400,   v:1116,  c:0,  cult:'Maíz · Caña',                   mun:'—'},
+  'Baja California Sur':{l:9300, v:2996,  c:0,  cult:'Tomate · Mango',               mun:'Comondú (tomate)'},
+};
+
+function renderPotencialCalendario(year, mes) {
+  // Get all acciones for the month
+  var arr = getAcciones(year, mes);
+  // Collect unique estados from associated clients/prospects
+  var estadosSet = {};
+  arr.forEach(function(a) {
+    var cid = a.clienteId || a.prospectoId;
+    if (!cid) return;
+    var cl = CLIENTS.find(function(c){return c.id===cid;}) || 
+             (typeof getLatamProspectos==='function' ? [] : []).find ? null : null;
+    if (!cl) {
+      // Try latam prospects
+      var lp = getLatamProspectos ? getLatamProspectos('all') : [];
+      cl = lp ? lp.find(function(p){return p.id===cid;}) : null;
+    }
+    if (cl && cl.estado) estadosSet[cl.estado] = true;
+  });
+  
+  var estados = Object.keys(estadosSet);
+  
+  // If no states detected, show top 3 states with most activity this month
+  if (estados.length === 0) {
+    // Fallback: show states of all active clients
+    var activeEstados = {};
+    CLIENTS.forEach(function(c){
+      if(c.estado && c.acciones && c.acciones.length>0) activeEstados[c.estado]=(activeEstados[c.estado]||0)+1;
+    });
+    estados = Object.keys(activeEstados).sort(function(a,b){return activeEstados[b]-activeEstados[a];}).slice(0,3);
+  }
+
+  if (estados.length === 0) return '';
+
+  var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  
+  var html = '<div style="margin-bottom:18px;padding:14px 16px;background:linear-gradient(135deg,#0a1628,#0f2040);border:1px solid #1e3a5f;border-radius:10px;">';
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">';
+  html += '<span style="font-size:16px;">🎯</span>';
+  html += '<span style="font-size:13px;font-weight:700;color:#D8AE3C;text-transform:uppercase;letter-spacing:1px;">Potencial de Mercado — '+meses[mes-1]+' '+year+'</span>';
+  html += '<span style="margin-left:auto;font-size:11px;color:var(--text3);">Estados activos este mes</span>';
+  html += '</div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:10px;">';
+  
+  estados.forEach(function(estado) {
+    var d = ESTADO_POTENCIAL[estado];
+    if (!d) return;
+    var cobColor = d.c >= 70 ? '#2F6E3F' : d.c >= 30 ? '#D8AE3C' : d.c >= 10 ? '#D9622B' : '#ef4444';
+    var litrosK = d.l >= 1000 ? (d.l/1000).toFixed(0)+'K L' : d.l+' L';
+    var valorM = d.v >= 1000 ? '$'+(d.v/1000).toFixed(1)+'B' : '$'+d.v+'M';
+    
+    html += '<div style="background:#0d1f35;border:1px solid #1e3a5f;border-left:3px solid #D8AE3C;border-radius:8px;padding:10px 14px;min-width:200px;flex:1;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
+    html += '<span style="font-size:13px;font-weight:700;color:#e8eaf0;">📍 '+estado+'</span>';
+    html += '<span style="font-size:10px;background:'+cobColor+';color:#fff;padding:2px 6px;border-radius:4px;">'+d.c+'% cubierto</span>';
+    html += '</div>';
+    html += '<div style="display:flex;gap:12px;margin-bottom:6px;">';
+    html += '<div><span style="font-size:18px;font-weight:800;color:#2F6E3F;">'+litrosK+'</span><br><span style="font-size:10px;color:var(--text3);">oportunidad</span></div>';
+    html += '<div><span style="font-size:14px;font-weight:700;color:#D8AE3C;">'+valorM+'</span><br><span style="font-size:10px;color:var(--text3);">sin cliente</span></div>';
+    html += '</div>';
+    html += '<div style="font-size:11px;color:var(--text2);margin-bottom:3px;">🌾 '+d.cult+'</div>';
+    html += '<div style="font-size:10px;color:var(--text3);">⭐ '+d.mun+'</div>';
+    html += '</div>';
+  });
+  
+  html += '</div></div>';
+  return html;
+}
+
 function renderCalendario(){
   var titleEl = document.getElementById('cal-title');
   if(titleEl) titleEl.textContent = MESES_ES[CAL_MONTH] + ' ' + CAL_YEAR;
 
   var grid = document.getElementById('cal-grid');
   if(!grid) return;
+
+  // Panel Potencial de Mercado por Estado
+  var _pp=document.getElementById('cal-potencial-panel');
+  if(!_pp){_pp=document.createElement('div');_pp.id='cal-potencial-panel';grid.parentNode.insertBefore(_pp,grid);}
+  _pp.innerHTML=renderPotencialCalendario(CAL_YEAR,CAL_MONTH+1);
+
 
   // Get first day of month (0=Sun, adjust to Mon=0)
   var firstDay = new Date(CAL_YEAR, CAL_MONTH, 1).getDay();
