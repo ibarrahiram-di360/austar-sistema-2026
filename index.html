@@ -2075,7 +2075,11 @@ function saveLatamProspectoFull(pid,lpid){
   p.precio=document.getElementById('lp-precio').value;
   p.cultivos=document.getElementById('lp-cultivos').value;
   p.notas=document.getElementById('lp-notas').value;
-  p.stafunction seedLatamProspectos(){
+  p.status=document.getElementById('lp-status').value;
+  saveLatamProspectos(pid,arr);
+  openLatamDet(pid);
+}
+function seedLatamProspectos(){
   try{
     if(getLatamProspectos('co').length===0){
       saveLatamProspectos('co',[
