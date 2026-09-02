@@ -2627,9 +2627,8 @@ function renderCalendario(){
   if(!grid) return;
 
   // Panel Potencial de Mercado por Estado
-  var _pp=document.getElementById('cal-potencial-panel');
-  if(!_pp){_pp=document.createElement('div');_pp.id='cal-potencial-panel';grid.parentNode.insertBefore(_pp,grid);}
-  _pp.innerHTML=renderPotencialCalendario(CAL_YEAR,CAL_MONTH+1);
+  var _calBody=document.getElementById('calendario-body');
+  if(_calBody){var _pp=document.getElementById('cal-potencial-panel');if(!_pp){_pp=document.createElement('div');_pp.id='cal-potencial-panel';_calBody.insertBefore(_pp,_calBody.firstChild);}_pp.innerHTML=renderPotencialCalendario(CAL_YEAR,CAL_MONTH+1);}
 
 
   // Get first day of month (0=Sun, adjust to Mon=0)
