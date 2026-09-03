@@ -2842,7 +2842,7 @@ function renderLatam(){
     var statusColors={'activo':'#2F6E3F','distribuidor':'#1B3B23','negociacion':'#D8AE3C','prospecto':'#3b82f6','sin_contacto':'#6b7280'};
     var statusLabels={'activo':'Activo','distribuidor':'Distribuidor','negociacion':'En negociación','prospecto':'Prospecto','sin_contacto':'Sin contacto'};
     var col=statusColors[status]||'#6b7280';
-    html+='<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+col+';border-radius:8px;padding:14px;cursor:pointer;" onclick="openLatamDet(''+p.id+'')">';
+    html+='<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+col+';border-radius:8px;padding:14px;cursor:pointer;" onclick="openLatamDet(this.dataset.lid)" data-lid="'+p.id+'">';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
     html+='<span style="font-size:20px;">'+p.flag+'</span><span style="font-size:15px;font-weight:700;color:var(--text);">'+p.nombre+'</span>';
     html+='<span style="font-size:11px;background:'+col+';color:#fff;padding:2px 7px;border-radius:10px;">'+( statusLabels[status]||status)+'</span></div>';
@@ -2920,6 +2920,10 @@ function guardarActividadCal(){
   renderCalendario();
 }
 
+
+function initBackupTab(){renderBackup();}
+function renderMonitor(){var el=document.getElementById('tab-monitor');if(el)el.innerHTML='<div class="page-header"><div class="page-title">👁️ Monitor</div></div><div style="padding:20px;color:var(--text3);">Módulo Monitor activo</div>';}
+function certInitTab(){if(typeof renderCertificados==='function')renderCertificados();}
 // BOOT
 // ════════════════════════════════════════
 const total=CLIENTS.length;
