@@ -2356,7 +2356,7 @@ function renderAlianzas(){
   [{icon:'📷',name:'Instagram',handle:'@austar_mexico',color:'#e1306c',url:'https://instagram.com/austar_mexico'},{icon:'💼',name:'LinkedIn',handle:'Chemical Direct México',color:'#0077b5',url:'https://linkedin.com/company/chemical-direct-mexico'},{icon:'👥',name:'Facebook',handle:'Austar México',color:'#1877f2',url:'https://facebook.com/austarmexico'},{icon:'💬',name:'WhatsApp',handle:'+52 33 2335 9705',color:'#25d366',url:'https://wa.me/523323359705'}].forEach(function(r){h+='<a href="'+r.url+'" target="_blank" style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+r.color+';border-radius:8px;padding:10px 14px;flex:1;min-width:140px;text-decoration:none;display:block;"><div style="font-size:18px;margin-bottom:2px;">'+r.icon+'</div><div style="font-size:12px;font-weight:700;color:var(--text);">'+r.name+'</div><div style="font-size:10px;color:var(--text3);">'+r.handle+'</div></a>';});
   h+='</div></div>';
   // Alianzas con actividades por mes
-  var als=typeof getAlianzas==='function'?getAlianzas():ALIANZAS_DEFAULT;
+  var als=typeof getAlianzas==='function'?getAlianzas():(typeof ALIANZAS_DEFAULT!=='undefined'?ALIANZAS_DEFAULT:[]);
   var target=y+'-'+(m<9?'0':'')+(m+1);
   var allActs=typeof getCalActividades==='function'?getCalActividades():[];
   h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">';
@@ -2962,7 +2962,7 @@ var ALIANZAS_DEFAULT=[
   {id:'alsain',nombre:'ALSAIN (Saúl López)',tipo:'Agencia marketing',contacto:'Saúl López',estatus:'activa',notas:'Redes sociales desde ago 2026'},
   {id:'agrofertil',nombre:'Agrofértil (Carlos Garzón)',tipo:'Distribuidor LATAM',contacto:'Carlos Garzón',estatus:'activa',notas:'Master Distribuidor Colombia 2000L'},
 ];
-function getAlianzas(){try{var d=localStorage.getItem('alianzas_austar');return d?JSON.parse(d):[];}catch(e){return[];}}
+function getAlianzas(){try{var d=localStorage.getItem('alianzas_austar');var arr=d?JSON.parse(d):[];return arr.length>0?arr:(typeof ALIANZAS_DEFAULT!=='undefined'?ALIANZAS_DEFAULT:[]);}catch(e){return typeof ALIANZAS_DEFAULT!=='undefined'?ALIANZAS_DEFAULT:[];}}
 function saveAlianza(a){var arr=getAlianzas();if(!a.id)a.id='al_'+Date.now();var i=arr.findIndex(function(x){return x.id===a.id;});if(i>=0)arr[i]=a;else arr.push(a);localStorage.setItem('alianzas_austar',JSON.stringify(arr));}
 function openNuevaAlianza(){alert('Próximamente: formulario de nueva alianza');}
 
