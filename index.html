@@ -782,7 +782,7 @@ select option{background:var(--bg2)}
     <div class="nav-item" onclick="gotoTab('acciones')" id="nav-acciones"><span class="ni">✅</span>Plan de Acción</div>
     <div class="nav-item" onclick="gotoTab('alianzas')" id="nav-alianzas"><span class="ni">🤝</span>Alianzas</div>
     <div class="nav-item" onclick="gotoTab('comunidades')" id="nav-comunidades"><span class="ni">🌱</span>Comunidades</div>
-    <div class="nav-item" onclick="gotoTab('calendario')" id="nav-calendario"><span class="ni">📆</span>Calendario</div><div class="nav-item" onclick="gotoTab('backup')" id="nav-backup"><span class="ni">💾</span>Respaldo</div>
+    <div class="nav-item" onclick="gotoTab('calendario')" id="nav-calendario"><span class="ni">📆</span>Calendario</div>
     <div class="sb-footer">
       <div style="display:flex;align-items:center;gap:8px">
         <div id="user-av" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0"></div>
@@ -2926,6 +2926,12 @@ function guardarActividadCal(){
 function initBackupTab(){renderBackup();}
 function renderMonitor(){var el=document.getElementById('tab-monitor');if(el)el.innerHTML='<div class="page-header"><div class="page-title">👁️ Monitor</div></div><div style="padding:20px;color:var(--text3);">Módulo Monitor activo</div>';}
 function certInitTab(){if(typeof renderCertificados==='function')renderCertificados();}
+
+var ALIANZAS_DEFAULT=[];
+function getAlianzas(){try{var d=localStorage.getItem('alianzas_austar');return d?JSON.parse(d):[];}catch(e){return[];}}
+function saveAlianza(a){var arr=getAlianzas();if(!a.id)a.id='al_'+Date.now();var i=arr.findIndex(function(x){return x.id===a.id;});if(i>=0)arr[i]=a;else arr.push(a);localStorage.setItem('alianzas_austar',JSON.stringify(arr));}
+function openNuevaAlianza(){alert('Próximamente: formulario de nueva alianza');}
+
 // BOOT
 // ════════════════════════════════════════
 const total=CLIENTS.length;
