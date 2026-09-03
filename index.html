@@ -2266,14 +2266,14 @@ function renderAcciones(){
   var y=window.AC_YEAR,m=window.AC_MONTH;
   var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   var h='<div class="page-header"><div class="page-title">✅ Plan de Acción</div></div>';
-  // Month nav
   h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">';
   h+='<button onclick="AC_MONTH--;if(AC_MONTH<0){AC_MONTH=11;AC_YEAR--;}renderAcciones()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 14px;color:var(--text);cursor:pointer;font-size:16px;">◀</button>';
   h+='<div style="font-size:16px;font-weight:700;color:var(--text);min-width:160px;text-align:center;">'+meses[m]+' '+y+'</div>';
   h+='<button onclick="AC_MONTH++;if(AC_MONTH>11){AC_MONTH=0;AC_YEAR++;}renderAcciones()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 14px;color:var(--text);cursor:pointer;font-size:16px;">▶</button>';
   h+='<button onclick="AC_YEAR=new Date().getFullYear();AC_MONTH=new Date().getMonth();renderAcciones()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;color:var(--text3);cursor:pointer;font-size:11px;">Hoy</button>';
+  h+='<button onclick="openNuevaActividadCal(new Date().toISOString().slice(0,10))" class="btn btn-sm" style="margin-left:auto;">+ Nueva Actividad</button>';
   h+='</div>';
-  // Top 10 estados por oportunidad (ordenados por litros)
+  // Top 10 estados por oportunidad
   h+='<div style="margin-bottom:20px;padding:14px 16px;background:linear-gradient(135deg,#0a1628,#0f2040);border:1px solid #1e3a5f;border-radius:10px;">';
   h+='<div style="font-size:13px;font-weight:700;color:#D8AE3C;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">🎯 Top 10 Estados Prioritarios — '+meses[m]+' '+y+'</div>';
   var estados=Object.keys(ESTADO_POTENCIAL).sort(function(a,b){return ESTADO_POTENCIAL[b].l-ESTADO_POTENCIAL[a].l;}).slice(0,10);
@@ -2286,36 +2286,30 @@ function renderAcciones(){
     var rankColor=['#ffd700','#c0c0c0','#cd7f32'][i]||'#4b5563';
     h+='<div style="display:flex;align-items:center;gap:10px;background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:8px 12px;">';
     h+='<span style="font-size:14px;font-weight:800;color:'+rankColor+';min-width:22px;">'+(i+1)+'</span>';
-    h+='<div style="flex:1;">';
-    h+='<div style="font-size:12px;font-weight:700;color:#e8eaf0;">📍 '+estado+'</div>';
-    h+='<div style="font-size:10px;color:var(--text3);">🌾 '+d.cult+' · ⭐ '+d.mun+'</div>';
-    h+='</div>';
-    h+='<div style="text-align:right;"><div style="font-size:13px;font-weight:800;color:#2F6E3F;">'+litrosK+'</div><div style="font-size:9px;color:var(--text3);">sin cliente</div></div>';
-    h+='<div style="text-align:center;"><span style="font-size:10px;background:'+cobColor+';color:#fff;padding:1px 5px;border-radius:3px;">'+d.c+'%</span><div style="font-size:9px;color:var(--text3);margin-top:2px;">'+cl+' clientes</div></div>';
+    h+='<div style="flex:1;"><div style="font-size:12px;font-weight:700;color:#e8eaf0;">📍 '+estado+'</div><div style="font-size:10px;color:var(--text3);">🌾 '+d.cult+' · ⭐ '+d.mun+'</div></div>';
+    h+='<div style="text-align:right;"><div style="font-size:13px;font-weight:800;color:#2F6E3F;">'+litrosK+'</div></div>';
+    h+='<span style="font-size:10px;background:'+cobColor+';color:#fff;padding:1px 5px;border-radius:3px;">'+d.c+'%</span>';
+    h+='<span style="font-size:10px;color:var(--text3);">'+cl+' cl</span>';
     h+='</div>';
   });
   h+='</div></div>';
-  // Actividades del mes
-  var acts=typeof getCalActividades==='function'?getCalActividades().filter(function(a){
-    var ap=a.fecha?a.fecha.substring(0,7):'';
-    var target=y+'-'+(m<9?'0':'')+(m+1);
-    return ap===target;
-  }):[];
+  // Actividades de campo del mes
+  var target=y+'-'+(m<9?'0':'')+(m+1);
+  var acts=typeof getCalActividades==='function'?getCalActividades().filter(function(a){return(a.fecha||'').substring(0,7)===target;}):[];
   h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
-  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">📋 Actividades de campo — '+meses[m]+' ('+acts.length+')</div>';
-  h+='<button class="btn btn-sm" onclick="openNuevaActividadCal(new Date().toISOString().slice(0,10))">+ Nueva Actividad</button></div>';
+  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">📋 Actividades de campo — '+meses[m]+' ('+acts.length+')</div></div>';
   if(acts.length===0){
-    h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center;color:var(--text3);">Sin actividades registradas para '+meses[m]+'</div>';
+    h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center;color:var(--text3);">Sin actividades para '+meses[m]+'. Usa el Calendario o el botón de arriba.</div>';
   } else {
     h+='<div style="display:flex;flex-direction:column;gap:8px;">';
+    var icons={visita_campo:'🚗',expo:'🏛️',reunion:'🤝',capacitacion:'📚',otro:'📌'};
     acts.sort(function(a,b){return a.fecha>b.fecha?1:-1;}).forEach(function(a){
-      var icons={visita_campo:'🚗',expo:'🏛️',reunion:'🤝',capacitacion:'📚',otro:'📌'};
       h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start;">';
       h+='<div style="font-size:18px;">'+(icons[a.tipo]||'📌')+'</div>';
       h+='<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--text);">'+a.titulo+'</div>';
       if(a.estado)h+='<div style="font-size:11px;color:#60a5fa;">📍 '+a.estado+(a.lugar?' · '+a.lugar:'')+'</div>';
       if(a.cultivo)h+='<div style="font-size:11px;color:var(--text3);">🌾 '+a.cultivo+'</div>';
-      h+='</div><div style="font-size:11px;color:var(--text3);white-space:nowrap;">'+a.fecha+'</div></div>';
+      h+='</div><div style="font-size:11px;color:var(--text3);">'+a.fecha+'</div></div>';
     });
     h+='</div>';
   }
@@ -2343,60 +2337,67 @@ function deleteAlianza(id){
   saveAlianzas(getAlianzas().filter(function(r){return r.id!==id;}));renderAlianzas();
 }
 function renderAlianzas(){
-  var el=document.getElementById('tab-alianzas');
-  if(!el)return;
+  var el=document.getElementById('tab-alianzas');if(!el)return;
+  if(!window.AL_YEAR)window.AL_YEAR=new Date().getFullYear();
+  if(window.AL_MONTH===undefined)window.AL_MONTH=new Date().getMonth();
+  var y=window.AL_YEAR,m=window.AL_MONTH;
+  var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   var h='<div class="page-header"><div class="page-title">🤝 Alianzas & Redes</div></div>';
-
-  // === AGRONETWORK / AGROAMIGO ===
-  h+='<div style="margin-bottom:20px;padding:16px;background:linear-gradient(135deg,#0a1628,#0f2040);border:1px solid #1e3a5f;border-radius:10px;">';
-  h+='<div style="font-size:13px;font-weight:700;color:#D8AE3C;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">📻 Agronetwork · Agroamigo · AgroDisrupción</div>';
+  // Agronetwork panel
+  h+='<div style="margin-bottom:18px;padding:14px 16px;background:linear-gradient(135deg,#0a1628,#0f2040);border:1px solid #1e3a5f;border-radius:10px;">';
+  h+='<div style="font-size:13px;font-weight:700;color:#D8AE3C;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">📻 Agronetwork · Agroamigo · AgroDisrupción</div>';
   h+='<div style="display:flex;flex-wrap:wrap;gap:10px;">';
-  h+='<div style="background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:12px;flex:1;min-width:160px;">';
-  h+='<div style="font-size:22px;font-weight:800;color:#2F6E3F;">180+</div><div style="font-size:11px;color:var(--text3);">Ediciones revista</div></div>';
-  h+='<div style="background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:12px;flex:1;min-width:160px;">';
-  h+='<div style="font-size:22px;font-weight:800;color:#D8AE3C;">17</div><div style="font-size:11px;color:var(--text3);">Años de trayectoria</div></div>';
-  h+='<div style="background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:12px;flex:1;min-width:160px;">';
-  h+='<div style="font-size:22px;font-weight:800;color:#60a5fa;">300+</div><div style="font-size:11px;color:var(--text3);">Comunidad OLAJ</div></div>';
-  h+='<div style="background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:12px;flex:1;min-width:160px;">';
-  h+='<div style="font-size:22px;font-weight:800;color:#a78bfa;">Agrodisrupción</div><div style="font-size:11px;color:var(--text3);">Podcast activo</div></div>';
+  [{v:'180+',l:'Ediciones revista',c:'#2F6E3F'},{v:'17',l:'Años trayectoria',c:'#D8AE3C'},{v:'300+',l:'Comunidad OLAJ',c:'#60a5fa'},{v:'Agrodisrupción',l:'Podcast activo',c:'#a78bfa'}].forEach(function(s){h+='<div style="background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:10px 14px;flex:1;min-width:120px;"><div style="font-size:18px;font-weight:800;color:'+s.c+';">'+s.v+'</div><div style="font-size:10px;color:var(--text3);">'+s.l+'</div></div>';});
   h+='</div></div>';
-
-  // === REDES SOCIALES ===
-  h+='<div style="margin-bottom:20px;">';
-  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">📱 Redes Sociales Austar</div>';
-  h+='<div style="display:flex;flex-wrap:wrap;gap:10px;">';
-  var redes=[
-    {icon:'📷',name:'Instagram',handle:'@austar_mexico',color:'#e1306c',url:'https://instagram.com/austar_mexico'},
-    {icon:'💼',name:'LinkedIn',handle:'Chemical Direct México',color:'#0077b5',url:'https://linkedin.com/company/chemical-direct-mexico'},
-    {icon:'👥',name:'Facebook',handle:'Austar México',color:'#1877f2',url:'https://facebook.com/austarmexico'},
-    {icon:'💬',name:'WhatsApp',handle:'+52 33 2335 9705',color:'#25d366',url:'https://wa.me/523323359705'},
-  ];
-  redes.forEach(function(r){
-    h+='<a href="'+r.url+'" target="_blank" style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+r.color+';border-radius:8px;padding:12px 16px;flex:1;min-width:160px;text-decoration:none;display:block;">';
-    h+='<div style="font-size:20px;margin-bottom:4px;">'+r.icon+'</div>';
-    h+='<div style="font-size:13px;font-weight:700;color:var(--text);">'+r.name+'</div>';
-    h+='<div style="font-size:11px;color:var(--text3);">'+r.handle+'</div></a>';
-  });
+  // Redes sociales
+  h+='<div style="margin-bottom:18px;">';
+  h+='<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">📱 Redes Sociales</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:8px;">';
+  [{icon:'📷',name:'Instagram',handle:'@austar_mexico',color:'#e1306c',url:'https://instagram.com/austar_mexico'},{icon:'💼',name:'LinkedIn',handle:'Chemical Direct México',color:'#0077b5',url:'https://linkedin.com/company/chemical-direct-mexico'},{icon:'👥',name:'Facebook',handle:'Austar México',color:'#1877f2',url:'https://facebook.com/austarmexico'},{icon:'💬',name:'WhatsApp',handle:'+52 33 2335 9705',color:'#25d366',url:'https://wa.me/523323359705'}].forEach(function(r){h+='<a href="'+r.url+'" target="_blank" style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+r.color+';border-radius:8px;padding:10px 14px;flex:1;min-width:140px;text-decoration:none;display:block;"><div style="font-size:18px;margin-bottom:2px;">'+r.icon+'</div><div style="font-size:12px;font-weight:700;color:var(--text);">'+r.name+'</div><div style="font-size:10px;color:var(--text3);">'+r.handle+'</div></a>';});
   h+='</div></div>';
-
-  // === ALIANZAS ESTRATÉGICAS ===
-  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🤝 Alianzas Estratégicas</div>';
-  var als=getAlianzas?getAlianzas():[];
-  if(als.length===0){
-    h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px;text-align:center;color:var(--text3);">No hay alianzas registradas. <button class="btn btn-sm" onclick="openNuevaAlianza()">+ Nueva Alianza</button></div>';
-  } else {
-    h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">';
-    als.forEach(function(a){
-      var stColors={activa:'#2F6E3F',pausada:'#D8AE3C',inactiva:'#6b7280'};
-      h+='<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+(stColors[a.estado]||'#6b7280')+';border-radius:8px;padding:14px;">';
-      h+='<div style="font-weight:700;color:var(--text);margin-bottom:4px;">'+a.nombre+'</div>';
-      h+='<div style="font-size:12px;color:var(--text2);margin-bottom:6px;">'+a.tipo+' · '+(a.contacto||'')+'</div>';
-      h+='<div style="font-size:11px;color:var(--text3);">'+( a.notas||'')+'</div></div>';
-    });
+  // Alianzas con actividades por mes
+  var als=typeof getAlianzas==='function'?getAlianzas():ALIANZAS_DEFAULT;
+  var target=y+'-'+(m<9?'0':'')+(m+1);
+  var allActs=typeof getCalActividades==='function'?getCalActividades():[];
+  h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">';
+  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;flex:1;">🤝 Alianzas Estratégicas — '+meses[m]+' '+y+'</div>';
+  h+='<button onclick="AL_MONTH--;if(AL_MONTH<0){AL_MONTH=11;AL_YEAR--;}renderAlianzas()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text);cursor:pointer;">◀</button>';
+  h+='<button onclick="AL_MONTH++;if(AL_MONTH>11){AL_MONTH=0;AL_YEAR++;}renderAlianzas()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text);cursor:pointer;">▶</button>';
+  h+='<button onclick="openNuevaAlianza()" class="btn btn-sm">+ Nueva Alianza</button>';
+  h+='</div>';
+  h+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  als.forEach(function(a){
+    var actsMes=allActs.filter(function(ac){return (ac.fecha||'').substring(0,7)===target&&(ac.alianzaId===a.id||ac.titulo.toLowerCase().includes(a.nombre.toLowerCase()));});
+    var stColors={activa:'#2F6E3F',pausada:'#D8AE3C',inactiva:'#6b7280'};
+    var col=stColors[a.estatus]||'#6b7280';
+    h+='<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+col+';border-radius:8px;padding:14px;">';
+    h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">';
+    h+='<div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--text);">'+a.nombre+'</div><div style="font-size:11px;color:var(--text3);">'+a.tipo+(a.contacto?' · '+a.contacto:'')+'</div></div>';
+    h+='<span style="font-size:10px;background:'+col+';color:#fff;padding:2px 7px;border-radius:10px;">'+(a.estatus||'activa')+'</span>';
+    h+='<button data-alid="'+a.id+'" data-alnom="'+a.nombre+'" onclick="openActividadAlianza(this.dataset.alid,this.dataset.alnom)" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text2);cursor:pointer;font-size:11px;">+ Actividad</button>';
     h+='</div>';
-  }
-  h+='<div style="margin-top:12px;"><button class="btn btn-sm" onclick="openNuevaAlianza()">+ Nueva Alianza</button></div>';
+    if(a.notas)h+='<div style="font-size:11px;color:var(--text3);margin-bottom:8px;">'+a.notas+'</div>';
+    if(actsMes.length>0){
+      h+='<div style="display:flex;flex-direction:column;gap:4px;margin-top:6px;">';
+      actsMes.forEach(function(ac){var icons={visita_campo:'🚗',expo:'🏛️',reunion:'🤝',capacitacion:'📚',otro:'📌'};h+='<div style="background:var(--bg3);border-radius:5px;padding:5px 10px;font-size:11px;color:var(--text2);">'+(icons[ac.tipo]||'📌')+' '+ac.titulo+(ac.fecha?' · '+ac.fecha:'')+'</div>';});
+      h+='</div>';
+    } else {
+      h+='<div style="font-size:10px;color:var(--text3);font-style:italic;">Sin actividades en '+meses[m]+'</div>';
+    }
+    h+='</div>';
+  });
+  h+='</div>';
   el.innerHTML=h;
+}
+
+function openActividadAlianza(alianzaId,alianzaNombre){
+  openNuevaActividadCal(new Date().toISOString().slice(0,10));
+  setTimeout(function(){
+    var tit=document.getElementById('cm-titulo');
+    if(tit)tit.value='Reunión '+alianzaNombre;
+    var tipo=document.getElementById('cm-tipo');
+    if(tipo)tipo.value='reunion';
+  },200);
 }
 function getComunidades(){try{return JSON.parse(localStorage.getItem('austar_comunidades')||'[]');}catch{return[];}}
 function saveComunidades(arr){try{localStorage.setItem('austar_comunidades',JSON.stringify(arr));}catch{}}
@@ -2964,6 +2965,8 @@ var ALIANZAS_DEFAULT=[
 function getAlianzas(){try{var d=localStorage.getItem('alianzas_austar');return d?JSON.parse(d):[];}catch(e){return[];}}
 function saveAlianza(a){var arr=getAlianzas();if(!a.id)a.id='al_'+Date.now();var i=arr.findIndex(function(x){return x.id===a.id;});if(i>=0)arr[i]=a;else arr.push(a);localStorage.setItem('alianzas_austar',JSON.stringify(arr));}
 function openNuevaAlianza(){alert('Próximamente: formulario de nueva alianza');}
+
+var CULTIVOS_COM=['Mango','Aguacate','Limón','Naranja','Maíz','Tomate','Chile','Fresa','Uva','Nogal','Caña','Sorgo','Frijol','Alfalfa','Café','Guayaba','Papaya','Otro'];
 
 // BOOT
 // ════════════════════════════════════════
