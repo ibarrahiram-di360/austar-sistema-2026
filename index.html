@@ -2260,68 +2260,70 @@ function deleteAccion(year,mes,id){
 }
 
 function renderAcciones(){
-  var year=(document.getElementById('ac-year')||{}).value||'2026';
-  var mes=(document.getElementById('ac-mes')||{}).value||'Sep';
-  var arr=getAcciones(year,mes);
-  var body=document.getElementById('acciones-body');
-  if(!body)return;
+  var el=document.getElementById('tab-acciones');
+  if(!el)return;
+  var hoy=new Date();
+  var mes=hoy.getMonth();
+  var año=hoy.getFullYear();
+  var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var h='<div class="page-header"><div class="page-title">✅ Plan de Acción — '+meses[mes]+' '+año+'</div></div>';
 
-  var pending=arr.filter(function(a){return a.estatus==='Pendiente';}).length;
-  var doing=arr.filter(function(a){return a.estatus==='Proceso';}).length;
-  var done=arr.filter(function(a){return a.estatus==='Hecho';}).length;
+  // TOP 10 ESTADOS POR OPORTUNIDAD
+  h+='<div style="margin-bottom:20px;padding:14px 16px;background:linear-gradient(135deg,#0a1628,#0f2040);border:1px solid #1e3a5f;border-radius:10px;">';
+  h+='<div style="font-size:13px;font-weight:700;color:#D8AE3C;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">🎯 Top 10 Estados — Prioridad de Prospección</div>';
+  var estados=Object.keys(ESTADO_POTENCIAL).sort(function(a,b){
+    return ESTADO_POTENCIAL[b].l - ESTADO_POTENCIAL[a].l;
+  }).slice(0,10);
+  h+='<div style="display:flex;flex-direction:column;gap:8px;">';
+  estados.forEach(function(estado,i){
+    var d=ESTADO_POTENCIAL[estado];
+    var clientes=CLIENTS.filter(function(c){return c.estado===estado;}).length;
+    var litrosK=d.l>=1000?(d.l/1000).toFixed(0)+'K L':d.l+' L';
+    var cobColor=d.c>=70?'#2F6E3F':d.c>=30?'#D8AE3C':d.c>=10?'#D9622B':'#ef4444';
+    var prioColor=['#ffd700','#c0c0c0','#cd7f32'][i]||'#4b5563';
+    h+='<div style="display:flex;align-items:center;gap:12px;background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:10px 14px;">';
+    h+='<span style="font-size:16px;font-weight:800;color:'+prioColor+';min-width:28px;">'+(i+1)+'</span>';
+    h+='<div style="flex:1;">';
+    h+='<div style="font-size:13px;font-weight:700;color:#e8eaf0;">📍 '+estado+'</div>';
+    h+='<div style="font-size:11px;color:var(--text3);margin-top:2px;">🌾 '+d.cult+' · ⭐ '+d.mun+'</div>';
+    h+='</div>';
+    h+='<div style="text-align:right;">';
+    h+='<div style="font-size:14px;font-weight:800;color:#2F6E3F;">'+litrosK+'</div>';
+    h+='<div style="font-size:10px;color:var(--text3);">oportunidad</div></div>';
+    h+='<div style="text-align:center;">';
+    h+='<span style="font-size:10px;background:'+cobColor+';color:#fff;padding:2px 6px;border-radius:4px;">'+d.c+'%</span>';
+    h+='<div style="font-size:10px;color:var(--text3);margin-top:2px;">'+clientes+' clientes</div></div>';
+    h+='</div>';
+  });
+  h+='</div></div>';
 
-  var html='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">'+
-    '<div class="met gl"><div class="mv" style="color:var(--green)">'+done+'</div><div class="ml">Completadas</div></div>'+
-    '<div class="met al"><div class="mv" style="color:var(--amber)">'+doing+'</div><div class="ml">En proceso</div></div>'+
-    '<div class="met" style="border-left:3px solid var(--red)"><div class="mv" style="color:var(--red)">'+pending+'</div><div class="ml">Pendientes</div></div>'+
-    '<div class="met bl"><div class="mv" style="color:var(--blue)">'+arr.length+'</div><div class="ml">Total del mes</div></div>'+
-    '</div>';
-
-  if(!arr.length){
-    html+='<div class="card" style="text-align:center;padding:40px;color:var(--text3)">Sin acciones para '+mes+' '+year+'. Usa el botón + para agregar tareas del mes.</div>';
+  // ACCIONES REGISTRADAS DEL MES
+  var arr=getAcciones?getAcciones(año,mes+1):[];
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
+  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">📋 Actividades del mes ('+arr.length+')</div>';
+  h+='<button class="btn btn-sm" onclick="openNuevaAccion()">+ Nueva Actividad</button></div>';
+  if(arr.length===0){
+    h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px;text-align:center;color:var(--text3);">Sin actividades registradas este mes</div>';
   } else {
-    html+='<div class="card"><div style="display:flex;flex-direction:column;gap:8px">';
-    arr.forEach(function(row){
-      var st=ESTATUS_AC[row.estatus]||ESTATUS_AC.Pendiente;
-      html+='<div class="card-c" style="padding:10px 14px">'+
-        '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:center;margin-bottom:6px">'+
-          '<input value="'+(row.accion||'')+'" id="ac_acc_'+row.id+'" placeholder="Acción específica..." style="font-size:12px">'+
-          '<input value="'+(row.frente||'')+'" id="ac_fr_'+row.id+'" placeholder="Frente / Estado" style="font-size:12px">'+
-          '<select id="ac_resp_'+row.id+'" style="font-size:12px">'+
-            RESPONSABLES.map(function(r){return '<option'+(row.responsable===r?' selected':'')+'>'+r+'</option>';}).join('')+
-          '</select>'+
-          '<input type="date" value="'+(row.fecha||'')+'" id="ac_fecha_'+row.id+'" style="font-size:12px">'+
-          '<div style="display:flex;gap:4px">'+
-            '<button onclick="saveAccion(\''+year+'\',\''+mes+'\',\''+row.id+'\')" style="font-size:10px;padding:3px 7px;background:var(--green2);border:none;color:white;border-radius:4px;cursor:pointer">💾</button>'+
-            '<button onclick="deleteAccion(\''+year+'\',\''+mes+'\',\''+row.id+'\')" style="font-size:10px;padding:3px 7px;background:none;border:1px solid var(--red);color:var(--red);border-radius:4px;cursor:pointer">✕</button>'+
-          '</div>'+
-        '</div>'+
-        '<div style="display:flex;gap:8px;align-items:center">'+
-          '<select id="ac_est_'+row.id+'" style="font-size:11px;width:130px">'+
-            Object.keys(ESTATUS_AC).map(function(k){return '<option value="'+k+'"'+(row.estatus===k?' selected':'')+'>'+ESTATUS_AC[k].l+'</option>';}).join('')+
-          '</select>'+
-          '<input value="'+(row.notas||'')+'" id="ac_notas_'+row.id+'" placeholder="Notas..." style="font-size:11px;flex:1">'+
-          '<span class="tag '+st.c+'">'+st.l+'</span>'+
-        '</div>'+
-      '</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:8px;">';
+    arr.sort(function(a,b){return a.fecha>b.fecha?1:-1;}).forEach(function(a){
+      var cl=CLIENTS.find(function(c){return c.id===a.clienteId;});
+      var tipos={visita:'🚗',expo:'🏛️',reunion:'🤝',llamada:'📞',otro:'📌'};
+      var tipoIcon=tipos[a.tipo]||'📌';
+      h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start;">';
+      h+='<div style="font-size:20px;">'+tipoIcon+'</div>';
+      h+='<div style="flex:1;">';
+      h+='<div style="font-size:13px;font-weight:600;color:var(--text);">'+a.titulo+'</div>';
+      if(cl)h+='<div style="font-size:12px;color:var(--text2);">'+cl.nombre+' · '+cl.estado+'</div>';
+      if(a.lugar)h+='<div style="font-size:11px;color:var(--text3);">📍 '+a.lugar+'</div>';
+      h+='</div>';
+      h+='<div style="font-size:11px;color:var(--text3);white-space:nowrap;">'+a.fecha+'</div>';
+      h+='</div>';
     });
-    html+='</div></div>';
+    h+='</div>';
   }
-  body.innerHTML=html;
+  el.innerHTML=h;
 }
-
-// ════════════════════════════════════════
-// ALIANZAS
-// ════════════════════════════════════════
-var ALIANZAS_DEFAULT=[
-  {id:'bni',nombre:'BNI',tipo:'Red empresarial',responsable:'Leopoldo',socio:'',estatus:'',proxima:'',notas:''},
-  {id:'cdaaj',nombre:'CDAAJ',tipo:'Cámara',responsable:'Leopoldo',socio:'',estatus:'',proxima:'',notas:''},
-  {id:'anfaca',nombre:'ANFACA',tipo:'Asociación',responsable:'Leopoldo',socio:'Odiseo',estatus:'',proxima:'',notas:''},
-  {id:'apeajal',nombre:'APEAJAL',tipo:'Asociación',responsable:'Leopoldo',socio:'',estatus:'',proxima:'',notas:''},
-  {id:'ipade',nombre:'IPADE',tipo:'Academia',responsable:'Leopoldo',socio:'',estatus:'',proxima:'',notas:''},
-  {id:'olaj',nombre:'OLAJ',tipo:'Comunidad',responsable:'Hiram',socio:'',estatus:'Activo',proxima:'',notas:'300+ miembros'},
-  {id:'amcham',nombre:'AMCHAM',tipo:'Cámara',responsable:'Leopoldo',socio:'',estatus:'',proxima:'',notas:''}
-];
 function getAlianzas(){try{var d=JSON.parse(localStorage.getItem('austar_alianzas')||'null');return d||JSON.parse(JSON.stringify(ALIANZAS_DEFAULT));}catch{return JSON.parse(JSON.stringify(ALIANZAS_DEFAULT));}}
 function saveAlianzas(arr){try{localStorage.setItem('austar_alianzas',JSON.stringify(arr));}catch{}}
 function addAlianza(){
@@ -2344,43 +2346,61 @@ function deleteAlianza(id){
   saveAlianzas(getAlianzas().filter(function(r){return r.id!==id;}));renderAlianzas();
 }
 function renderAlianzas(){
-  var arr=getAlianzas();
-  var body=document.getElementById('alianzas-body');
-  if(!body)return;
-  var activas=arr.filter(function(a){return a.estatus==='Activo';}).length;
-  var html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">'+
-    '<div class="met gl"><div class="mv" style="color:var(--green)">'+activas+'</div><div class="ml">Activas</div></div>'+
-    '<div class="met bl"><div class="mv" style="color:var(--blue)">'+arr.length+'</div><div class="ml">Total alianzas</div></div>'+
-    '<div class="met al"><div class="mv" style="color:var(--amber)">'+(arr.length-activas)+'</div><div class="ml">Por activar</div></div>'+
-    '</div><div style="display:flex;flex-direction:column;gap:10px">';
-  arr.forEach(function(row){
-    var estColor=row.estatus==='Activo'?'var(--green)':row.estatus==='Proceso'?'var(--amber)':'var(--text3)';
-    html+='<div class="card">'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:8px;align-items:center;margin-bottom:8px">'+
-        '<div><div class="lbl">Alianza</div><input value="'+(row.nombre||'')+'" id="al_nm_'+row.id+'" placeholder="Nombre"></div>'+
-        '<div><div class="lbl">Tipo</div><input value="'+(row.tipo||'')+'" id="al_tipo_'+row.id+'" placeholder="Red / Asociación..."></div>'+
-        '<div><div class="lbl">Responsable</div><select id="al_resp_'+row.id+'">'+RESPONSABLES.map(function(r){return '<option'+(row.responsable===r?' selected':'')+'>'+r+'</option>';}).join('')+'</select></div>'+
-        '<div><div class="lbl">Socio CDM</div><input value="'+(row.socio||'')+'" id="al_socio_'+row.id+'" placeholder="Ej: Odiseo"></div>'+
-        '<div><div class="lbl">Estatus</div><select id="al_est_'+row.id+'">'+['Activo','En proceso','Pendiente','Pausado'].map(function(s){return '<option'+(row.estatus===s?' selected':'')+'>'+s+'</option>';}).join('')+'</select></div>'+
-        '<div style="display:flex;gap:4px;margin-top:16px">'+
-          '<button onclick="saveAlianza(\''+row.id+'\')" style="font-size:10px;padding:3px 7px;background:var(--green2);border:none;color:white;border-radius:4px;cursor:pointer">💾</button>'+
-          '<button onclick="deleteAlianza(\''+row.id+'\')" style="font-size:10px;padding:3px 7px;background:none;border:1px solid var(--red);color:var(--red);border-radius:4px;cursor:pointer">✕</button>'+
-        '</div>'+
-      '</div>'+
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
-        '<div><div class="lbl">Próxima acción</div><input value="'+(row.proxima||'')+'" id="al_prox_'+row.id+'" placeholder="Qué sigue con esta alianza..."></div>'+
-        '<div><div class="lbl">Notas</div><input value="'+(row.notas||'')+'" id="al_notas_'+row.id+'" placeholder="Notas..."></div>'+
-      '</div>'+
-    '</div>';
-  });
-  html+='</div>';
-  body.innerHTML=html;
-}
+  var el=document.getElementById('tab-alianzas');
+  if(!el)return;
+  var h='<div class="page-header"><div class="page-title">🤝 Alianzas & Redes</div></div>';
 
-// ════════════════════════════════════════
-// COMUNIDADES WHATSAPP
-// ════════════════════════════════════════
-var CULTIVOS_COM=['Mango','Aguacate','Nogal','Cítricos','Tomate','Forestal','Generalista'];
+  // === AGRONETWORK / AGROAMIGO ===
+  h+='<div style="margin-bottom:20px;padding:16px;background:linear-gradient(135deg,#0a1628,#0f2040);border:1px solid #1e3a5f;border-radius:10px;">';
+  h+='<div style="font-size:13px;font-weight:700;color:#D8AE3C;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">📻 Agronetwork · Agroamigo · AgroDisrupción</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:10px;">';
+  h+='<div style="background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:12px;flex:1;min-width:160px;">';
+  h+='<div style="font-size:22px;font-weight:800;color:#2F6E3F;">180+</div><div style="font-size:11px;color:var(--text3);">Ediciones revista</div></div>';
+  h+='<div style="background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:12px;flex:1;min-width:160px;">';
+  h+='<div style="font-size:22px;font-weight:800;color:#D8AE3C;">17</div><div style="font-size:11px;color:var(--text3);">Años de trayectoria</div></div>';
+  h+='<div style="background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:12px;flex:1;min-width:160px;">';
+  h+='<div style="font-size:22px;font-weight:800;color:#60a5fa;">300+</div><div style="font-size:11px;color:var(--text3);">Comunidad OLAJ</div></div>';
+  h+='<div style="background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:12px;flex:1;min-width:160px;">';
+  h+='<div style="font-size:22px;font-weight:800;color:#a78bfa;">Agrodisrupción</div><div style="font-size:11px;color:var(--text3);">Podcast activo</div></div>';
+  h+='</div></div>';
+
+  // === REDES SOCIALES ===
+  h+='<div style="margin-bottom:20px;">';
+  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">📱 Redes Sociales Austar</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:10px;">';
+  var redes=[
+    {icon:'📷',name:'Instagram',handle:'@austar_mexico',color:'#e1306c',url:'https://instagram.com/austar_mexico'},
+    {icon:'💼',name:'LinkedIn',handle:'Chemical Direct México',color:'#0077b5',url:'https://linkedin.com/company/chemical-direct-mexico'},
+    {icon:'👥',name:'Facebook',handle:'Austar México',color:'#1877f2',url:'https://facebook.com/austarmexico'},
+    {icon:'💬',name:'WhatsApp',handle:'+52 33 2335 9705',color:'#25d366',url:'https://wa.me/523323359705'},
+  ];
+  redes.forEach(function(r){
+    h+='<a href="'+r.url+'" target="_blank" style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+r.color+';border-radius:8px;padding:12px 16px;flex:1;min-width:160px;text-decoration:none;display:block;">';
+    h+='<div style="font-size:20px;margin-bottom:4px;">'+r.icon+'</div>';
+    h+='<div style="font-size:13px;font-weight:700;color:var(--text);">'+r.name+'</div>';
+    h+='<div style="font-size:11px;color:var(--text3);">'+r.handle+'</div></a>';
+  });
+  h+='</div></div>';
+
+  // === ALIANZAS ESTRATÉGICAS ===
+  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🤝 Alianzas Estratégicas</div>';
+  var als=getAlianzas?getAlianzas():[];
+  if(als.length===0){
+    h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px;text-align:center;color:var(--text3);">No hay alianzas registradas. <button class="btn btn-sm" onclick="openNuevaAlianza()">+ Nueva Alianza</button></div>';
+  } else {
+    h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">';
+    als.forEach(function(a){
+      var stColors={activa:'#2F6E3F',pausada:'#D8AE3C',inactiva:'#6b7280'};
+      h+='<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+(stColors[a.estado]||'#6b7280')+';border-radius:8px;padding:14px;">';
+      h+='<div style="font-weight:700;color:var(--text);margin-bottom:4px;">'+a.nombre+'</div>';
+      h+='<div style="font-size:12px;color:var(--text2);margin-bottom:6px;">'+a.tipo+' · '+(a.contacto||'')+'</div>';
+      h+='<div style="font-size:11px;color:var(--text3);">'+( a.notas||'')+'</div></div>';
+    });
+    h+='</div>';
+  }
+  h+='<div style="margin-top:12px;"><button class="btn btn-sm" onclick="openNuevaAlianza()">+ Nueva Alianza</button></div>';
+  el.innerHTML=h;
+}
 function getComunidades(){try{return JSON.parse(localStorage.getItem('austar_comunidades')||'[]');}catch{return[];}}
 function saveComunidades(arr){try{localStorage.setItem('austar_comunidades',JSON.stringify(arr));}catch{}}
 function addComunidad(){
@@ -2602,6 +2622,16 @@ function renderCalendario(){
   // Panel Potencial de Mercado por Estado
   var _calBody=document.getElementById('calendario-body');
   if(_calBody){var _pp=document.getElementById('cal-potencial-panel');if(!_pp){_pp=document.createElement('div');_pp.id='cal-potencial-panel';_calBody.insertBefore(_pp,_calBody.firstChild);}_pp.innerHTML=renderPotencialCalendario(CAL_YEAR,CAL_MONTH+1);}
+  // Add activity button to page header
+  var _calHdr=document.querySelector('#tab-calendario .page-header');
+  if(_calHdr&&!_calHdr.querySelector('.btn-nueva-act')){
+    var _btn=document.createElement('button');
+    _btn.className='btn btn-sm btn-nueva-act';
+    _btn.textContent='+ Actividad de Campo';
+    _btn.onclick=function(){openNuevaActividadCal(new Date().toISOString().slice(0,10));};
+    _calHdr.appendChild(_btn);
+  }
+
 
 
   // Get first day of month (0=Sun, adjust to Mon=0)
@@ -2667,7 +2697,16 @@ function renderCalendario(){
     } else {
       cells += '<div style="color:var(--text3);font-size:12px">' + (dayNum > 0 && dayNum <= daysInMonth ? dayNum : '') + '</div>';
     }
-    cells += '</div>';
+    
+      // Campo activities
+      var _fa=typeof getActividadesForDate==='function'?getActividadesForDate(dateStr):[];
+      _fa.slice(0,2).forEach(function(fa){
+        var _ti={visita_campo:'🚗',expo:'🏛️',reunion:'🤝',capacitacion:'📚',otro:'📌'};
+        var _ic=_ti[fa.tipo]||'📌';
+        cells+='<div style="background:#D8AE3C22;border-left:2px solid #D8AE3C;border-radius:3px;padding:2px 4px;margin-top:2px;font-size:10px;color:#D8AE3C;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;" title="'+fa.lugar+'">'+_ic+' '+(fa.titulo.substring(0,18)||'')+(fa.titulo.length>18?'…':'')+'</div>';
+      });
+      if(_fa.length>2)cells+='<div style="font-size:9px;color:#D8AE3C;padding:1px 3px;">+'+(_fa.length-2)+' más</div>';
+cells += '</div>';
   }
   grid.innerHTML = cells;
 
@@ -2813,6 +2852,72 @@ function renderLatam(){
   });
   html+='</div>';
   el.innerHTML=html;
+}
+
+
+// ─── ACTIVIDADES DE CAMPO (Calendario) ────────────────
+function getCalActividades(){
+  try{var d=localStorage.getItem('cal_actividades_2026');return d?JSON.parse(d):[];}catch(e){return[];}
+}
+function saveCalActividad(act){
+  var arr=getCalActividades();
+  if(!act.id)act.id='ca_'+Date.now();
+  var idx=arr.findIndex(function(a){return a.id===act.id;});
+  if(idx>=0)arr[idx]=act;else arr.push(act);
+  localStorage.setItem('cal_actividades_2026',JSON.stringify(arr));
+}
+function deleteCalActividad(id){
+  var arr=getCalActividades().filter(function(a){return a.id!==id;});
+  localStorage.setItem('cal_actividades_2026',JSON.stringify(arr));
+}
+function getActividadesForDate(dateStr){
+  return getCalActividades().filter(function(a){return a.fecha===dateStr;});
+}
+function openNuevaActividadCal(fecha){
+  var estados=Object.keys(ESTADO_POTENCIAL).sort();
+  var tiposOpts=['visita_campo','expo','reunion','capacitacion','otro'];
+  var tiposLabels={visita_campo:'🚗 Visita a Campo',expo:'🏛️ Expo / Evento',reunion:'🤝 Reunión',capacitacion:'📚 Capacitación',otro:'📌 Otro'};
+  var html='<div id="cal-modal-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;" onclick="if(event.target.id==='cal-modal-overlay')closeCM()">';
+  html+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">';
+  html+='<div style="font-size:16px;font-weight:700;color:var(--text);">📅 Nueva Actividad de Campo</div>';
+  html+='<button onclick="closeCM()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;">✕</button></div>';
+  html+='<div style="display:flex;flex-direction:column;gap:12px;">';
+  html+='<div><label style="font-size:12px;color:var(--text3);">Tipo</label><select id="cm-tipo" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;">';
+  tiposOpts.forEach(function(t){html+='<option value="'+t+'">'+tiposLabels[t]+'</option>';});
+  html+='</select></div>';
+  html+='<div><label style="font-size:12px;color:var(--text3);">Título / Descripción *</label><input id="cm-titulo" type="text" placeholder="Ej: Visita campo mango Huaristema" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;box-sizing:border-box;"></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
+  html+='<div><label style="font-size:12px;color:var(--text3);">Fecha *</label><input id="cm-fecha" type="date" value="'+(fecha||new Date().toISOString().slice(0,10))+'" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;box-sizing:border-box;"></div>';
+  html+='<div><label style="font-size:12px;color:var(--text3);">Estado</label><select id="cm-estado" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;"><option value="">— Selecciona —</option>';
+  estados.forEach(function(e){html+='<option value="'+e+'">'+e+'</option>';});
+  html+='</select></div></div>';
+  html+='<div><label style="font-size:12px;color:var(--text3);">Municipio / Lugar</label><input id="cm-lugar" type="text" placeholder="Ej: Huaristema, Nayarit" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;box-sizing:border-box;"></div>';
+  html+='<div><label style="font-size:12px;color:var(--text3);">Cultivo / Producto</label><input id="cm-cultivo" type="text" placeholder="Ej: Mango, Aguacate" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;box-sizing:border-box;"></div>';
+  html+='<div><label style="font-size:12px;color:var(--text3);">Notas</label><textarea id="cm-notas" rows="2" placeholder="Detalles adicionales..." style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;resize:vertical;box-sizing:border-box;"></textarea></div>';
+  html+='<div style="display:flex;gap:10px;margin-top:6px;">';
+  html+='<button class="btn" style="flex:1;" onclick="guardarActividadCal()">💾 Guardar</button>';
+  html+='<button class="btn btn-sec" style="flex:1;" onclick="closeCM()">Cancelar</button></div>';
+  html+='</div></div></div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function closeCM(){var o=document.getElementById('cal-modal-overlay');if(o)o.remove();}
+function guardarActividadCal(){
+  var titulo=document.getElementById('cm-titulo')?.value?.trim();
+  var fecha=document.getElementById('cm-fecha')?.value;
+  if(!titulo||!fecha){alert('Título y fecha son requeridos');return;}
+  var act={
+    id:'ca_'+Date.now(),
+    tipo:document.getElementById('cm-tipo')?.value||'otro',
+    titulo:titulo,fecha:fecha,
+    estado:document.getElementById('cm-estado')?.value||'',
+    lugar:document.getElementById('cm-lugar')?.value||'',
+    cultivo:document.getElementById('cm-cultivo')?.value||'',
+    notas:document.getElementById('cm-notas')?.value||''
+  };
+  saveCalActividad(act);
+  closeCM();
+  renderCalendario();
 }
 
 // BOOT
