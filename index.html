@@ -2623,10 +2623,9 @@ function renderCalendario(){
   hdr+='<div style="font-size:18px;font-weight:700;color:var(--text);min-width:180px;text-align:center;">'+meses[m]+' '+y+'</div>';
   hdr+='<button onclick="calNavMes(1)" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:var(--text);cursor:pointer;font-size:16px;">▶</button>';
   hdr+='<div style="display:flex;gap:4px;margin-left:8px;">';
-  ['mes','semana','dia'].forEach(function(v){
-    var active=v===view;
-    var labels={mes:'Mes',semana:'Semana',dia:'Día'};
-    hdr+='<button onclick="CAL_VIEW=''+v+'';renderCalendario()" style="background:'+(active?'#2F6E3F':'var(--bg2)')+';border:1px solid '+(active?'#2F6E3F':'var(--border)')+';border-radius:6px;padding:5px 12px;color:'+(active?'#fff':'var(--text)')+';cursor:pointer;font-size:12px;font-weight:'+(active?'700':'400')+';">'+labels[v]+'</button>';
+  [{v:'mes',l:'Mes'},{v:'semana',l:'Semana'},{v:'dia',l:'Día'}].forEach(function(vb){
+    var active=vb.v===view;
+    hdr+='<button data-cv="'+vb.v+'" onclick="CAL_VIEW=this.dataset.cv;renderCalendario()" style="background:'+(active?'#2F6E3F':'var(--bg2)')+';border:1px solid '+(active?'#2F6E3F':'var(--border)')+';border-radius:6px;padding:5px 12px;color:'+(active?'#fff':'var(--text)')+';cursor:pointer;font-size:12px;font-weight:'+(active?'700':'400')+';">'+vb.l+'</button>';
   });
   hdr+='</div>';
   hdr+='<button onclick="openNuevaActividadCal(new Date().toISOString().slice(0,10))" style="margin-left:auto;background:#2F6E3F;border:none;border-radius:6px;padding:7px 14px;color:#fff;cursor:pointer;font-size:12px;font-weight:600;">+ Actividad</button>';
@@ -2665,7 +2664,7 @@ function buildCalMes(y,m){
     var dateStr=y+'-'+(m<9?'0':'')+(m+1)+'-'+(d<10?'0':'')+d;
     var acts=typeof getActividadesForDate==='function'?getActividadesForDate(dateStr):[];
     var isWe=(first+d-1)%7>=5;
-    h+='<div onclick="openNuevaActividadCal(''+dateStr+'')" style="min-height:80px;padding:5px;border-right:0.5px solid var(--border);border-bottom:0.5px solid var(--border);background:'+(isToday?'rgba(47,110,63,0.15)':isWe?'var(--bg3)':'var(--bg2)')+';cursor:pointer;position:relative;" title="'+dateStr+'">';
+    h+='<div data-cdate="'+dateStr+'" onclick="openNuevaActividadCal(this.dataset.cdate)" style="min-hedata-cdate="'+dateStr+'" onclick="openNuevaActividadCal(this.dataset.cdate)" var(--border);border-bottom:0.5px solid var(--border);background:'+(isToday?'rgba(47,110,63,0.15)':isWe?'var(--bg3)':'var(--bg2)')+';cursor:pointer;position:relative;" title="'+dateStr+'">';
     h+='<div style="font-size:12px;font-weight:'+(isToday?'800':'400')+';color:'+(isToday?'#2F6E3F':'var(--text2)')+';margin-bottom:3px;">'+d+'</div>';
     acts.slice(0,2).forEach(function(a){
       var icons={visita_campo:'🚗',expo:'🏛️',reunion:'🤝',capacitacion:'📚',otro:'📌'};
@@ -2701,7 +2700,7 @@ function buildCalSemana(y,m){
       var dd=new Date(semStart);dd.setDate(semStart.getDate()+d);
       var dateStr=dd.toISOString().slice(0,10);
       var acts=typeof getActividadesForDate==='function'?getActividadesForDate(dateStr):[];
-      h+='<div onclick="openNuevaActividadCal(''+dateStr+'')" style="min-height:36px;border-right:0.5px solid var(--border);padding:2px;cursor:pointer;">';
+      h+='<div onclick="openNuevaActividadCaldata-cdate="'+dateStr+'" onclick="openNuevaActividadCal(this.dataset.cdate)"-right:0.5px solid var(--border);padding:2px;cursor:pointer;">';
       if(hora===7)acts.forEach(function(a){var icons={visita_campo:'🚗',expo:'🏛️',reunion:'🤝',capacitacion:'📚',otro:'📌'};h+='<div style="background:#D8AE3C22;border-left:2px solid #D8AE3C;border-radius:2px;padding:1px 3px;font-size:9px;color:#D8AE3C;overflow:hidden;white-space:nowrap;">'+(icons[a.tipo]||'📌')+' '+a.titulo.substring(0,12)+'</div>';});
       h+='</div>';
     }
@@ -2727,7 +2726,7 @@ function buildCalDia(y,m){
   horas.forEach(function(hora){
     h+='<div style="display:grid;grid-template-columns:60px 1fr;border-bottom:0.5px solid var(--border);">';
     h+='<div style="padding:8px;font-size:11px;color:var(--text3);border-right:1px solid var(--border);text-align:right;">'+hora+':00</div>';
-    h+='<div onclick="openNuevaActividadCal(''+dateStr+'')" style="min-height:44px;padding:4px 8px;cursor:pointer;"></div>';
+    h+='<div data-cdate="'+dateStr+'" onclick="openNuevaActividadCal(this.dataset.cdate)" style="min-height:44px;padding:4px 8px;cursor:pointer;"></div>';
     h+='</div>';
   });
   h+='</div>';
