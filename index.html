@@ -781,7 +781,7 @@ select option{background:var(--bg2)}
     <div class="nav-item" onclick="gotoTab('planner')" id="nav-planner"><span class="ni">📅</span>Planner Mensual</div>
     <div class="nav-item" onclick="gotoTab('acciones')" id="nav-acciones"><span class="ni">✅</span>Plan de Acción</div>
     <div class="nav-item" onclick="gotoTab('alianzas')" id="nav-alianzas"><span class="ni">🤝</span>Alianzas</div>
-    <div class="nav-item" onclick="gotoTab('comunidades')" id="nav-comunidades"><span class="ni">🌱</span>Comunidades</div>
+    <div class="nav-item" onclick="gotoTab('comunidades')" id="nav-comunidades"><span class="ni">🌱</span>Grupos</div>
     <div class="nav-item" onclick="gotoTab('calendario')" id="nav-calendario"><span class="ni">📆</span>Calendario</div>
     <div class="sb-footer">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1400,7 +1400,7 @@ select option{background:var(--bg2)}
     <div id="tab-planner" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">📅 Planner Mensual — Austar2030</div><div style="display:flex;gap:8px"><select id="pl-year" onchange="renderPlanner()" style="width:90px"><option>2025</option><option selected>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select><select id="pl-mes" onchange="renderPlanner()" style="width:100px"><option value="Ene">Enero</option><option value="Feb">Febrero</option><option value="Mar">Marzo</option><option value="Abr">Abril</option><option value="May">Mayo</option><option value="Jun">Junio</option><option value="Jul">Julio</option><option value="Ago">Agosto</option><option value="Sep" selected>Sep</option><option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dic">Dic</option></select><button class="btn btn-g btn-sm" onclick="addPlannerRow()">+ Agregar estado</button></div></div><div class="page-sub">Un estado por fila · Real vs Planeado · Canales de activación mensual</div></div><div style="padding:0 22px 22px" id="planner-body"><div style="text-align:center;padding:40px;color:var(--text3)">Selecciona el mes y el año para ver el planner.</div></div></div>
     <div id="tab-acciones" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">✅ Plan de Acción Mensual</div><div style="display:flex;gap:8px"><select id="ac-year" onchange="renderAcciones()" style="width:90px"><option>2025</option><option selected>2026</option><option>2027</option></select><select id="ac-mes" onchange="renderAcciones()" style="width:100px"><option value="Ene">Enero</option><option value="Feb">Febrero</option><option value="Mar">Marzo</option><option value="Abr">Abril</option><option value="May">Mayo</option><option value="Jun">Junio</option><option value="Jul">Julio</option><option value="Ago">Agosto</option><option value="Sep" selected>Sep</option><option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dic">Dic</option></select><button class="btn btn-g btn-sm" onclick="addAccion()">+ Nueva acción</button></div></div><div class="page-sub">Tareas del mes con responsable, fecha límite y estatus</div></div><div style="padding:0 22px 22px" id="acciones-body"></div></div>
     <div id="tab-alianzas" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">🤝 Alianzas Institucionales</div><button class="btn btn-g btn-sm" onclick="addAlianza()">+ Nueva alianza</button></div><div class="page-sub">BNI · CDAAJ · ANFACA · APEAJAL · IPADE · OLAJ · AMCHAM</div></div><div style="padding:0 22px 22px" id="alianzas-body"></div></div>
-    <div id="tab-comunidades" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">🌱 Comunidades por Cultivo</div><button class="btn btn-g btn-sm" onclick="addComunidad()">+ Nueva comunidad</button></div><div class="page-sub">Grupos WhatsApp por cultivo · región · miembros · responsable</div></div><div style="padding:0 22px 22px" id="comunidades-body"></div></div>
+    <div id="tab-comunidades" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">🌱 Grupos Austar — Comunidades por Cultivo</div><button class="btn btn-g btn-sm" onclick="addComunidad()">+ Nueva comunidad</button></div><div class="page-sub">Grupos WhatsApp por cultivo · región · miembros · responsable</div></div><div style="padding:0 22px 22px" id="comunidades-body"></div></div>
     <!-- CALENDARIO AUSTAR2030 -->
     <div id="tab-calendario" class="sc">
       <div class="page-header">
@@ -2266,40 +2266,41 @@ function renderAcciones(){
   var y=window.AC_YEAR,m=window.AC_MONTH;
   var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   var h='<div class="page-header"><div class="page-title">✅ Plan de Acción</div></div>';
-  h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">';
+  h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">';
   h+='<button onclick="AC_MONTH--;if(AC_MONTH<0){AC_MONTH=11;AC_YEAR--;}renderAcciones()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 14px;color:var(--text);cursor:pointer;font-size:16px;">◀</button>';
   h+='<div style="font-size:16px;font-weight:700;color:var(--text);min-width:160px;text-align:center;">'+meses[m]+' '+y+'</div>';
   h+='<button onclick="AC_MONTH++;if(AC_MONTH>11){AC_MONTH=0;AC_YEAR++;}renderAcciones()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 14px;color:var(--text);cursor:pointer;font-size:16px;">▶</button>';
   h+='<button onclick="AC_YEAR=new Date().getFullYear();AC_MONTH=new Date().getMonth();renderAcciones()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;color:var(--text3);cursor:pointer;font-size:11px;">Hoy</button>';
   h+='<button onclick="openNuevaActividadCal(new Date().toISOString().slice(0,10))" class="btn btn-sm" style="margin-left:auto;">+ Nueva Actividad</button>';
   h+='</div>';
-  // Top 10 estados por oportunidad
+  // ALL estados from ESTADO_POTENCIAL
+  var allEstados=Object.keys(ESTADO_POTENCIAL).sort(function(a,b){return ESTADO_POTENCIAL[b].l-ESTADO_POTENCIAL[a].l;});
   h+='<div style="margin-bottom:20px;padding:14px 16px;background:linear-gradient(135deg,#0a1628,#0f2040);border:1px solid #1e3a5f;border-radius:10px;">';
-  h+='<div style="font-size:13px;font-weight:700;color:#D8AE3C;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">🎯 Top 10 Estados Prioritarios — '+meses[m]+' '+y+'</div>';
-  var estados=Object.keys(ESTADO_POTENCIAL).sort(function(a,b){return ESTADO_POTENCIAL[b].l-ESTADO_POTENCIAL[a].l;}).slice(0,10);
-  h+='<div style="display:flex;flex-direction:column;gap:6px;">';
-  estados.forEach(function(estado,i){
+  h+='<div style="font-size:13px;font-weight:700;color:#D8AE3C;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">🎯 Todos los Estados — Prioridad de Prospección ('+allEstados.length+')</div>';
+  h+='<div style="max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;">';
+  allEstados.forEach(function(estado,i){
     var d=ESTADO_POTENCIAL[estado];
     var cl=CLIENTS.filter(function(c){return c.estado===estado;}).length;
     var litrosK=d.l>=1000?(d.l/1000).toFixed(0)+'K L':d.l+' L';
     var cobColor=d.c>=70?'#2F6E3F':d.c>=30?'#D8AE3C':d.c>=10?'#D9622B':'#ef4444';
-    var rankColor=['#ffd700','#c0c0c0','#cd7f32'][i]||'#4b5563';
-    h+='<div style="display:flex;align-items:center;gap:10px;background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:8px 12px;">';
-    h+='<span style="font-size:14px;font-weight:800;color:'+rankColor+';min-width:22px;">'+(i+1)+'</span>';
-    h+='<div style="flex:1;"><div style="font-size:12px;font-weight:700;color:#e8eaf0;">📍 '+estado+'</div><div style="font-size:10px;color:var(--text3);">🌾 '+d.cult+' · ⭐ '+d.mun+'</div></div>';
+    var rankColor=i<3?(['#ffd700','#c0c0c0','#cd7f32'][i]):'#4b5563';
+    h+='<div style="display:flex;align-items:center;gap:10px;background:#0d1f35;border:1px solid #1e3a5f;border-radius:7px;padding:7px 12px;">';
+    h+='<span style="font-size:13px;font-weight:800;color:'+rankColor+';min-width:22px;">'+(i+1)+'</span>';
+    h+='<div style="flex:1;"><div style="font-size:12px;font-weight:700;color:#e8eaf0;">📍 '+estado+'</div>';
+    h+='<div style="font-size:10px;color:var(--text3);">🌾 '+d.cult.split(' · ')[0]+' · ⭐ '+d.mun+'</div></div>';
     h+='<div style="text-align:right;"><div style="font-size:13px;font-weight:800;color:#2F6E3F;">'+litrosK+'</div></div>';
     h+='<span style="font-size:10px;background:'+cobColor+';color:#fff;padding:1px 5px;border-radius:3px;">'+d.c+'%</span>';
     h+='<span style="font-size:10px;color:var(--text3);">'+cl+' cl</span>';
     h+='</div>';
   });
   h+='</div></div>';
-  // Actividades de campo del mes
+  // Actividades de campo del mes con edición
   var target=y+'-'+(m<9?'0':'')+(m+1);
   var acts=typeof getCalActividades==='function'?getCalActividades().filter(function(a){return(a.fecha||'').substring(0,7)===target;}):[];
   h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
-  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">📋 Actividades de campo — '+meses[m]+' ('+acts.length+')</div></div>';
+  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">📋 Actividades — '+meses[m]+' ('+acts.length+')</div></div>';
   if(acts.length===0){
-    h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center;color:var(--text3);">Sin actividades para '+meses[m]+'. Usa el Calendario o el botón de arriba.</div>';
+    h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center;color:var(--text3);">Sin actividades para '+meses[m]+'</div>';
   } else {
     h+='<div style="display:flex;flex-direction:column;gap:8px;">';
     var icons={visita_campo:'🚗',expo:'🏛️',reunion:'🤝',capacitacion:'📚',otro:'📌'};
@@ -2309,11 +2310,45 @@ function renderAcciones(){
       h+='<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--text);">'+a.titulo+'</div>';
       if(a.estado)h+='<div style="font-size:11px;color:#60a5fa;">📍 '+a.estado+(a.lugar?' · '+a.lugar:'')+'</div>';
       if(a.cultivo)h+='<div style="font-size:11px;color:var(--text3);">🌾 '+a.cultivo+'</div>';
-      h+='</div><div style="font-size:11px;color:var(--text3);">'+a.fecha+'</div></div>';
+      h+='</div>';
+      h+='<div style="font-size:11px;color:var(--text3);">'+a.fecha+'</div>';
+      h+='<button data-acid="'+a.id+'" onclick="editarActividadCal(this.dataset.acid)" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text2);cursor:pointer;font-size:11px;">✏️</button>';
+      h+='<button data-acid="'+a.id+'" onclick="if(confirm('¿Eliminar actividad?'))deleteCalActividad(this.dataset.acid);renderAcciones();" style="background:#ef444415;border:1px solid #ef4444;border-radius:5px;padding:3px 8px;color:#ef4444;cursor:pointer;font-size:11px;">✕</button>';
+      h+='</div>';
     });
     h+='</div>';
   }
   el.innerHTML=h;
+}
+
+function editarActividadCal(id){
+  var acts=typeof getCalActividades==='function'?getCalActividades():[];
+  var act=acts.find(function(a){return a.id===id;});
+  if(!act)return;
+  openNuevaActividadCal(act.fecha);
+  setTimeout(function(){
+    if(document.getElementById('cm-tipo'))document.getElementById('cm-tipo').value=act.tipo||'otro';
+    if(document.getElementById('cm-titulo'))document.getElementById('cm-titulo').value=act.titulo||'';
+    if(document.getElementById('cm-fecha'))document.getElementById('cm-fecha').value=act.fecha||'';
+    if(document.getElementById('cm-estado'))document.getElementById('cm-estado').value=act.estado||'';
+    if(document.getElementById('cm-lugar'))document.getElementById('cm-lugar').value=act.lugar||'';
+    if(document.getElementById('cm-cultivo'))document.getElementById('cm-cultivo').value=act.cultivo||'';
+    if(document.getElementById('cm-notas'))document.getElementById('cm-notas').value=act.notas||'';
+    // Override save to update existing
+    window._editingActId=id;
+    var origSave=window.guardarActividadCal;
+    window.guardarActividadCal=function(){
+      var titulo=document.getElementById('cm-titulo')?.value?.trim();
+      var fecha=document.getElementById('cm-fecha')?.value;
+      if(!titulo||!fecha){alert('Título y fecha requeridos');return;}
+      var updated={id:window._editingActId,tipo:document.getElementById('cm-tipo')?.value||'otro',titulo:titulo,fecha:fecha,estado:document.getElementById('cm-estado')?.value||'',lugar:document.getElementById('cm-lugar')?.value||'',cultivo:document.getElementById('cm-cultivo')?.value||'',notas:document.getElementById('cm-notas')?.value||''};
+      saveCalActividad(updated);
+      window.guardarActividadCal=origSave;
+      window._editingActId=null;
+      closeCM();
+      renderAcciones();
+    };
+  },300);
 }
 function getAlianzas(){try{var d=JSON.parse(localStorage.getItem('austar_alianzas')||'null');return d||JSON.parse(JSON.stringify(ALIANZAS_DEFAULT));}catch{return JSON.parse(JSON.stringify(ALIANZAS_DEFAULT));}}
 function saveAlianzas(arr){try{localStorage.setItem('austar_alianzas',JSON.stringify(arr));}catch{}}
@@ -2936,17 +2971,24 @@ function renderMonitor(){
   var h='<div class="page-header"><div class="page-title">👁️ Monitor del Sistema</div></div>';
   h+='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">';
   [{v:tots,l:'Total clientes',c:'#60a5fa'},{v:compro,l:'Compraron/Recompra',c:'#2F6E3F'},{v:prosp,l:'Prospectos',c:'#D8AE3C'},{v:cont,l:'Contactados',c:'#a78bfa'},{v:noC,l:'No compraron',c:'#ef4444'}].forEach(function(s){h+='<div class="stat-card" style="flex:1;min-width:100px;"><div class="stat-val" style="color:'+s.c+';">'+s.v+'</div><div class="stat-lbl">'+s.l+'</div></div>';});
-  h+='</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">';
-  var stateCount={};CLIENTS.forEach(function(c){if(c.estado)stateCount[c.estado]=(stateCount[c.estado]||0)+1;});
-  var topStates=Object.entries(stateCount).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
-  h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;"><div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:12px;text-transform:uppercase;">📍 Top Estados</div>';
-  topStates.forEach(function(s,i){var pct=Math.round(s[1]/tots*100);h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="min-width:16px;font-size:11px;color:var(--text3);">'+(i+1)+'</span><span style="flex:1;font-size:12px;color:var(--text);">'+s[0]+'</span><span style="font-size:11px;color:#2F6E3F;font-weight:700;">'+s[1]+'</span><div style="width:50px;height:5px;background:var(--bg3);border-radius:3px;"><div style="width:'+pct+'%;height:100%;background:#2F6E3F;border-radius:3px;"></div></div></div>';});
   h+='</div>';
-  var cultCount={};CLIENTS.forEach(function(c){var cv=Array.isArray(c.cultivos)?c.cultivos.join(','):(c.cultivos||'');cv.split(',').forEach(function(cu){var cu2=cu.trim();if(cu2)cultCount[cu2]=(cultCount[cu2]||0)+1;});});
-  var topCult=Object.entries(cultCount).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
-  h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;"><div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:12px;text-transform:uppercase;">🌾 Top Cultivos</div>';
-  topCult.forEach(function(c,i){var pct=Math.round(c[1]/tots*100);h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="min-width:16px;font-size:11px;color:var(--text3);">'+(i+1)+'</span><span style="flex:1;font-size:12px;color:var(--text);">'+c[0]+'</span><span style="font-size:11px;color:#D8AE3C;font-weight:700;">'+c[1]+'</span><div style="width:50px;height:5px;background:var(--bg3);border-radius:3px;"><div style="width:'+pct+'%;height:100%;background:#D8AE3C;border-radius:3px;"></div></div></div>';});
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">';
+  // ALL states with clients
+  var stateCount={};CLIENTS.forEach(function(c){if(c.estado)stateCount[c.estado]=(stateCount[c.estado]||0)+1;});
+  var allStates=Object.entries(stateCount).sort(function(a,b){return b[1]-a[1];});
+  h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;">';
+  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:12px;text-transform:uppercase;">📍 Estados con clientes ('+allStates.length+')</div>';
+  h+='<div style="max-height:400px;overflow-y:auto;">';
+  allStates.forEach(function(s,i){var pct=Math.round(s[1]/tots*100);h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;"><span style="min-width:18px;font-size:11px;color:var(--text3);">'+(i+1)+'</span><span style="flex:1;font-size:12px;color:var(--text);">'+s[0]+'</span><span style="font-size:11px;color:#2F6E3F;font-weight:700;min-width:24px;text-align:right;">'+s[1]+'</span><div style="width:60px;height:5px;background:var(--bg3);border-radius:3px;"><div style="width:'+pct+'%;height:100%;background:#2F6E3F;border-radius:3px;"></div></div></div>';});
   h+='</div></div>';
+  // ALL cultivos
+  var cultCount={};CLIENTS.forEach(function(c){var cv=Array.isArray(c.cultivos)?c.cultivos.join(','):(c.cultivos||'');cv.split(',').forEach(function(cu){var cu2=cu.trim();if(cu2)cultCount[cu2]=(cultCount[cu2]||0)+1;});});
+  var allCult=Object.entries(cultCount).sort(function(a,b){return b[1]-a[1];});
+  h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;">';
+  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:12px;text-transform:uppercase;">🌾 Cultivos activos ('+allCult.length+')</div>';
+  h+='<div style="max-height:400px;overflow-y:auto;">';
+  allCult.forEach(function(c,i){var pct=Math.round(c[1]/tots*100);h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;"><span style="min-width:18px;font-size:11px;color:var(--text3);">'+(i+1)+'</span><span style="flex:1;font-size:12px;color:var(--text);">'+c[0]+'</span><span style="font-size:11px;color:#D8AE3C;font-weight:700;min-width:24px;text-align:right;">'+c[1]+'</span><div style="width:60px;height:5px;background:var(--bg3);border-radius:3px;"><div style="width:'+pct+'%;height:100%;background:#D8AE3C;border-radius:3px;"></div></div></div>';});
+  h+='</div></div></div>';
   el.innerHTML=h;
 }
 function certInitTab(){if(typeof renderCertificados==='function')renderCertificados();}
