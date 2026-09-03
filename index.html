@@ -2927,47 +2927,24 @@ function guardarActividadCal(){
 function initBackupTab(){renderBackup();}
 function renderMonitor(){
   var el=document.getElementById('tab-monitor');if(!el)return;
-  var total=CLIENTS.length;
+  var tots=CLIENTS.length;
   var compro=CLIENTS.filter(function(c){var s=getStage(c);return s==='compro'||s==='recompra';}).length;
   var prosp=CLIENTS.filter(function(c){return getStage(c)==='prospecto';}).length;
   var cont=CLIENTS.filter(function(c){return getStage(c)==='contactado';}).length;
-  var noCompra=CLIENTS.filter(function(c){return getStage(c)==='no_compra';}).length;
+  var noC=CLIENTS.filter(function(c){return getStage(c)==='no_compra';}).length;
   var h='<div class="page-header"><div class="page-title">👁️ Monitor del Sistema</div></div>';
   h+='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">';
-  [{v:total,l:'Total clientes',c:'#60a5fa'},{v:compro,l:'Compraron / Recompra',c:'#2F6E3F'},{v:prosp,l:'Prospectos activos',c:'#D8AE3C'},{v:cont,l:'Contactados',c:'#a78bfa'},{v:noCompra,l:'No compraron',c:'#ef4444'}].forEach(function(s){
-    h+='<div class="stat-card" style="flex:1;min-width:120px;"><div class="stat-val" style="color:'+s.c+';">'+s.v+'</div><div class="stat-lbl">'+s.l+'</div></div>';
-  });
-  h+='</div>';
-  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">';
-  // Top states
+  [{v:tots,l:'Total clientes',c:'#60a5fa'},{v:compro,l:'Compraron/Recompra',c:'#2F6E3F'},{v:prosp,l:'Prospectos',c:'#D8AE3C'},{v:cont,l:'Contactados',c:'#a78bfa'},{v:noC,l:'No compraron',c:'#ef4444'}].forEach(function(s){h+='<div class="stat-card" style="flex:1;min-width:100px;"><div class="stat-val" style="color:'+s.c+';">'+s.v+'</div><div class="stat-lbl">'+s.l+'</div></div>';});
+  h+='</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">';
   var stateCount={};CLIENTS.forEach(function(c){if(c.estado)stateCount[c.estado]=(stateCount[c.estado]||0)+1;});
   var topStates=Object.entries(stateCount).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
-  h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;">';
-  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">📍 Top Estados</div>';
-  topStates.forEach(function(s,i){
-    var pct=Math.round(s[1]/total*100);
-    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">';
-    h+='<span style="font-size:11px;color:var(--text3);min-width:16px;">'+(i+1)+'</span>';
-    h+='<span style="font-size:12px;color:var(--text);flex:1;">'+s[0]+'</span>';
-    h+='<span style="font-size:11px;color:#2F6E3F;font-weight:700;">'+s[1]+'</span>';
-    h+='<div style="width:60px;height:6px;background:var(--bg3);border-radius:3px;"><div style="width:'+pct+'%;height:100%;background:#2F6E3F;border-radius:3px;"></div></div>';
-    h+='</div>';
-  });
+  h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;"><div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:12px;text-transform:uppercase;">📍 Top Estados</div>';
+  topStates.forEach(function(s,i){var pct=Math.round(s[1]/tots*100);h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="min-width:16px;font-size:11px;color:var(--text3);">'+(i+1)+'</span><span style="flex:1;font-size:12px;color:var(--text);">'+s[0]+'</span><span style="font-size:11px;color:#2F6E3F;font-weight:700;">'+s[1]+'</span><div style="width:50px;height:5px;background:var(--bg3);border-radius:3px;"><div style="width:'+pct+'%;height:100%;background:#2F6E3F;border-radius:3px;"></div></div></div>';});
   h+='</div>';
-  // Top cultivos
-  var cultCount={};CLIENTS.forEach(function(c){(c.cultivos||'').split(',').forEach(function(cu){var cu2=cu.trim();if(cu2)cultCount[cu2]=(cultCount[cu2]||0)+1;});});
+  var cultCount={};CLIENTS.forEach(function(c){var cv=Array.isArray(c.cultivos)?c.cultivos.join(','):(c.cultivos||'');cv.split(',').forEach(function(cu){var cu2=cu.trim();if(cu2)cultCount[cu2]=(cultCount[cu2]||0)+1;});});
   var topCult=Object.entries(cultCount).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
-  h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;">';
-  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">🌾 Top Cultivos</div>';
-  topCult.forEach(function(c,i){
-    var pct=Math.round(c[1]/total*100);
-    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">';
-    h+='<span style="font-size:11px;color:var(--text3);min-width:16px;">'+(i+1)+'</span>';
-    h+='<span style="font-size:12px;color:var(--text);flex:1;">'+c[0]+'</span>';
-    h+='<span style="font-size:11px;color:#D8AE3C;font-weight:700;">'+c[1]+'</span>';
-    h+='<div style="width:60px;height:6px;background:var(--bg3);border-radius:3px;"><div style="width:'+pct+'%;height:100%;background:#D8AE3C;border-radius:3px;"></div></div>';
-    h+='</div>';
-  });
+  h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;"><div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:12px;text-transform:uppercase;">🌾 Top Cultivos</div>';
+  topCult.forEach(function(c,i){var pct=Math.round(c[1]/tots*100);h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="min-width:16px;font-size:11px;color:var(--text3);">'+(i+1)+'</span><span style="flex:1;font-size:12px;color:var(--text);">'+c[0]+'</span><span style="font-size:11px;color:#D8AE3C;font-weight:700;">'+c[1]+'</span><div style="width:50px;height:5px;background:var(--bg3);border-radius:3px;"><div style="width:'+pct+'%;height:100%;background:#D8AE3C;border-radius:3px;"></div></div></div>';});
   h+='</div></div>';
   el.innerHTML=h;
 }
