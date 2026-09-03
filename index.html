@@ -716,7 +716,8 @@ select option{background:var(--bg2)}
     
 .cert-wrapper{background:linear-gradient(135deg,#0a4d3c 0%,#1a7f64 100%);padding:20px;border-radius:12px;}
 </style>
-</head>
+
+<script src="clients_data.js"></script></head>
 <body>
 
 <!-- ═══════════════ LOGIN ═══════════════ -->
@@ -1468,28 +1469,32 @@ function fmtM(n){return'$'+(n/1000000).toFixed(1)+'M'}
 
 // Build clients
 function buildClients(){
+  // If full CRM_DATA loaded from clients_data.js, use it
+  if(window.CRM_DATA&&window.CRM_DATA.length>100){
+    CLIENTS=window.CRM_DATA;
+    if(typeof renderCliMetrics==='function')renderCliMetrics();
+    if(typeof initSelects==='function')initSelects();
+    if(typeof applyFilter==='function')applyFilter();
+    return;
+  }
+  // Fallback: build from embedded D2 array
   const all=[];
   const sm={activo:'compro',nuevo:'prospecto',retomado:'contactado',reactivado:'contactado'};
-  D2.forEach((r,i)=>all.push({id:'b'+i,nombre:r[0],razon:r[1],estado:r[2],municipio:r[3],tel:r[4],cultivos:r[5]?r[5].split(',').map(s=>s.trim()).filter(Boolean):[],tipo:'agricultor',etapa_base:sm[r[6]]||'prospecto'}));
-  D1.forEach((r,i)=>{const t=['agricultor','socio_comercial','casa_agro','agroinfluencer'];all.push({id:'c'+i,nombre:r[0],razon:null,estado:r[1],municipio:r[2],tel:r[3],cultivos:r[4]?r[4].split(',').map(s=>s.trim()).filter(Boolean):[],tipo:t[r[5]||0],etapa_base:'prospecto'});});
-  try{const ex=JSON.parse(ls('austar_extra_clients')||'[]');all.push(...ex);}catch{}
-  // D3: Base de datos importada (4,330 contactos)
-  (typeof D3!=="undefined"?D3:[]).forEach(function(c){
-    if(!all.find(function(x){return x.id===c.id;})){
-      all.push({
-        id:c.id,nombre:c.nombre,tel:c.tel,email:'',
-        estado:c.estado,municipio:c.municipio,
-        cultivos:c.cultivos||[],tipo:'D3',etapa_base:c.etapa
-      });
-    }
-  });
-  return all;
+  D2.forEach((r,i)=>all.push({id:'b'+i,nombre:r[0],razon:r[1],estado:r[2],municipio:r[3],tel:r[4],cultivos:r[5]?r[5].split(',').map(s=>s.trim()).filter(Boolean):[],tipo:'agricultor',etapa_base:sm[r[6]]||r[6]||'prospecto'}));
+  if(window.D3)D3.forEach((r,i)=>all.push({id:'c'+i,nombre:r[0],razon:r[1],estado:r[2],municipio:r[3],tel:r[4],cultivos:r[5]?r[5].split(',').map(s=>s.trim()).filter(Boolean):[],tipo:'agricultor',etapa_base:sm[r[6]]||r[6]||'prospecto'}));
+  CLIENTS=all;
 }
-let CLIENTS=buildClients();
 
-// ════════════════════════════════════════
-// INIT FILTERS & SELECTS
-// ════════════════════════════════════════
+function buildClientsFromCRM(){
+  // Called by clients_data.js once decompression completes
+  CLIENTS=window.CRM_DATA;
+  if(typeof renderCliMetrics==='function')renderCliMetrics();
+  if(typeof initSelects==='function')initSelects();
+  if(typeof applyFilter==='function')applyFilter();
+  if(typeof renderDashboard==='function'&&document.getElementById('tab-dashboard')?.classList.contains('on'))renderDashboard();
+  if(typeof renderMonitor==='function'&&document.getElementById('tab-monitor')?.classList.contains('on'))renderMonitor();
+  console.log('CRM cargado: '+CLIENTS.length+' registros');
+}
 function initSelects(){
   // Estado selector for new prospect
   const ns=document.getElementById('n-st');
