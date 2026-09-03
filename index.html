@@ -2824,38 +2824,39 @@ function renderCalSummary(plannerRows, acciones, mes){
 // ════════════════════════════════════════
 
 function renderLatam(){
+  var el=document.getElementById('tab-latam');
+  if(!el)return;
   var activos=LATAM_PAISES.filter(function(p){return['activo','distribuidor'].includes(getLatamStatus(p.id));}).length;
   var negoc=LATAM_PAISES.filter(function(p){return getLatamStatus(p.id)==='negociacion';}).length;
   var prosp=LATAM_PAISES.filter(function(p){return getLatamStatus(p.id)==='prospecto';}).length;
-  var el=document.getElementById('tab-latam');
-  if(!el)return;
-  var html='<div class="page-header"><div class="page-title">🌎 Mercado Latinoamérica</div></div>';
-  html+='<div style="display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap;">';
-  html+='<div class="stat-card" style="flex:1;min-width:140px;"><div class="stat-val" style="color:#2F6E3F;">'+activos+'</div><div class="stat-lbl">Países activos / distribuidores</div></div>';
-  html+='<div class="stat-card" style="flex:1;min-width:140px;"><div class="stat-val" style="color:#D8AE3C;">'+negoc+'</div><div class="stat-lbl">En negociación</div></div>';
-  html+='<div class="stat-card" style="flex:1;min-width:140px;"><div class="stat-val" style="color:#60a5fa;">'+prosp+'</div><div class="stat-lbl">Prospectos</div></div>';
-  html+='</div>';
-  html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">';
+  var h='<div class="page-header"><div class="page-title">🌎 Mercado Latinoamérica</div></div>';
+  h+='<div style="display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap;">';
+  h+='<div class="stat-card" style="flex:1;min-width:140px;"><div class="stat-val" style="color:#2F6E3F;">'+activos+'</div><div class="stat-lbl">Activos / Distribuidores</div></div>';
+  h+='<div class="stat-card" style="flex:1;min-width:140px;"><div class="stat-val" style="color:#D8AE3C;">'+negoc+'</div><div class="stat-lbl">En negociación</div></div>';
+  h+='<div class="stat-card" style="flex:1;min-width:140px;"><div class="stat-val" style="color:#60a5fa;">'+prosp+'</div><div class="stat-lbl">Prospectos</div></div>';
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">';
   LATAM_PAISES.forEach(function(p){
     var status=getLatamStatus(p.id);
     var prospects=getLatamProspectos(p.id);
-    var statusColors={'activo':'#2F6E3F','distribuidor':'#1B3B23','negociacion':'#D8AE3C','prospecto':'#3b82f6','sin_contacto':'#6b7280'};
-    var statusLabels={'activo':'Activo','distribuidor':'Distribuidor','negociacion':'En negociación','prospecto':'Prospecto','sin_contacto':'Sin contacto'};
+    var statusColors={activo:'#2F6E3F',distribuidor:'#1B3B23',negociacion:'#D8AE3C',prospecto:'#3b82f6',sin_contacto:'#6b7280'};
+    var statusLabels={activo:'Activo',distribuidor:'Distribuidor',negociacion:'En negociación',prospecto:'Prospecto',sin_contacto:'Sin contacto'};
     var col=statusColors[status]||'#6b7280';
-    html+='<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+col+';border-radius:8px;padding:14px;cursor:pointer;" onclick="openLatamDet(this.dataset.lid)" data-lid="'+p.id+'">';
-    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
-    html+='<span style="font-size:20px;">'+p.flag+'</span><span style="font-size:15px;font-weight:700;color:var(--text);">'+p.nombre+'</span>';
-    html+='<span style="font-size:11px;background:'+col+';color:#fff;padding:2px 7px;border-radius:10px;">'+( statusLabels[status]||status)+'</span></div>';
-    html+='<div style="font-size:12px;color:var(--text2);margin-bottom:6px;">🌾 '+p.cultivos+'</div>';
-    html+='<div style="font-size:11px;color:var(--text3);">👥 '+(prospects.length)+' prospectos registrados</div>';
-    html+='</div>';
+    h+='<div class="latam-card" data-pid="'+p.id+'" style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+col+';border-radius:8px;padding:14px;cursor:pointer;">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
+    h+='<span style="font-size:20px;">'+p.flag+'</span>';
+    h+='<span style="font-size:15px;font-weight:700;color:var(--text);">'+p.nombre+'</span>';
+    h+='<span style="font-size:11px;background:'+col+';color:#fff;padding:2px 7px;border-radius:10px;">'+(statusLabels[status]||status)+'</span></div>';
+    h+='<div style="font-size:12px;color:var(--text2);margin-bottom:6px;">🌾 '+p.cultivos+'</div>';
+    h+='<div style="font-size:11px;color:var(--text3);">👥 '+(prospects.length)+' prospectos registrados</div>';
+    h+='</div>';
   });
-  html+='</div>';
-  el.innerHTML=html;
+  h+='</div>';
+  el.innerHTML=h;
+  el.querySelectorAll('.latam-card').forEach(function(card){
+    card.addEventListener('click',function(){openLatamDet(this.dataset.pid);});
+  });
 }
-
-
-// ─── ACTIVIDADES DE CAMPO (Calendario) ────────────────
 function getCalActividades(){
   try{var d=localStorage.getItem('cal_actividades_2026');return d?JSON.parse(d):[];}catch(e){return[];}
 }
