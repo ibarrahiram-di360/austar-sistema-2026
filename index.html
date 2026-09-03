@@ -777,9 +777,8 @@ select option{background:var(--bg2)}
     <div class="nav-section">Admin</div>
     <div class="nav-item" onclick="gotoTab('monitor')" id="nav-monitor"><span class="ni">👁️</span>Monitor</div>
     <div class="nav-item" onclick="gotoTab('certificados')" id="nav-certificados"><span class="ni">🏆</span>Certificados</div>
-    <div class="nav-item" onclick="gotoTab('backup')" id="
-    <div class="nav-item" onclick="gotoTab('planner')" id="
-    <div class="nav-item" onclick="gotoTab('planner')" id="nav-planner"><span class="ni">📅</span>Planner</div>
+    <div class="nav-item" onclick="gotoTab('backup')" id="nav-backup"><span class="ni">💾</span>Respaldo</div>
+    <div class="nav-item" onclick="gotoTab('planner')" id="nav-planner"><span class="ni">📅</span>Planner Mensual</div>
     <div class="nav-item" onclick="gotoTab('acciones')" id="nav-acciones"><span class="ni">✅</span>Plan de Acción</div>
     <div class="nav-item" onclick="gotoTab('alianzas')" id="nav-alianzas"><span class="ni">🤝</span>Alianzas</div>
     <div class="nav-item" onclick="gotoTab('comunidades')" id="nav-comunidades"><span class="ni">🌱</span>Comunidades</div>
@@ -2563,7 +2562,7 @@ function renderPotencialCalendario(year,mes){
   if(Object.keys(estadosSet).length===0){
     CLIENTS.forEach(function(c){if(c.estado)estadosSet[c.estado]=(estadosSet[c.estado]||0)+1;});
   }
-  var estados=Object.keys(estadosSet).sort(function(a,b){return estadosSet[b]-estadosSet[a];}).slice(0,4);
+  var estados=Object.keys(estadosSet).sort(function(a,b){return estadosSet[b]-estadosSet[a];}).slice(0,10);
   if(estados.length===0)return'';
   var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   var html='<div style="margin-bottom:18px;padding:14px 16px;background:linear-gradient(135deg,#0a1628,#0f2040);border:1px solid #1e3a5f;border-radius:10px;">';
@@ -2784,6 +2783,38 @@ function renderCalSummary(plannerRows, acciones, mes){
 }
 
 // ════════════════════════════════════════
+
+function renderLatam(){
+  var activos=LATAM_PAISES.filter(function(p){return['activo','distribuidor'].includes(getLatamStatus(p.id));}).length;
+  var negoc=LATAM_PAISES.filter(function(p){return getLatamStatus(p.id)==='negociacion';}).length;
+  var prosp=LATAM_PAISES.filter(function(p){return getLatamStatus(p.id)==='prospecto';}).length;
+  var el=document.getElementById('tab-latam');
+  if(!el)return;
+  var html='<div class="page-header"><div class="page-title">🌎 Mercado Latinoamérica</div></div>';
+  html+='<div style="display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap;">';
+  html+='<div class="stat-card" style="flex:1;min-width:140px;"><div class="stat-val" style="color:#2F6E3F;">'+activos+'</div><div class="stat-lbl">Países activos / distribuidores</div></div>';
+  html+='<div class="stat-card" style="flex:1;min-width:140px;"><div class="stat-val" style="color:#D8AE3C;">'+negoc+'</div><div class="stat-lbl">En negociación</div></div>';
+  html+='<div class="stat-card" style="flex:1;min-width:140px;"><div class="stat-val" style="color:#60a5fa;">'+prosp+'</div><div class="stat-lbl">Prospectos</div></div>';
+  html+='</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">';
+  LATAM_PAISES.forEach(function(p){
+    var status=getLatamStatus(p.id);
+    var prospects=getLatamProspectos(p.id);
+    var statusColors={'activo':'#2F6E3F','distribuidor':'#1B3B23','negociacion':'#D8AE3C','prospecto':'#3b82f6','sin_contacto':'#6b7280'};
+    var statusLabels={'activo':'Activo','distribuidor':'Distribuidor','negociacion':'En negociación','prospecto':'Prospecto','sin_contacto':'Sin contacto'};
+    var col=statusColors[status]||'#6b7280';
+    html+='<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+col+';border-radius:8px;padding:14px;cursor:pointer;" onclick="openLatamDet(''+p.id+'')">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
+    html+='<span style="font-size:20px;">'+p.flag+'</span><span style="font-size:15px;font-weight:700;color:var(--text);">'+p.nombre+'</span>';
+    html+='<span style="font-size:11px;background:'+col+';color:#fff;padding:2px 7px;border-radius:10px;">'+( statusLabels[status]||status)+'</span></div>';
+    html+='<div style="font-size:12px;color:var(--text2);margin-bottom:6px;">🌾 '+p.cultivos+'</div>';
+    html+='<div style="font-size:11px;color:var(--text3);">👥 '+(prospects.length)+' prospectos registrados</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
 // BOOT
 // ════════════════════════════════════════
 const total=CLIENTS.length;
