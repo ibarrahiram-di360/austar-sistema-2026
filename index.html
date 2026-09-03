@@ -2260,65 +2260,62 @@ function deleteAccion(year,mes,id){
 }
 
 function renderAcciones(){
-  var el=document.getElementById('tab-acciones');
-  if(!el)return;
-  var hoy=new Date();
-  var mes=hoy.getMonth();
-  var año=hoy.getFullYear();
+  var el=document.getElementById('tab-acciones');if(!el)return;
+  if(!window.AC_YEAR)window.AC_YEAR=new Date().getFullYear();
+  if(window.AC_MONTH===undefined)window.AC_MONTH=new Date().getMonth();
+  var y=window.AC_YEAR,m=window.AC_MONTH;
   var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  var h='<div class="page-header"><div class="page-title">✅ Plan de Acción — '+meses[mes]+' '+año+'</div></div>';
-
-  // TOP 10 ESTADOS POR OPORTUNIDAD
+  var h='<div class="page-header"><div class="page-title">✅ Plan de Acción</div></div>';
+  // Month nav
+  h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">';
+  h+='<button onclick="AC_MONTH--;if(AC_MONTH<0){AC_MONTH=11;AC_YEAR--;}renderAcciones()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 14px;color:var(--text);cursor:pointer;font-size:16px;">◀</button>';
+  h+='<div style="font-size:16px;font-weight:700;color:var(--text);min-width:160px;text-align:center;">'+meses[m]+' '+y+'</div>';
+  h+='<button onclick="AC_MONTH++;if(AC_MONTH>11){AC_MONTH=0;AC_YEAR++;}renderAcciones()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 14px;color:var(--text);cursor:pointer;font-size:16px;">▶</button>';
+  h+='<button onclick="AC_YEAR=new Date().getFullYear();AC_MONTH=new Date().getMonth();renderAcciones()" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;color:var(--text3);cursor:pointer;font-size:11px;">Hoy</button>';
+  h+='</div>';
+  // Top 10 estados por oportunidad (ordenados por litros)
   h+='<div style="margin-bottom:20px;padding:14px 16px;background:linear-gradient(135deg,#0a1628,#0f2040);border:1px solid #1e3a5f;border-radius:10px;">';
-  h+='<div style="font-size:13px;font-weight:700;color:#D8AE3C;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">🎯 Top 10 Estados — Prioridad de Prospección</div>';
-  var estados=Object.keys(ESTADO_POTENCIAL).sort(function(a,b){
-    return ESTADO_POTENCIAL[b].l - ESTADO_POTENCIAL[a].l;
-  }).slice(0,10);
-  h+='<div style="display:flex;flex-direction:column;gap:8px;">';
+  h+='<div style="font-size:13px;font-weight:700;color:#D8AE3C;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">🎯 Top 10 Estados Prioritarios — '+meses[m]+' '+y+'</div>';
+  var estados=Object.keys(ESTADO_POTENCIAL).sort(function(a,b){return ESTADO_POTENCIAL[b].l-ESTADO_POTENCIAL[a].l;}).slice(0,10);
+  h+='<div style="display:flex;flex-direction:column;gap:6px;">';
   estados.forEach(function(estado,i){
     var d=ESTADO_POTENCIAL[estado];
-    var clientes=CLIENTS.filter(function(c){return c.estado===estado;}).length;
+    var cl=CLIENTS.filter(function(c){return c.estado===estado;}).length;
     var litrosK=d.l>=1000?(d.l/1000).toFixed(0)+'K L':d.l+' L';
     var cobColor=d.c>=70?'#2F6E3F':d.c>=30?'#D8AE3C':d.c>=10?'#D9622B':'#ef4444';
-    var prioColor=['#ffd700','#c0c0c0','#cd7f32'][i]||'#4b5563';
-    h+='<div style="display:flex;align-items:center;gap:12px;background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:10px 14px;">';
-    h+='<span style="font-size:16px;font-weight:800;color:'+prioColor+';min-width:28px;">'+(i+1)+'</span>';
+    var rankColor=['#ffd700','#c0c0c0','#cd7f32'][i]||'#4b5563';
+    h+='<div style="display:flex;align-items:center;gap:10px;background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:8px 12px;">';
+    h+='<span style="font-size:14px;font-weight:800;color:'+rankColor+';min-width:22px;">'+(i+1)+'</span>';
     h+='<div style="flex:1;">';
-    h+='<div style="font-size:13px;font-weight:700;color:#e8eaf0;">📍 '+estado+'</div>';
-    h+='<div style="font-size:11px;color:var(--text3);margin-top:2px;">🌾 '+d.cult+' · ⭐ '+d.mun+'</div>';
+    h+='<div style="font-size:12px;font-weight:700;color:#e8eaf0;">📍 '+estado+'</div>';
+    h+='<div style="font-size:10px;color:var(--text3);">🌾 '+d.cult+' · ⭐ '+d.mun+'</div>';
     h+='</div>';
-    h+='<div style="text-align:right;">';
-    h+='<div style="font-size:14px;font-weight:800;color:#2F6E3F;">'+litrosK+'</div>';
-    h+='<div style="font-size:10px;color:var(--text3);">oportunidad</div></div>';
-    h+='<div style="text-align:center;">';
-    h+='<span style="font-size:10px;background:'+cobColor+';color:#fff;padding:2px 6px;border-radius:4px;">'+d.c+'%</span>';
-    h+='<div style="font-size:10px;color:var(--text3);margin-top:2px;">'+clientes+' clientes</div></div>';
+    h+='<div style="text-align:right;"><div style="font-size:13px;font-weight:800;color:#2F6E3F;">'+litrosK+'</div><div style="font-size:9px;color:var(--text3);">sin cliente</div></div>';
+    h+='<div style="text-align:center;"><span style="font-size:10px;background:'+cobColor+';color:#fff;padding:1px 5px;border-radius:3px;">'+d.c+'%</span><div style="font-size:9px;color:var(--text3);margin-top:2px;">'+cl+' clientes</div></div>';
     h+='</div>';
   });
   h+='</div></div>';
-
-  // ACCIONES REGISTRADAS DEL MES
-  var arr=getAcciones?getAcciones(año,mes+1):[];
+  // Actividades del mes
+  var acts=typeof getCalActividades==='function'?getCalActividades().filter(function(a){
+    var ap=a.fecha?a.fecha.substring(0,7):'';
+    var target=y+'-'+(m<9?'0':'')+(m+1);
+    return ap===target;
+  }):[];
   h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
-  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">📋 Actividades del mes ('+arr.length+')</div>';
-  h+='<button class="btn btn-sm" onclick="openNuevaAccion()">+ Nueva Actividad</button></div>';
-  if(arr.length===0){
-    h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px;text-align:center;color:var(--text3);">Sin actividades registradas este mes</div>';
+  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">📋 Actividades de campo — '+meses[m]+' ('+acts.length+')</div>';
+  h+='<button class="btn btn-sm" onclick="openNuevaActividadCal(new Date().toISOString().slice(0,10))">+ Nueva Actividad</button></div>';
+  if(acts.length===0){
+    h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center;color:var(--text3);">Sin actividades registradas para '+meses[m]+'</div>';
   } else {
     h+='<div style="display:flex;flex-direction:column;gap:8px;">';
-    arr.sort(function(a,b){return a.fecha>b.fecha?1:-1;}).forEach(function(a){
-      var cl=CLIENTS.find(function(c){return c.id===a.clienteId;});
-      var tipos={visita:'🚗',expo:'🏛️',reunion:'🤝',llamada:'📞',otro:'📌'};
-      var tipoIcon=tipos[a.tipo]||'📌';
+    acts.sort(function(a,b){return a.fecha>b.fecha?1:-1;}).forEach(function(a){
+      var icons={visita_campo:'🚗',expo:'🏛️',reunion:'🤝',capacitacion:'📚',otro:'📌'};
       h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start;">';
-      h+='<div style="font-size:20px;">'+tipoIcon+'</div>';
-      h+='<div style="flex:1;">';
-      h+='<div style="font-size:13px;font-weight:600;color:var(--text);">'+a.titulo+'</div>';
-      if(cl)h+='<div style="font-size:12px;color:var(--text2);">'+cl.nombre+' · '+cl.estado+'</div>';
-      if(a.lugar)h+='<div style="font-size:11px;color:var(--text3);">📍 '+a.lugar+'</div>';
-      h+='</div>';
-      h+='<div style="font-size:11px;color:var(--text3);white-space:nowrap;">'+a.fecha+'</div>';
-      h+='</div>';
+      h+='<div style="font-size:18px;">'+(icons[a.tipo]||'📌')+'</div>';
+      h+='<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--text);">'+a.titulo+'</div>';
+      if(a.estado)h+='<div style="font-size:11px;color:#60a5fa;">📍 '+a.estado+(a.lugar?' · '+a.lugar:'')+'</div>';
+      if(a.cultivo)h+='<div style="font-size:11px;color:var(--text3);">🌾 '+a.cultivo+'</div>';
+      h+='</div><div style="font-size:11px;color:var(--text3);white-space:nowrap;">'+a.fecha+'</div></div>';
     });
     h+='</div>';
   }
@@ -2613,124 +2610,129 @@ function renderPotencialCalendario(year,mes){
   return html;
 }
 function renderCalendario(){
-  var titleEl = document.getElementById('cal-title');
-  if(titleEl) titleEl.textContent = MESES_ES[CAL_MONTH] + ' ' + CAL_YEAR;
-
-  var grid = document.getElementById('cal-grid');
-  if(!grid) return;
-
-  // Panel Potencial de Mercado por Estado
+  var el=document.getElementById('tab-calendario');if(!el)return;
+  var y=CAL_YEAR,m=CAL_MONTH,view=window.CAL_VIEW||'mes';
+  var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var dias=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  // Potencial panel
   var _calBody=document.getElementById('calendario-body');
-  if(_calBody){var _pp=document.getElementById('cal-potencial-panel');if(!_pp){_pp=document.createElement('div');_pp.id='cal-potencial-panel';_calBody.insertBefore(_pp,_calBody.firstChild);}_pp.innerHTML=renderPotencialCalendario(CAL_YEAR,CAL_MONTH+1);}
-  // Add activity button to page header
-  var _calHdr=document.querySelector('#tab-calendario .page-header');
-  if(_calHdr&&!_calHdr.querySelector('.btn-nueva-act')){
-    var _btn=document.createElement('button');
-    _btn.className='btn btn-sm btn-nueva-act';
-    _btn.textContent='+ Actividad de Campo';
-    _btn.onclick=function(){openNuevaActividadCal(new Date().toISOString().slice(0,10));};
-    _calHdr.appendChild(_btn);
-  }
-
-
-
-  // Get first day of month (0=Sun, adjust to Mon=0)
-  var firstDay = new Date(CAL_YEAR, CAL_MONTH, 1).getDay();
-  firstDay = (firstDay + 6) % 7; // Convert Sun=0 to Mon=0
-  var daysInMonth = new Date(CAL_YEAR, CAL_MONTH + 1, 0).getDate();
-  var today = new Date();
-
-  // Get all actions with dates
-  var monthAcciones = getAllAccionesInMonth(CAL_YEAR, CAL_MONTH);
-  // Also get planner for this month
-  var mes = MESES_SHORT[CAL_MONTH];
-  var plannerRows = getPlannerData(CAL_YEAR.toString(), mes);
-
-  // Map actions by date
-  var byDate = {};
-  monthAcciones.forEach(function(a){
-    if(!byDate[a.fecha]) byDate[a.fecha] = [];
-    byDate[a.fecha].push(a);
+  if(!_calBody){el.innerHTML='';_calBody=el;}
+  // Build header
+  var hdr='<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">';
+  hdr+='<button onclick="calNavMes(-1)" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:var(--text);cursor:pointer;font-size:16px;">◀</button>';
+  hdr+='<div style="font-size:18px;font-weight:700;color:var(--text);min-width:180px;text-align:center;">'+meses[m]+' '+y+'</div>';
+  hdr+='<button onclick="calNavMes(1)" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;color:var(--text);cursor:pointer;font-size:16px;">▶</button>';
+  hdr+='<div style="display:flex;gap:4px;margin-left:8px;">';
+  ['mes','semana','dia'].forEach(function(v){
+    var active=v===view;
+    var labels={mes:'Mes',semana:'Semana',dia:'Día'};
+    hdr+='<button onclick="CAL_VIEW=''+v+'';renderCalendario()" style="background:'+(active?'#2F6E3F':'var(--bg2)')+';border:1px solid '+(active?'#2F6E3F':'var(--border)')+';border-radius:6px;padding:5px 12px;color:'+(active?'#fff':'var(--text)')+';cursor:pointer;font-size:12px;font-weight:'+(active?'700':'400')+';">'+labels[v]+'</button>';
   });
-
-  // Build grid cells
-  var cells = '';
-  var totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
-
-  for(var i = 0; i < totalCells; i++){
-    var dayNum = i - firstDay + 1;
-    var isCurrentMonth = dayNum >= 1 && dayNum <= daysInMonth;
-    var dateStr = isCurrentMonth ?
-      CAL_YEAR + '-' + String(CAL_MONTH+1).padStart(2,'0') + '-' + String(dayNum).padStart(2,'0') : '';
-    var isToday = isCurrentMonth &&
-      today.getFullYear() === CAL_YEAR &&
-      today.getMonth() === CAL_MONTH &&
-      today.getDate() === dayNum;
-
-    var dayAcciones = dateStr && byDate[dateStr] ? byDate[dateStr] : [];
-    var isWeekend = (i % 7 >= 5);
-
-    cells += '<div onclick="calClickDay(\'' + dateStr + '\',' + dayNum + ')" style="' +
-      'min-height:90px;padding:6px;border-right:0.5px solid var(--bg3);border-bottom:0.5px solid var(--bg3);' +
-      'background:' + (isToday ? 'var(--bg3)' : isWeekend ? 'rgba(0,0,0,0.02)' : 'transparent') + ';' +
-      'cursor:' + (isCurrentMonth ? 'pointer' : 'default') + ';' +
-      'transition:background 0.15s' +
-      '">';
-
-    if(isCurrentMonth){
-      cells += '<div style="font-weight:' + (isToday?'700':'500') + ';font-size:13px;margin-bottom:4px;color:' +
-        (isToday ? 'var(--amber)' : 'var(--text)') + '">' + dayNum + '</div>';
-
-      // Show up to 3 action pills
-      dayAcciones.slice(0,3).forEach(function(a){
-        var col = RESP_COLORS[a.responsable] || '#6b7280';
-        var estCol = EST_COLORS[a.estatus] || '#6b7280';
-        cells += '<div style="background:' + col + '22;border-left:2px solid ' + col + ';' +
-          'padding:2px 5px;border-radius:3px;font-size:10px;margin-bottom:2px;' +
-          'color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">' +
-          (a.accion||'Sin título').substring(0,25) + (a.accion&&a.accion.length>25?'...':'') +
-        '</div>';
-      });
-      if(dayAcciones.length > 3){
-        cells += '<div style="font-size:10px;color:var(--text3)">+' + (dayAcciones.length-3) + ' más</div>';
-      }
-    } else {
-      cells += '<div style="color:var(--text3);font-size:12px">' + (dayNum > 0 && dayNum <= daysInMonth ? dayNum : '') + '</div>';
-    }
-    
-      // Campo activities
-      var _fa=typeof getActividadesForDate==='function'?getActividadesForDate(dateStr):[];
-      _fa.slice(0,2).forEach(function(fa){
-        var _ti={visita_campo:'🚗',expo:'🏛️',reunion:'🤝',capacitacion:'📚',otro:'📌'};
-        var _ic=_ti[fa.tipo]||'📌';
-        cells+='<div style="background:#D8AE3C22;border-left:2px solid #D8AE3C;border-radius:3px;padding:2px 4px;margin-top:2px;font-size:10px;color:#D8AE3C;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;" title="'+fa.lugar+'">'+_ic+' '+(fa.titulo.substring(0,18)||'')+(fa.titulo.length>18?'…':'')+'</div>';
-      });
-      if(_fa.length>2)cells+='<div style="font-size:9px;color:#D8AE3C;padding:1px 3px;">+'+(_fa.length-2)+' más</div>';
-cells += '</div>';
-  }
-  grid.innerHTML = cells;
-
-  // Legend
-  var legend = document.getElementById('cal-legend');
-  if(legend){
-    var usedResp = {};
-    monthAcciones.forEach(function(a){ usedResp[a.responsable] = true; });
-    legend.innerHTML = Object.keys(RESP_COLORS).filter(function(r){ return usedResp[r]; }).map(function(r){
-      return '<span style="display:flex;align-items:center;gap:4px">' +
-        '<span style="width:10px;height:10px;border-radius:50%;background:' + RESP_COLORS[r] + ';display:inline-block"></span>' +
-        r + '</span>';
-    }).join('') +
-    '<span style="margin-left:auto;color:var(--text3)">' + monthAcciones.length + ' acciones este mes</span>';
-  }
-
-  // Monthly summary
-  renderCalSummary(plannerRows, monthAcciones, mes);
-
-  // Hide detail panel
-  var det = document.getElementById('cal-detail');
-  if(det) det.style.display = 'none';
+  hdr+='</div>';
+  hdr+='<button onclick="openNuevaActividadCal(new Date().toISOString().slice(0,10))" style="margin-left:auto;background:#2F6E3F;border:none;border-radius:6px;padding:7px 14px;color:#fff;cursor:pointer;font-size:12px;font-weight:600;">+ Actividad</button>';
+  hdr+='</div>';
+  // Potencial panel
+  var potHtml=typeof renderPotencialCalendario==='function'?renderPotencialCalendario(y,m+1):'';
+  var gridHtml='';
+  if(view==='mes'){gridHtml=buildCalMes(y,m);}
+  else if(view==='semana'){gridHtml=buildCalSemana(y,m);}
+  else{gridHtml=buildCalDia(y,m);}
+  _calBody.innerHTML=hdr+potHtml+gridHtml;
 }
 
+function calNavMes(dir){
+  CAL_MONTH+=dir;
+  if(CAL_MONTH<0){CAL_MONTH=11;CAL_YEAR--;}
+  if(CAL_MONTH>11){CAL_MONTH=0;CAL_YEAR++;}
+  renderCalendario();
+}
+
+function buildCalMes(y,m){
+  var dias=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  var first=new Date(y,m,1).getDay();
+  var daysInMonth=new Date(y,m+1,0).getDate();
+  var today=new Date();
+  var h='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;">';
+  // Day headers
+  h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border);">';
+  dias.forEach(function(d){h+='<div style="padding:8px;text-align:center;font-size:11px;font-weight:700;color:var(--text3);">'+d+'</div>';});
+  h+='</div>';
+  // Grid
+  h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);">';
+  for(var i=0;i<first;i++)h+='<div style="min-height:80px;border-right:0.5px solid var(--border);border-bottom:0.5px solid var(--border);background:var(--bg3);"></div>';
+  for(var d=1;d<=daysInMonth;d++){
+    var isToday=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;
+    var dateStr=y+'-'+(m<9?'0':'')+(m+1)+'-'+(d<10?'0':'')+d;
+    var acts=typeof getActividadesForDate==='function'?getActividadesForDate(dateStr):[];
+    var isWe=(first+d-1)%7>=5;
+    h+='<div onclick="openNuevaActividadCal(''+dateStr+'')" style="min-height:80px;padding:5px;border-right:0.5px solid var(--border);border-bottom:0.5px solid var(--border);background:'+(isToday?'rgba(47,110,63,0.15)':isWe?'var(--bg3)':'var(--bg2)')+';cursor:pointer;position:relative;" title="'+dateStr+'">';
+    h+='<div style="font-size:12px;font-weight:'+(isToday?'800':'400')+';color:'+(isToday?'#2F6E3F':'var(--text2)')+';margin-bottom:3px;">'+d+'</div>';
+    acts.slice(0,2).forEach(function(a){
+      var icons={visita_campo:'🚗',expo:'🏛️',reunion:'🤝',capacitacion:'📚',otro:'📌'};
+      h+='<div style="background:#D8AE3C22;border-left:2px solid #D8AE3C;border-radius:3px;padding:2px 4px;margin-bottom:2px;font-size:10px;color:#D8AE3C;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">'+(icons[a.tipo]||'📌')+' '+a.titulo.substring(0,15)+'</div>';
+    });
+    if(acts.length>2)h+='<div style="font-size:9px;color:#D8AE3C;">+'+( acts.length-2)+' más</div>';
+    h+='</div>';
+  }
+  var remaining=(7-(first+daysInMonth)%7)%7;
+  for(var i=0;i<remaining;i++)h+='<div style="min-height:80px;border-right:0.5px solid var(--border);border-bottom:0.5px solid var(--border);background:var(--bg3);"></div>';
+  h+='</div></div>';
+  return h;
+}
+
+function buildCalSemana(y,m){
+  var today=new Date();
+  var semStart=new Date(today);semStart.setDate(today.getDate()-today.getDay());
+  var dias=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  var horas=[7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+  var h='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;">';
+  h+='<div style="display:grid;grid-template-columns:50px repeat(7,1fr);border-bottom:1px solid var(--border);">';
+  h+='<div style="padding:8px;font-size:10px;color:var(--text3);text-align:center;">Hora</div>';
+  for(var d=0;d<7;d++){
+    var dd=new Date(semStart);dd.setDate(semStart.getDate()+d);
+    var isToday=dd.toDateString()===today.toDateString();
+    h+='<div style="padding:8px;text-align:center;font-size:11px;color:'+(isToday?'#2F6E3F':'var(--text3)')+';font-weight:'+(isToday?'700':'400')+';">'+dias[d]+'<br><span style="font-size:14px;font-weight:800;">'+dd.getDate()+'</span></div>';
+  }
+  h+='</div>';
+  horas.forEach(function(hora){
+    h+='<div style="display:grid;grid-template-columns:50px repeat(7,1fr);border-bottom:0.5px solid var(--border);">';
+    h+='<div style="padding:4px 6px;font-size:10px;color:var(--text3);border-right:1px solid var(--border);text-align:right;">'+hora+':00</div>';
+    for(var d=0;d<7;d++){
+      var dd=new Date(semStart);dd.setDate(semStart.getDate()+d);
+      var dateStr=dd.toISOString().slice(0,10);
+      var acts=typeof getActividadesForDate==='function'?getActividadesForDate(dateStr):[];
+      h+='<div onclick="openNuevaActividadCal(''+dateStr+'')" style="min-height:36px;border-right:0.5px solid var(--border);padding:2px;cursor:pointer;">';
+      if(hora===7)acts.forEach(function(a){var icons={visita_campo:'🚗',expo:'🏛️',reunion:'🤝',capacitacion:'📚',otro:'📌'};h+='<div style="background:#D8AE3C22;border-left:2px solid #D8AE3C;border-radius:2px;padding:1px 3px;font-size:9px;color:#D8AE3C;overflow:hidden;white-space:nowrap;">'+(icons[a.tipo]||'📌')+' '+a.titulo.substring(0,12)+'</div>';});
+      h+='</div>';
+    }
+    h+='</div>';
+  });
+  h+='</div>';
+  return h;
+}
+
+function buildCalDia(y,m){
+  var today=new Date();
+  var dateStr=today.toISOString().slice(0,10);
+  var acts=typeof getActividadesForDate==='function'?getActividadesForDate(dateStr):[];
+  var horas=[7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+  var h='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;">';
+  h+='<div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px;font-weight:700;color:var(--text);">📅 '+today.toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'</div>';
+  if(acts.length>0){
+    h+='<div style="padding:12px 16px;border-bottom:1px solid var(--border);">';
+    h+='<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;text-transform:uppercase;">Actividades de hoy ('+acts.length+')</div>';
+    acts.forEach(function(a){var icons={visita_campo:'🚗',expo:'🏛️',reunion:'🤝',capacitacion:'📚',otro:'📌'};h+='<div style="background:#D8AE3C15;border:1px solid #D8AE3C44;border-radius:8px;padding:10px 14px;margin-bottom:8px;"><div style="font-size:13px;font-weight:600;color:var(--text);">'+(icons[a.tipo]||'📌')+' '+a.titulo+'</div>'+(a.lugar?'<div style="font-size:11px;color:var(--text3);margin-top:3px;">📍 '+a.lugar+'</div>':'')+'</div>';});
+    h+='</div>';
+  }
+  horas.forEach(function(hora){
+    h+='<div style="display:grid;grid-template-columns:60px 1fr;border-bottom:0.5px solid var(--border);">';
+    h+='<div style="padding:8px;font-size:11px;color:var(--text3);border-right:1px solid var(--border);text-align:right;">'+hora+':00</div>';
+    h+='<div onclick="openNuevaActividadCal(''+dateStr+'')" style="min-height:44px;padding:4px 8px;cursor:pointer;"></div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  return h;
+}
 function calClickDay(dateStr, dayNum){
   if(!dateStr) return;
   var det = document.getElementById('cal-detail');
@@ -2924,10 +2926,65 @@ function guardarActividadCal(){
 
 
 function initBackupTab(){renderBackup();}
-function renderMonitor(){var el=document.getElementById('tab-monitor');if(el)el.innerHTML='<div class="page-header"><div class="page-title">👁️ Monitor</div></div><div style="padding:20px;color:var(--text3);">Módulo Monitor activo</div>';}
+function renderMonitor(){
+  var el=document.getElementById('tab-monitor');if(!el)return;
+  var total=CLIENTS.length;
+  var compro=CLIENTS.filter(function(c){var s=getStage(c);return s==='compro'||s==='recompra';}).length;
+  var prosp=CLIENTS.filter(function(c){return getStage(c)==='prospecto';}).length;
+  var cont=CLIENTS.filter(function(c){return getStage(c)==='contactado';}).length;
+  var noCompra=CLIENTS.filter(function(c){return getStage(c)==='no_compra';}).length;
+  var h='<div class="page-header"><div class="page-title">👁️ Monitor del Sistema</div></div>';
+  h+='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">';
+  [{v:total,l:'Total clientes',c:'#60a5fa'},{v:compro,l:'Compraron / Recompra',c:'#2F6E3F'},{v:prosp,l:'Prospectos activos',c:'#D8AE3C'},{v:cont,l:'Contactados',c:'#a78bfa'},{v:noCompra,l:'No compraron',c:'#ef4444'}].forEach(function(s){
+    h+='<div class="stat-card" style="flex:1;min-width:120px;"><div class="stat-val" style="color:'+s.c+';">'+s.v+'</div><div class="stat-lbl">'+s.l+'</div></div>';
+  });
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">';
+  // Top states
+  var stateCount={};CLIENTS.forEach(function(c){if(c.estado)stateCount[c.estado]=(stateCount[c.estado]||0)+1;});
+  var topStates=Object.entries(stateCount).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
+  h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;">';
+  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">📍 Top Estados</div>';
+  topStates.forEach(function(s,i){
+    var pct=Math.round(s[1]/total*100);
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">';
+    h+='<span style="font-size:11px;color:var(--text3);min-width:16px;">'+(i+1)+'</span>';
+    h+='<span style="font-size:12px;color:var(--text);flex:1;">'+s[0]+'</span>';
+    h+='<span style="font-size:11px;color:#2F6E3F;font-weight:700;">'+s[1]+'</span>';
+    h+='<div style="width:60px;height:6px;background:var(--bg3);border-radius:3px;"><div style="width:'+pct+'%;height:100%;background:#2F6E3F;border-radius:3px;"></div></div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  // Top cultivos
+  var cultCount={};CLIENTS.forEach(function(c){(c.cultivos||'').split(',').forEach(function(cu){var cu2=cu.trim();if(cu2)cultCount[cu2]=(cultCount[cu2]||0)+1;});});
+  var topCult=Object.entries(cultCount).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
+  h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;">';
+  h+='<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">🌾 Top Cultivos</div>';
+  topCult.forEach(function(c,i){
+    var pct=Math.round(c[1]/total*100);
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">';
+    h+='<span style="font-size:11px;color:var(--text3);min-width:16px;">'+(i+1)+'</span>';
+    h+='<span style="font-size:12px;color:var(--text);flex:1;">'+c[0]+'</span>';
+    h+='<span style="font-size:11px;color:#D8AE3C;font-weight:700;">'+c[1]+'</span>';
+    h+='<div style="width:60px;height:6px;background:var(--bg3);border-radius:3px;"><div style="width:'+pct+'%;height:100%;background:#D8AE3C;border-radius:3px;"></div></div>';
+    h+='</div>';
+  });
+  h+='</div></div>';
+  el.innerHTML=h;
+}
 function certInitTab(){if(typeof renderCertificados==='function')renderCertificados();}
 
-var ALIANZAS_DEFAULT=[];
+var ALIANZAS_DEFAULT=[
+  {id:'bni',nombre:'BNI',tipo:'Red empresarial',contacto:'Leopoldo',estatus:'activa',notas:''},
+  {id:'cdaaj',nombre:'CDAAJ',tipo:'Cámara',contacto:'Leopoldo',estatus:'activa',notas:''},
+  {id:'anfaca',nombre:'ANFACA',tipo:'Asociación Nacional',contacto:'Leopoldo / Odiseo',estatus:'activa',notas:'Propuesta colaboración pendiente'},
+  {id:'apeajal',nombre:'APEAJAL',tipo:'Asociación',contacto:'Leopoldo',estatus:'activa',notas:''},
+  {id:'ipade',nombre:'IPADE',tipo:'Institución educativa',contacto:'',estatus:'activa',notas:''},
+  {id:'inifap',nombre:'INIFAP / Dr. Juan Herrera',tipo:'Institución investigación',contacto:'Dr. Juan Herrera',estatus:'activa',notas:'Austar Academy - sesión ago 25'},
+  {id:'consejo_jal',nombre:'Consejo Agropecuario Jalisco',tipo:'Consejo sectorial',contacto:'',estatus:'activa',notas:'Fondo generacional exploratorio'},
+  {id:'alsain',nombre:'ALSAIN (Saúl López)',tipo:'Agencia marketing',contacto:'Saúl López',estatus:'activa',notas:'Redes sociales desde ago 2026'},
+  {id:'agrofertil',nombre:'Agrofértil (Carlos Garzón)',tipo:'Distribuidor LATAM',contacto:'Carlos Garzón',estatus:'activa',notas:'Master Distribuidor Colombia 2000L'},
+];
 function getAlianzas(){try{var d=localStorage.getItem('alianzas_austar');return d?JSON.parse(d):[];}catch(e){return[];}}
 function saveAlianza(a){var arr=getAlianzas();if(!a.id)a.id='al_'+Date.now();var i=arr.findIndex(function(x){return x.id===a.id;});if(i>=0)arr[i]=a;else arr.push(a);localStorage.setItem('alianzas_austar',JSON.stringify(arr));}
 function openNuevaAlianza(){alert('Próximamente: formulario de nueva alianza');}
