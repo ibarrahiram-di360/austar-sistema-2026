@@ -2876,31 +2876,32 @@ function getActividadesForDate(dateStr){
 }
 function openNuevaActividadCal(fecha){
   var estados=Object.keys(ESTADO_POTENCIAL).sort();
-  var tiposOpts=['visita_campo','expo','reunion','capacitacion','otro'];
-  var tiposLabels={visita_campo:'🚗 Visita a Campo',expo:'🏛️ Expo / Evento',reunion:'🤝 Reunión',capacitacion:'📚 Capacitación',otro:'📌 Otro'};
-  var html='<div id="cal-modal-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;" onclick="if(event.target.id==='cal-modal-overlay')closeCM()">';
-  html+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;">';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">';
-  html+='<div style="font-size:16px;font-weight:700;color:var(--text);">📅 Nueva Actividad de Campo</div>';
-  html+='<button onclick="closeCM()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;">✕</button></div>';
-  html+='<div style="display:flex;flex-direction:column;gap:12px;">';
-  html+='<div><label style="font-size:12px;color:var(--text3);">Tipo</label><select id="cm-tipo" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;">';
-  tiposOpts.forEach(function(t){html+='<option value="'+t+'">'+tiposLabels[t]+'</option>';});
-  html+='</select></div>';
-  html+='<div><label style="font-size:12px;color:var(--text3);">Título / Descripción *</label><input id="cm-titulo" type="text" placeholder="Ej: Visita campo mango Huaristema" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;box-sizing:border-box;"></div>';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
-  html+='<div><label style="font-size:12px;color:var(--text3);">Fecha *</label><input id="cm-fecha" type="date" value="'+(fecha||new Date().toISOString().slice(0,10))+'" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;box-sizing:border-box;"></div>';
-  html+='<div><label style="font-size:12px;color:var(--text3);">Estado</label><select id="cm-estado" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;"><option value="">— Selecciona —</option>';
-  estados.forEach(function(e){html+='<option value="'+e+'">'+e+'</option>';});
-  html+='</select></div></div>';
-  html+='<div><label style="font-size:12px;color:var(--text3);">Municipio / Lugar</label><input id="cm-lugar" type="text" placeholder="Ej: Huaristema, Nayarit" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;box-sizing:border-box;"></div>';
-  html+='<div><label style="font-size:12px;color:var(--text3);">Cultivo / Producto</label><input id="cm-cultivo" type="text" placeholder="Ej: Mango, Aguacate" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;box-sizing:border-box;"></div>';
-  html+='<div><label style="font-size:12px;color:var(--text3);">Notas</label><textarea id="cm-notas" rows="2" placeholder="Detalles adicionales..." style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;resize:vertical;box-sizing:border-box;"></textarea></div>';
-  html+='<div style="display:flex;gap:10px;margin-top:6px;">';
-  html+='<button class="btn" style="flex:1;" onclick="guardarActividadCal()">💾 Guardar</button>';
-  html+='<button class="btn btn-sec" style="flex:1;" onclick="closeCM()">Cancelar</button></div>';
-  html+='</div></div></div>';
-  document.body.insertAdjacentHTML('beforeend',html);
+  var overlay=document.createElement('div');
+  overlay.id='cal-modal-overlay';
+  overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  overlay.onclick=function(e){if(e.target===overlay)closeCM();};
+  var modal=document.createElement('div');
+  modal.style.cssText='background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;';
+  var tiposOpts=[{v:'visita_campo',l:'🚗 Visita a Campo'},{v:'expo',l:'🏛️ Expo / Evento'},{v:'reunion',l:'🤝 Reunión'},{v:'capacitacion',l:'📚 Capacitación'},{v:'otro',l:'📌 Otro'}];
+  var estadosOpts=estados.map(function(e){return '<option value="'+e+'">'+e+'</option>';}).join('');
+  var f=fecha||new Date().toISOString().slice(0,10);
+  modal.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><div style="font-size:16px;font-weight:700;color:var(--text);">📅 Nueva Actividad de Campo</div><button onclick="closeCM()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;">✕</button></div>'
+  +'<div style="display:flex;flex-direction:column;gap:12px;">'
+  +'<div><label style="font-size:12px;color:var(--text3);">Tipo</label>'
+  +'<select id="cm-tipo" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;">'
+  +tiposOpts.map(function(t){return '<option value="'+t.v+'">'+t.l+'</option>';}).join('')
+  +'</select></div>'
+  +'<div><label style="font-size:12px;color:var(--text3);">Título *</label><input id="cm-titulo" type="text" placeholder="Visita campo mango Huaristema" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;box-sizing:border-box;"></div>'
+  +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
+  +'<div><label style="font-size:12px;color:var(--text3);">Fecha *</label><input id="cm-fecha" type="date" value="'+f+'" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;box-sizing:border-box;"></div>'
+  +'<div><label style="font-size:12px;color:var(--text3);">Estado</label><select id="cm-estado" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;"><option value="">— Selecciona —</option>'+estadosOpts+'</select></div></div>'
+  +'<div><label style="font-size:12px;color:var(--text3);">Municipio / Lugar</label><input id="cm-lugar" type="text" placeholder="Ej: Huaristema, Nayarit" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;box-sizing:border-box;"></div>'
+  +'<div><label style="font-size:12px;color:var(--text3);">Cultivo</label><input id="cm-cultivo" type="text" placeholder="Ej: Mango, Aguacate" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;box-sizing:border-box;"></div>'
+  +'<div><label style="font-size:12px;color:var(--text3);">Notas</label><textarea id="cm-notas" rows="2" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);margin-top:4px;resize:vertical;box-sizing:border-box;"></textarea></div>'
+  +'<div style="display:flex;gap:10px;margin-top:6px;"><button class="btn" style="flex:1;" onclick="guardarActividadCal()">💾 Guardar</button><button class="btn btn-sec" style="flex:1;" onclick="closeCM()">Cancelar</button></div>'
+  +'</div>';
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
 }
 function closeCM(){var o=document.getElementById('cal-modal-overlay');if(o)o.remove();}
 function guardarActividadCal(){
