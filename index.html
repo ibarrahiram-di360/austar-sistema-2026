@@ -2318,7 +2318,7 @@ function renderAcciones(){
       h+='</div>';
       h+='<div style="font-size:11px;color:var(--text3);">'+a.fecha+'</div>';
       h+='<button data-acid="'+a.id+'" onclick="editarActividadCal(this.dataset.acid)" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text2);cursor:pointer;font-size:11px;">✏️</button>';
-      h+='<button data-acid="'+a.id+'" onclick="if(confirm('¿Eliminar actividad?'))deleteCalActividad(this.dataset.acid);renderAcciones();" style="background:#ef444415;border:1px solid #ef4444;border-radius:5px;padding:3px 8px;color:#ef4444;cursor:pointer;font-size:11px;">✕</button>';
+      h+='<button data-acid="'+a.id+'" onclick="if(confirm(\'¿Eliminar actividad?\'))deleteCalActividad(this.dataset.acid);renderAcciones();" style="background:#ef444415;border:1px solid #ef4444;border-radius:5px;padding:3px 8px;color:#ef4444;cursor:pointer;font-size:11px;">✕</button>';
       h+='</div>';
     });
     h+='</div>';
@@ -3025,3 +3025,4 @@ if(typeof seedLatamProspectos==='function') seedLatamProspectos();
 </script>
 </body>
 </html>
+ 
