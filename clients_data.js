@@ -4,5 +4,6 @@ window._CRM_RAW=[["r0","Bernardo Parra","Nayarit","","3111544756","Aguacate,Lim√
 window.CRM_DATA=r.map(function(x){var c=x[5]?x[5].split(",").filter(Boolean):[];
 return{id:x[0],nombre:x[1],estado:x[2],municipio:x[3],tel:x[4],cultivos:c,tipo:"agricultor",etapa_base:x[6]};});
 if(typeof buildClientsFromCRM==="function")buildClientsFromCRM();
+else{document.addEventListener("DOMContentLoaded",function(){if(typeof buildClientsFromCRM==="function")buildClientsFromCRM();});}
 console.log("CRM:",window.CRM_DATA.length,"clientes");
 })();
