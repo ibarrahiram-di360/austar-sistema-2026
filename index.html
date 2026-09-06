@@ -778,6 +778,71 @@ td,th{font-size:15px !important;}
 <script>
 window.BANDERA=function(id){var F={"co":"<rect width=\"30\" height=\"10\" fill=\"#FCD116\"/><rect y=\"10\" width=\"30\" height=\"5\" fill=\"#003893\"/><rect y=\"15\" width=\"30\" height=\"5\" fill=\"#CE1126\"/>","pe":"<rect width=\"30\" height=\"20\" fill=\"#fff\"/><rect width=\"10\" height=\"20\" fill=\"#D91023\"/><rect x=\"20\" width=\"10\" height=\"20\" fill=\"#D91023\"/>","gt":"<rect width=\"30\" height=\"20\" fill=\"#fff\"/><rect width=\"10\" height=\"20\" fill=\"#4997D0\"/><rect x=\"20\" width=\"10\" height=\"20\" fill=\"#4997D0\"/>","pa":"<rect width=\"15\" height=\"10\" fill=\"#fff\"/><rect x=\"15\" width=\"15\" height=\"10\" fill=\"#D21034\"/><rect y=\"10\" width=\"15\" height=\"10\" fill=\"#005293\"/><rect x=\"15\" y=\"10\" width=\"15\" height=\"10\" fill=\"#fff\"/><circle cx=\"7.5\" cy=\"5\" r=\"2.4\" fill=\"#005293\"/><circle cx=\"22.5\" cy=\"15\" r=\"2.4\" fill=\"#D21034\"/>","sv":"<rect width=\"30\" height=\"20\" fill=\"#fff\"/><rect width=\"30\" height=\"6.4\" fill=\"#0F47AF\"/><rect y=\"13.6\" width=\"30\" height=\"6.4\" fill=\"#0F47AF\"/>","hn":"<rect width=\"30\" height=\"20\" fill=\"#fff\"/><rect width=\"30\" height=\"6.1\" fill=\"#0073CF\"/><rect y=\"13.9\" width=\"30\" height=\"6.1\" fill=\"#0073CF\"/><circle cx=\"11\" cy=\"10\" r=\"1\" fill=\"#0073CF\"/><circle cx=\"19\" cy=\"10\" r=\"1\" fill=\"#0073CF\"/><circle cx=\"15\" cy=\"7.4\" r=\"1\" fill=\"#0073CF\"/><circle cx=\"15\" cy=\"12.6\" r=\"1\" fill=\"#0073CF\"/>","cr":"<rect width=\"30\" height=\"20\" fill=\"#fff\"/><rect width=\"30\" height=\"3.4\" fill=\"#002B7F\"/><rect y=\"16.6\" width=\"30\" height=\"3.4\" fill=\"#002B7F\"/><rect y=\"7.2\" width=\"30\" height=\"5.6\" fill=\"#CE1126\"/>","otros":"<rect width=\"30\" height=\"20\" fill=\"#EAF0E8\"/><circle cx=\"15\" cy=\"10\" r=\"7\" fill=\"none\" stroke=\"#2F6E3F\" stroke-width=\"1.4\"/><path d=\"M8 10h14M15 3a11 11 0 0 1 0 14a11 11 0 0 1 0-14\" fill=\"none\" stroke=\"#2F6E3F\" stroke-width=\"1.4\"/>"};var b=F[id]||F.otros;return '<svg class="bandera" viewBox="0 0 30 20" role="img" aria-label="Bandera">'+b+'</sv'+'g>';};
 </script>
+
+<script>
+/* AUSTAR - CALENDARIO COMERCIAL 2026 CRUZADO CON CARTERA */
+(function(){
+var Z={"P":["CSSSDDDPPCCS","DPCSDPCSDPCS","DPPCCCSSSDDD","SSDDDPPCCSSS","SSDDPPCCSSDD","SSDPCSDPCSPC"],"C":["ACEITUNA","AGUACATE","ALGODON","AVENA","CAFECEREZA","CANADEAZUCAR","CARTAMO","CEBADA","CHILEVERDEYSECO","DURAZNO","FRIJOL","GARBANZOGRANO","GUAYABA","HORTALIZAS","LIMON","MAIZGRANO","MANGO","NARANJA","NOGAL","PAPAYA","SORGOGRANO","TOMATEROJOJITOMATE","TRIGOGRANO"],"E":{"AGUASCALIENTES":"P2M1J1K2I2S4C2D0G0H0T1N2","JALISCO":"P2B5K2Q3O1U2W0I2S4C2D0G0H0T1N2","MICHOACAN":"P2M1B5K2Q3O1U2W0J1V2S4C2D0G0H0T1N2","SINALOA":"P0U2K0L0Q3V0I0W0S4C2D0G0H0T1N2","NAYARIT":"U0K0P2F1Q3I0S4C2D0G0H0T1N2","TAMAULIPAS":"R1U0P0F1O1A1S4C2D0G0H0T1N2","VERACRUZ":"R1P2F1Q3E1O1S4C2D0G0H0T1N2","NUEVOLEON":"R1W0U2P2O1S4C2D0G0H0T1N2","BAJACALIFORNIA":"A1S4C2D0G0H0T1N2","SONORA":"A1L0W0S4C2D0G0H0T1N2","CHIAPAS":"E1P2S4C2D0G0H0T1N2","SANLUISPOTOSI":"F1S4C2D0G0H0T1N2","ZACATECAS":"I2J1K2S4C2D0G0H0T1N2","CHIHUAHUA":"I2S4C2D0G0H0T1N2","DURANGO":"K2S4C2D0G0H0T1N2","PUEBLA":"R1S4C2D0G0H0T1N2","GUANAJUATO":"U2W0S4C2D0G0H0T1N2"}};
+var MAP={"MAIZ":"MAIZGRANO","AGUACATE":"AGUACATE","MANGO":"MANGO","LIMON":"LIMON","FRIJOL":"FRIJOL","SORGO":"SORGOGRANO","TRIGO":"TRIGOGRANO","GARBANZO":"GARBANZOGRANO","TOMATE":"TOMATEROJOJITOMATE","TOMATILLO":"TOMATEROJOJITOMATE","CHILE":"CHILEVERDEYSECO","CANA":"CANADEAZUCAR","NARANJO":"NARANJA","GUAYABO":"GUAYABA","DURAZNO":"DURAZNO","NOGAL":"NOGAL","ALGODON":"ALGODON","AVENA":"AVENA","CARTAMO":"CARTAMO","CEBADA":"CEBADA","PAPAYA":"PAPAYA","HORTALIZAS":"HORTALIZAS"};
+var CAL={};
+for(var e in Z.E){var s=Z.E[e],o={};for(var i=0;i<s.length;i+=2){o[Z.C[s.charCodeAt(i)-65]]=Z.P[+s.charAt(i+1)];}CAL[e]=o;}
+window.AUSTAR_CAL2026=CAL;
+var M=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+var MN=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var LBL={C:'Cotizacion y cierre',P:'Prospeccion y visita',S:'Seguimiento',D:'Diagnostico'};
+var SUB={C:'En ventana de cierre este mes',P:'Primer acercamiento o visita',S:'Mantener contacto',D:'Levantar informacion de campo'};
+var COL={C:'#2F6E3F',P:'#D8AE3C',S:'#B6C4B8',D:'#8FB79A'};
+function K(s){s=s||'';try{s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');}catch(e){}return s.toUpperCase().replace(/[^A-Z]/g,'');}
+window.austarCruce=function(mi){
+ var lista=(typeof CLIENTS!=='undefined'&&CLIENTS&&CLIENTS.length)?CLIENTS:(window.CRM_DATA||[]);
+ var b={},tot={C:0,P:0,S:0,D:0},cub=0,fuera=0;
+ for(var i=0;i<lista.length;i++){
+  var cl=lista[i],st=CAL[K(cl.estado)],hit=false,cus=cl.cultivos||[];
+  if(st)for(var j=0;j<cus.length;j++){
+   var cn=MAP[K(cus[j])];if(!cn)continue;
+   var pat=st[cn];if(!pat)continue;
+   var a=pat.charAt(mi);if('CPSD'.indexOf(a)<0)continue;
+   var k=a+'|'+cl.estado+'|'+cus[j];b[k]=(b[k]||0)+1;tot[a]++;hit=true;}
+  if(hit)cub++;else fuera++;}
+ return{b:b,tot:tot,cub:cub,fuera:fuera};};
+window.austarPanelCal=function(mi){
+ var r=window.austarCruce(mi),h='';
+ h+='<div class="card" style="margin-bottom:14px;"><div class="ct">Calendario comercial '+MN[mi]+' 2026</div>';
+ h+='<div style="font-size:14px;color:var(--text2);margin-bottom:14px;">'+r.cub+' de '+(r.cub+r.fuera)+' clientes con accion definida</div>';
+ h+='<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+ for(var m=0;m<12;m++){var on=(m===mi);
+  h+='<button onclick="austarSetMes('+m+')" style="flex:1;min-width:62px;background:'+(on?'#F2F7F1':'var(--bg2)')+';border:1px solid '+(on?'#2F6E3F':'var(--border)')+';border-radius:7px;padding:9px 4px;cursor:pointer;font-weight:'+(on?'700':'500')+';font-size:14px;color:var(--text);">'+M[m]+'</button>';}
+ h+='</div></div>';
+ var ord=['C','P','S','D'];
+ for(var o=0;o<4;o++){var a=ord[o];if(!r.tot[a])continue;
+  var f=[];for(var k in r.b){if(k.charAt(0)===a){var p=k.split('|');f.push([p[1],p[2],r.b[k]]);}}
+  f.sort(function(x,y){return y[2]-x[2];});
+  h+='<div class="card" style="margin-bottom:12px;padding:0 !important;overflow:hidden;">';
+  h+='<div style="display:flex;align-items:center;gap:13px;padding:15px 20px;border-bottom:1px solid var(--border);">';
+  h+='<span style="width:4px;height:32px;border-radius:2px;background:'+COL[a]+';"></span>';
+  h+='<div><div style="font-size:17px;font-weight:650;">'+LBL[a]+'</div><div style="font-size:13px;color:var(--text3);">'+SUB[a]+'</div></div>';
+  h+='<span style="margin-left:auto;font-size:26px;font-weight:700;color:'+COL[a]+';">'+r.tot[a]+'</span></div>';
+  for(var i2=0;i2<Math.min(f.length,6);i2++){
+   h+='<div style="display:grid;grid-template-columns:1fr 160px 80px;gap:14px;padding:11px 20px;border-bottom:1px solid var(--bg3);font-size:15px;">';
+   h+='<span style="font-weight:600;">'+f[i2][1]+'</span><span style="color:var(--text2);">'+f[i2][0]+'</span>';
+   h+='<span style="text-align:right;font-weight:650;">'+f[i2][2]+'</span></div>';}
+  if(f.length>6)h+='<div style="padding:11px 20px;font-size:14px;color:var(--text3);">y '+(f.length-6)+' bloques mas</div>';
+  h+='</div>';}
+ return h;};
+window.austarSetMes=function(m){window.AUSTAR_MES=m;var el=document.getElementById('austar-cal-panel');if(el)el.innerHTML=window.austarPanelCal(m);};
+function pintar(){
+ var el=document.getElementById('tab-calendario');if(!el)return;
+ if(document.getElementById('austar-cal-panel'))return;
+ var mi=(typeof window.AUSTAR_MES==='number')?window.AUSTAR_MES:new Date().getMonth();
+ var w=document.createElement('div');w.id='austar-cal-panel';
+ w.innerHTML=window.austarPanelCal(mi);el.insertBefore(w,el.firstChild);}
+var orig=window.renderCalendario;
+window.renderCalendario=function(){
+ if(typeof orig==='function'){try{orig.apply(this,arguments);}catch(e){console.error(e);}}
+ try{pintar();}catch(e){console.error('panel cal:',e);}
+};
+})();
+</script>
 </head>
 <body>
 
