@@ -986,6 +986,158 @@ window.mergeBackups=function(){
 window.renderBackup=function(){};
 })();
 </script>
+
+<script>
+/* AUSTAR - CERTIFICADOS: motor de ROI (funciones ausentes) */
+(function(){
+var PRECIO_L=1577;
+var DOSIS_FRUTAL=3.75;
+var DOSIS_GRANO=0.125;
+var FRUTALES=['aguacate','mango','limon','naranj','guayab','durazno','nogal','papaya','manzan','toronja','granad','membrillo','pina','pina','arandano','frambuesa','fresa','zarzamora','berries','aceituna','cafe','ciruel','higo','nuez','citric'];
+function K(s){s=s||'';try{s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');}catch(e){}return s.toLowerCase();}
+window.austarEsFrutal=function(cultivo){var k=K(cultivo);for(var i=0;i<FRUTALES.length;i++){if(k.indexOf(FRUTALES[i])>-1)return true;}return false;};
+window.austarDosisHa=function(cultivo){return window.austarEsFrutal(cultivo)?DOSIS_FRUTAL:DOSIS_GRANO;};
+function n(id){var e=document.getElementById(id);if(!e)return 0;var v=parseFloat(String(e.value).replace(/[^0-9.\-]/g,''));return isFinite(v)?v:0;}
+function t(id){var e=document.getElementById(id);return e?String(e.value||'').trim():'';}
+function mxn(x){try{return '$'+Math.round(x).toLocaleString('es-MX');}catch(e){return '$'+Math.round(x);}}
+window.austarCertDatos=function(){
+ var ha=n('cert-ha')||1, cultivo=t('cert-cultivo');
+ var frutal=window.austarEsFrutal(cultivo), dosis=window.austarDosisHa(cultivo);
+ var litros=dosis*ha;
+ var invCap=n('cert-inv-austar');
+ var invSug=litros*PRECIO_L;
+ var inv=invCap>0?invCap:invSug;
+ var sin=n('cert-rend-sin'), con=n('cert-rend-con'), pt=n('cert-precio-ton');
+ var dton=(con-sin);
+ var extraHa=dton*pt;
+ var extra=extraHa*ha;
+ var otros=n('cert-otros-costos');
+ var neto=extra-inv-otros;
+ var roi=inv>0?(neto/inv*100):0;
+ var roiSolo=inv>0?((extra-inv)/inv*100):0;
+ var pago=extraHa>0?(inv/ha)/extraHa:0;
+ return {ha:ha,cultivo:cultivo,frutal:frutal,dosis:dosis,litros:litros,precioL:PRECIO_L,
+  invSug:invSug,inv:inv,capturada:invCap>0,sin:sin,con:con,pt:pt,dton:dton,
+  extraHa:extraHa,extra:extra,otros:otros,neto:neto,roi:roi,roiSolo:roiSolo,pago:pago,
+  completo:(sin>0&&con>0&&pt>0)};
+};
+window.certCalc=function(){
+ try{
+  var el=document.getElementById('cert-kpis'); if(!el) return;
+  var d=window.austarCertDatos();
+  var inp=document.getElementById('cert-inv-austar');
+  if(inp&&!d.capturada&&d.invSug>0){inp.placeholder=Math.round(d.invSug);}
+  function tarj(val,lbl,col){return '<div class="met"><div class="mv" style="font-size:20px;color:'+(col||'var(--text)')+'">'+val+'</div><div class="ml">'+lbl+'</div></div>';}
+  var h='';
+  if(!d.completo){
+   h+=tarj('—','Ganancia extra MXN','var(--text3)');
+   h+=tarj('—','Retorno sobre inversion','var(--text3)');
+   h+=tarj(d.litros?d.litros.toFixed(2)+' L':'—','Austar necesario','var(--green)');
+   h+=tarj(d.invSug?mxn(d.invSug):'—','Inversion estimada','var(--amber)');
+   el.innerHTML=h;
+   return;
+  }
+  var colRoi=d.roiSolo>=300?'var(--green)':(d.roiSolo>=100?'var(--amber)':'var(--red)');
+  h+=tarj(mxn(d.extra),'Ganancia extra MXN','var(--green)');
+  h+=tarj(Math.round(d.roiSolo).toLocaleString('es-MX')+'%','Retorno sobre Austar',colRoi);
+  h+=tarj(d.litros.toFixed(2)+' L','Austar necesario ('+(d.frutal?'frutal':'grano')+')','var(--green)');
+  h+=tarj(mxn(d.inv),'Inversion Austar'+(d.capturada?'':' (estimada)'),'var(--amber)');
+  h+=tarj('+'+d.dton.toFixed(2)+' ton/ha','Rendimiento adicional','var(--green)');
+  h+=tarj(mxn(d.neto),'Utilidad neta','var(--green)');
+  el.innerHTML=h;
+ }catch(e){console.error('certCalc:',e);}
+};
+window.certLimpiar=function(){
+ if(!confirm('Limpiar todos los campos del certificado?'))return;
+ ['cert-nombre','cert-tel','cert-cultivo','cert-variedad','cert-estado','cert-municipio','cert-fecha-siem','cert-fecha-cos','cert-inv-austar','cert-otros-costos','cert-rend-sin','cert-rend-con','cert-precio-ton'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+ var ha=document.getElementById('cert-ha'); if(ha)ha.value='1';
+ var f=document.getElementById('cert-fecha'); if(f)f.value=new Date().toISOString().slice(0,10);
+ window.certCalc();
+};
+window.austarCertTexto=function(){
+ var d=window.austarCertDatos();
+ var L=[];
+ L.push('*CERTIFICADO DE RESULTADOS AUSTAR*');
+ L.push('');
+ L.push('Productor: '+(t('cert-nombre')||'—'));
+ L.push('Cultivo: '+(d.cultivo||'—')+(t('cert-variedad')?' · '+t('cert-variedad'):''));
+ L.push('Ubicacion: '+[t('cert-municipio'),t('cert-estado')].filter(Boolean).join(', ')||'—');
+ L.push('Superficie tratada: '+d.ha+' ha');
+ L.push('');
+ L.push('*RESULTADO*');
+ L.push('Rendimiento sin Austar: '+d.sin+' ton/ha');
+ L.push('Rendimiento con Austar: '+d.con+' ton/ha');
+ L.push('Diferencia: +'+d.dton.toFixed(2)+' ton/ha');
+ L.push('Precio por tonelada: '+mxn(d.pt));
+ L.push('');
+ L.push('*NUMEROS*');
+ L.push('Austar aplicado: '+d.litros.toFixed(2)+' L ('+d.dosis+' L/ha)');
+ L.push('Inversion en Austar: '+mxn(d.inv));
+ L.push('Ganancia adicional: '+mxn(d.extra));
+ if(d.otros>0)L.push('Otros costos declarados: '+mxn(d.otros));
+ L.push('Utilidad neta: '+mxn(d.neto));
+ L.push('*Retorno sobre Austar: '+Math.round(d.roiSolo).toLocaleString('es-MX')+'%*');
+ L.push('');
+ L.push('_La inversion indicada corresponde unicamente al producto Austar a precio de lista. Los costos de aplicacion son independientes._');
+ L.push('');
+ L.push('Austar Mexico · Chemical Direct · 25 anos');
+ return L.join('\n');
+};
+window.certWhatsApp=function(){
+ try{
+  var d=window.austarCertDatos();
+  if(!d.completo){alert('Faltan datos: captura rendimiento sin Austar, con Austar y precio por tonelada.');return;}
+  var tel=String(t('cert-tel')).replace(/\D/g,'');
+  var txt=encodeURIComponent(window.austarCertTexto());
+  var url = tel.length>=10 ? ('https://wa.me/'+(tel.length===10?'52'+tel:tel)+'?text='+txt) : ('https://wa.me/?text='+txt);
+  window.open(url,'_blank');
+ }catch(e){alert('No se pudo abrir WhatsApp: '+e.message);}
+};
+window.certGenerarPDF=function(){
+ try{
+  var d=window.austarCertDatos();
+  if(!d.completo){alert('Faltan datos: rendimiento sin Austar, con Austar y precio por tonelada.');return;}
+  var w=window.open('','_blank'); if(!w){alert('Permite las ventanas emergentes para generar el PDF.');return;}
+  function fila(a,b){return '<tr><td>'+a+'</td><td class="n">'+b+'</td></tr>';}
+  var loc=[t('cert-municipio'),t('cert-estado')].filter(Boolean).join(', ')||'—';
+  var h='<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Certificado Austar</title><style>'
+  +'body{font-family:Archivo,-apple-system,Segoe UI,sans-serif;color:#12261A;padding:38px 44px;max-width:760px;margin:0 auto;font-size:15px;line-height:1.5}'
+  +'h1{font-size:27px;letter-spacing:-.02em;margin:0 0 4px}.sub{color:#5C6E60;margin-bottom:26px;font-size:15px}'
+  +'table{width:100%;border-collapse:collapse;margin-bottom:22px}td{padding:9px 0;border-bottom:1px solid #E2E8E0}'
+  +'td.n{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}'
+  +'.hero{background:#F2F7F1;border:1px solid #CBDCCF;border-left:5px solid #2F6E3F;border-radius:8px;padding:22px 26px;margin-bottom:24px}'
+  +'.hero b{display:block;font-size:44px;font-weight:800;color:#2F6E3F;letter-spacing:-.03em;line-height:1}'
+  +'.hero span{font-size:15px;color:#5C6E60}.sec{font-size:12.5px;font-weight:700;color:#5C6E60;margin:22px 0 8px}'
+  +'.nota{font-size:12.5px;color:#5C6E60;border-top:1px solid #E2E8E0;padding-top:14px;margin-top:26px}'
+  +'@media print{body{padding:0}}</style></head><body>'
+  +'<h1>Certificado de resultados</h1>'
+  +'<div class="sub">Austar Mexico · Chemical Direct · '+(t('cert-fecha')||new Date().toISOString().slice(0,10))+'</div>'
+  +'<div class="hero"><b>'+Math.round(d.roiSolo).toLocaleString('es-MX')+'%</b><span>Retorno sobre la inversion en Austar</span></div>'
+  +'<div class="sec">PRODUCTOR</div><table>'
+  +fila('Nombre',t('cert-nombre')||'—')+fila('Ubicacion',loc)
+  +fila('Cultivo',(d.cultivo||'—')+(t('cert-variedad')?' · '+t('cert-variedad'):''))
+  +fila('Superficie tratada',d.ha+' ha')+'</table>'
+  +'<div class="sec">RESULTADO EN CAMPO</div><table>'
+  +fila('Rendimiento sin Austar',d.sin+' ton/ha')+fila('Rendimiento con Austar',d.con+' ton/ha')
+  +fila('Diferencia','+'+d.dton.toFixed(2)+' ton/ha')+fila('Precio por tonelada',mxn(d.pt))+'</table>'
+  +'<div class="sec">NUMEROS</div><table>'
+  +fila('Austar aplicado',d.litros.toFixed(2)+' L ('+d.dosis+' L/ha)')
+  +fila('Inversion en Austar',mxn(d.inv))
+  +(d.otros>0?fila('Otros costos declarados',mxn(d.otros)):'')
+  +fila('Ganancia adicional',mxn(d.extra))
+  +fila('Utilidad neta',mxn(d.neto))+'</table>'
+  +'<div class="nota">La inversion indicada corresponde unicamente al producto Austar a precio de lista. Los costos de aplicacion, jornal y equipo son independientes y no estan incluidos. Rendimientos declarados por el productor.</div>'
+  +'<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print();},350);};</scr'+'ipt></body></html>';
+  w.document.write(h); w.document.close();
+ }catch(e){alert('No se pudo generar el certificado: '+e.message);}
+};
+window.renderCertificados=function(){
+ var f=document.getElementById('cert-fecha');
+ if(f&&!f.value)f.value=new Date().toISOString().slice(0,10);
+ try{window.certCalc();}catch(e){}
+};
+})();
+</script>
 </head>
 <body>
 
