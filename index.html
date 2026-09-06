@@ -720,7 +720,32 @@ body,#app,#main{background:#F4F8F2!important}
 .cert-wrapper{background:linear-gradient(135deg,#0a4d3c 0%,#1a7f64 100%);padding:20px;border-radius:12px;}
 </style>
 
-<script src="clients_data.js"></script></head>
+<script src="clients_data.js"></script><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,300..800&display=swap" rel="stylesheet">
+<style id="austar-restyle">
+/* AUSTAR - REFINAMIENTO VISUAL ETAPA 1. Solo estilos. */
+body,input,select,textarea,button,.btn,.btn-g,.btn-b,.nav-item,.tag,.page-title,.page-sub,.ct,.ml,.mv{font-family:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif !important;}
+body{font-size:15px !important;line-height:1.5 !important;letter-spacing:-.003em;-webkit-font-smoothing:antialiased;}
+.mv,.met b,.met strong,td,th,.oa-val,.num{font-variant-numeric:tabular-nums;font-feature-settings:'tnum';}
+.page-title{font-size:30px !important;font-weight:700 !important;letter-spacing:-.025em !important;line-height:1.15 !important;margin-bottom:5px !important;}
+.page-sub{font-size:15px !important;margin-bottom:24px !important;}
+.ct{font-size:15.5px !important;font-weight:650 !important;letter-spacing:-.012em !important;}
+.mv{font-size:29px !important;font-weight:700 !important;letter-spacing:-.028em !important;line-height:1.05 !important;}
+.ml{font-size:13px !important;margin-top:6px !important;}
+.nav-item{font-size:14.5px !important;padding:9px 14px !important;font-weight:500 !important;}
+.tag{font-size:11.5px !important;padding:3px 10px !important;font-weight:600 !important;}
+.btn,.btn-g,.btn-b{font-size:14px !important;padding:9px 18px !important;border-radius:7px !important;font-weight:550 !important;}
+input,select,textarea{font-size:14.5px !important;padding:10px 13px !important;border-radius:7px !important;}
+.card,.met,.ucard{border-radius:8px !important;border:1px solid var(--border) !important;padding:20px 22px !important;box-shadow:0 1px 2px rgba(18,38,26,.04) !important;}
+.ct,.page-title,.sb-title,[style*="text-transform:uppercase"],[style*="text-transform: uppercase"]{text-transform:none !important;letter-spacing:-.012em !important;}
+:root{--purple:#2F6E3F !important;--teal:#1B3B23 !important;--blue:#2F6E3F !important;--blue2:#1B3B23 !important;}
+.sb-logo{padding:22px 16px 18px !important;}
+.sb-title{font-size:20px !important;font-weight:800 !important;}
+.sb-sub{font-size:12px !important;}
+.sb-logo img{height:52px !important;width:auto !important;display:block;}
+</style>
+</head>
 <body>
 
 <!-- ═══════════════ LOGIN ═══════════════ -->
@@ -766,7 +791,7 @@ body,#app,#main{background:#F4F8F2!important}
   <!-- SIDEBAR -->
   <div id="sidebar">
     <div class="sb-logo">
-      <div class="sb-title">AUSTAR</div>
+      <img src="austar_logo.png" alt="Austar" style="width:148px;height:auto;display:block;margin:0 auto 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div class="sb-title" style="display:none">AUSTAR</div>
       <div class="sb-sub">Sistema Comercial MX 2026</div>
     </div>
     <div class="nav-section">Principal</div>
@@ -1603,7 +1628,7 @@ function gotoTab(t){
   const n=document.getElementById('nav-'+t);if(n)n.classList.add('act');
   if(t==='dashboard')renderDashboard();
   if(t==='historico')renderHistorico('total');
-  if(t==='clientes'){CLIENTS=buildClients();renderCliMetrics();initSelects();applyFilter();}
+  if(t==='clientes'){buildClients();renderCliMetrics();initSelects();applyFilter();}
   if(t==='inventario'){renderInv();setTimeout(()=>{const d=document.getElementById('inv-fecha');if(d)d.value=new Date().toISOString().slice(0,10);},50);}
   if(t==='latam')renderLatam();
   if(t==='monitor')renderMonitor();
@@ -3028,6 +3053,7 @@ if(typeof seedLatamProspectos==='function') seedLatamProspectos();
 </script>
 </body>
 </html>
+ 
  
  
  
