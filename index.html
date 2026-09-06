@@ -750,6 +750,26 @@ input,select,textarea{font-size:14.5px !important;padding:10px 13px !important;b
 .stat-lbl{font-size:13px !important;margin-top:6px !important;}
 .nav-section{font-size:11.5px !important;font-weight:600 !important;color:rgba(255,255,255,.42) !important;letter-spacing:.02em !important;text-transform:none !important;padding:16px 12px 5px !important;}
 .bandera{width:26px;height:17.5px;border-radius:2.5px;box-shadow:0 0 0 1px rgba(18,38,26,.16) inset;display:block;flex:none;}
+/* ETAPA 3 - tipografia mas clara y grande */
+body{font-size:16px !important;line-height:1.55 !important;}
+.page-title{font-size:34px !important;}
+.page-sub{font-size:16px !important;}
+.ct{font-size:17px !important;}
+.mv,.stat-val{font-size:33px !important;}
+.ml,.stat-lbl{font-size:14px !important;}
+.nav-item{font-size:15.5px !important;padding:10px 14px !important;}
+.nav-section{font-size:12px !important;}
+.tag{font-size:12.5px !important;padding:4px 11px !important;}
+.btn,.btn-g,.btn-b{font-size:15px !important;padding:10px 20px !important;}
+input,select,textarea{font-size:15.5px !important;padding:11px 14px !important;}
+td,th{font-size:15px !important;}
+[style*="font-size:11px"]{font-size:13px !important;}
+[style*="font-size:12px"]{font-size:14px !important;}
+[style*="font-size:13px"]{font-size:15px !important;}
+[style*="font-size:14px"]{font-size:15.5px !important;}
+[style*="font-size:15px"]{font-size:16.5px !important;}
+[style*="font-size:10px"]{font-size:12.5px !important;}
+
 
 </style>
 
@@ -2926,7 +2946,7 @@ function renderLatam(){
     h+='<div class="latam-card" data-pid="'+p.id+'" style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+col+';border-radius:8px;padding:14px;cursor:pointer;">';
     h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
     h+=(window.BANDERA?BANDERA(p.id):'<span style="font-size:20px;">'+p.flag+'</span>');
-    h+='<span style="font-size:15px;font-weight:700;color:var(--text);">'+p.nombre+'</span>';
+    h+='<span style="font-size:15px;font-weight:700;color:var(--text);">'+(p.pais||p.nombre||'')+'</span>';
     h+='<span style="font-size:11px;background:'+col+';color:#fff;padding:2px 7px;border-radius:10px;">'+(statusLabels[status]||status)+'</span></div>';
     h+='<div style="font-size:12px;color:var(--text2);margin-bottom:6px;">🌾 '+p.cultivos+'</div>';
     h+='<div style="font-size:11px;color:var(--text3);">👥 '+(prospects.length)+' prospectos registrados</div>';
