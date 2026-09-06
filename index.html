@@ -843,6 +843,149 @@ window.renderCalendario=function(){
 };
 })();
 </script>
+
+<script>
+/* AUSTAR - RESPALDO Y EXPORTACION (funciones ausentes, reconstruidas) */
+(function(){
+function LS(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function usuario(){try{return (window.CURRENT_USER||window.USER||localStorage.getItem('austar_user')||'sistema');}catch(e){return 'sistema';}}
+function baja(nombre,texto,mime){
+ var b=new Blob([texto],{type:mime||'application/json;charset=utf-8'});
+ var u=URL.createObjectURL(b);
+ var a=document.createElement('a');a.href=u;a.download=nombre;document.body.appendChild(a);a.click();
+ setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(u);},400);
+}
+window.austarRecolectar=function(){
+ var lista=(typeof CLIENTS!=='undefined'&&CLIENTS&&CLIENTS.length)?CLIENTS:(window.CRM_DATA||[]);
+ var d={meta:{fecha:new Date().toISOString(),version:'2026.1',usuario:usuario()},clientes:{},notas:{},extras:{},badges:{},etapas:{},inventario:{almacen:0,distribucion:0,mov:[]},latam:{}};
+ for(var i=0;i<lista.length;i++){var c=lista[i];d.clientes[c.id]=c;}
+ try{var ex=JSON.parse(LS('austar_extra_clients')||'[]');for(var j=0;j<ex.length;j++){d.clientes[ex[j].id]=ex[j];}}catch(e){}
+ try{
+  for(var k=0;k<localStorage.length;k++){
+   var key=localStorage.key(k);if(!key)continue;
+   if(key.indexOf('as_nt_')===0){try{d.notas[key.slice(6)]=JSON.parse(LS(key)||'[]');}catch(e){}}
+   else if(key.indexOf('as_st_')===0){d.etapas[key.slice(6)]=LS(key);}
+   else if(key.indexOf('as_ex_')===0){try{d.extras[key.slice(6)]=JSON.parse(LS(key)||'{}');}catch(e){}}
+   else if(key.indexOf('as_bg_')===0){try{d.badges[key.slice(6)]=JSON.parse(LS(key)||'[]');}catch(e){}}
+   else if(key.indexOf('as_lt')===0){var p=key.split('_');var pid=p[p.length-1];d.latam[pid]=d.latam[pid]||{};d.latam[pid][p[1]]=LS(key);}
+  }
+ }catch(e){}
+ try{d.inventario=JSON.parse(LS('austar_inv')||'null')||d.inventario;}catch(e){}
+ try{d.alianzas=JSON.parse(LS('alianzas_austar')||LS('austar_alianzas')||'null');}catch(e){}
+ try{d.comunidades=JSON.parse(LS('austar_comunidades')||'null');}catch(e){}
+ try{d.calendario=JSON.parse(LS('cal_actividades_2026')||'null');}catch(e){}
+ return d;
+};
+window.exportJSON=function(){
+ try{
+  var d=window.austarRecolectar();
+  var f=new Date().toISOString().slice(0,10);
+  baja('austar-respaldo-'+f+'.json', JSON.stringify(d,null,2));
+  var n=Object.keys(d.clientes).length, nn=Object.keys(d.notas).length, ne=Object.keys(d.etapas).length;
+  alert('Respaldo generado.\n\nClientes: '+n+'\nCon notas: '+nn+'\nCon etapa cambiada: '+ne+'\n\nGuardalo en Drive o Dropbox.');
+ }catch(e){alert('No se pudo generar el respaldo: '+e.message);}
+};
+window.importJSON=function(){
+ var inp=document.createElement('input');inp.type='file';inp.accept='.json,application/json';
+ inp.onchange=function(){
+  var f=inp.files&&inp.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+   try{
+    var d=JSON.parse(r.result);
+    if(!d||!d.meta){alert('El archivo no parece un respaldo de Austar.');return;}
+    var nn=Object.keys(d.notas||{}).length, ne=Object.keys(d.etapas||{}).length;
+    if(!confirm('Respaldo de '+(d.meta.usuario||'?')+' del '+String(d.meta.fecha).slice(0,10)+'.\n\nNotas: '+nn+'\nEtapas: '+ne+'\n\nSe agregaran a este dispositivo sin borrar lo existente. Continuar?'))return;
+    var c=0;
+    for(var k in (d.etapas||{})){try{localStorage.setItem('as_st_'+k,d.etapas[k]);c++;}catch(e){}}
+    for(var k2 in (d.notas||{})){try{localStorage.setItem('as_nt_'+k2,JSON.stringify(d.notas[k2]));c++;}catch(e){}}
+    for(var k3 in (d.extras||{})){try{localStorage.setItem('as_ex_'+k3,JSON.stringify(d.extras[k3]));c++;}catch(e){}}
+    for(var k4 in (d.badges||{})){try{localStorage.setItem('as_bg_'+k4,JSON.stringify(d.badges[k4]));c++;}catch(e){}}
+    alert('Importado. '+c+' registros aplicados.\n\nRecarga la pagina para verlos.');
+   }catch(e){alert('Archivo invalido: '+e.message);}
+  };
+  r.readAsText(f);
+ };
+ inp.click();
+};
+function csvEsc(v){v=(v==null?'':String(v));return '"'+v.replace(/"/g,'""')+'"';}
+function csvBaja(nombre,filas){
+ var t=filas.map(function(f){return f.map(csvEsc).join(',');}).join('\r\n');
+ baja(nombre,'\ufeff'+t,'text/csv;charset=utf-8');
+}
+window.exportCSV=function(tipo){
+ try{
+  var lista=(typeof CLIENTS!=='undefined'&&CLIENTS&&CLIENTS.length)?CLIENTS:(window.CRM_DATA||[]);
+  var f=new Date().toISOString().slice(0,10), filas=[];
+  function etapa(c){try{return (typeof getStage==='function')?getStage(c):(c.etapa_base||'');}catch(e){return c.etapa_base||'';}}
+  if(tipo==='clientes'||tipo==='pipeline'){
+   filas.push(['ID','Nombre','Estado','Municipio','Telefono','Cultivos','Etapa']);
+   for(var i=0;i<lista.length;i++){var c=lista[i];
+    filas.push([c.id,c.nombre,c.estado,c.municipio||'',c.tel||'',(c.cultivos||[]).join(' | '),etapa(c)]);}
+  } else if(tipo==='seguimientos'){
+   filas.push(['ID cliente','Nombre','Fecha','Tipo','Nota','Usuario']);
+   var mapa={};for(var j=0;j<lista.length;j++)mapa[lista[j].id]=lista[j].nombre;
+   for(var k=0;k<localStorage.length;k++){var key=localStorage.key(k);
+    if(!key||key.indexOf('as_nt_')!==0)continue;
+    var id=key.slice(6),arr=[];try{arr=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
+    for(var n=0;n<arr.length;n++){var x=arr[n];
+     filas.push([id,mapa[id]||'(fuera del sistema)',x.fecha||x.f||'',x.tipo||'',x.t||x.texto||'',x.u||'']);}}
+  } else if(tipo==='inventario'){
+   var inv={};try{inv=JSON.parse(localStorage.getItem('austar_inv')||'{}');}catch(e){}
+   filas.push(['Concepto','Valor']);
+   filas.push(['Almacen',inv.almacen||0]);filas.push(['Distribucion',inv.distribucion||0]);
+   filas.push([]);filas.push(['Fecha','Tipo','Cantidad','Nota']);
+   (inv.mov||[]).forEach(function(m){filas.push([m.fecha||'',m.tipo||'',m.cant||m.cantidad||'',m.nota||'']);});
+  } else if(tipo==='latam'){
+   filas.push(['Pais','Distribuidor','Litros','Estatus','Notas']);
+   var P=(window.LATAM_PAISES||[]);
+   for(var p=0;p<P.length;p++){var q=P[p];
+    filas.push([q.pais||q.nombre||q.id, localStorage.getItem('as_ltd_'+q.id)||q.distribuidor||'', localStorage.getItem('as_ltp_'+q.id)||'', localStorage.getItem('as_ltst_'+q.id)||q.estatus||'', localStorage.getItem('as_ltn_'+q.id)||'']);}
+  } else { alert('Tipo no reconocido: '+tipo); return; }
+  csvBaja('austar-'+tipo+'-'+f+'.csv', filas);
+ }catch(e){alert('No se pudo exportar: '+e.message);}
+};
+window.exportExcel=function(){
+ try{
+  if(typeof XLSX==='undefined'){ window.exportCSV('clientes'); return; }
+  var lista=(typeof CLIENTS!=='undefined'&&CLIENTS&&CLIENTS.length)?CLIENTS:(window.CRM_DATA||[]);
+  function etapa(c){try{return (typeof getStage==='function')?getStage(c):(c.etapa_base||'');}catch(e){return c.etapa_base||'';}}
+  var rows=lista.map(function(c){return {ID:c.id,Nombre:c.nombre,Estado:c.estado,Municipio:c.municipio||'',Telefono:c.tel||'',Cultivos:(c.cultivos||[]).join(' | '),Etapa:etapa(c)};});
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Clientes');
+  XLSX.writeFile(wb,'austar-clientes-'+new Date().toISOString().slice(0,10)+'.xlsx');
+ }catch(e){alert('No se pudo generar el Excel: '+e.message);}
+};
+window.mergeBackups=function(){
+ var inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.multiple=true;
+ inp.onchange=function(){
+  var fs=inp.files;if(!fs||!fs.length)return;
+  var leidos=0,total=fs.length,apl=0,quien=[];
+  for(var i=0;i<total;i++){(function(f){
+   var r=new FileReader();
+   r.onload=function(){
+    try{var d=JSON.parse(r.result);
+     if(d&&d.meta){quien.push((d.meta.usuario||'?')+' '+String(d.meta.fecha).slice(0,10));
+      for(var k in (d.etapas||{})){try{localStorage.setItem('as_st_'+k,d.etapas[k]);apl++;}catch(e){}}
+      for(var k2 in (d.notas||{})){
+       var prev=[];try{prev=JSON.parse(localStorage.getItem('as_nt_'+k2)||'[]');}catch(e){}
+       var nue=d.notas[k2]||[],vistos={},out=[];
+       prev.concat(nue).forEach(function(n){var key=(n.fecha||'')+'|'+(n.t||'')+'|'+(n.u||'');if(!vistos[key]){vistos[key]=1;out.push(n);}});
+       try{localStorage.setItem('as_nt_'+k2,JSON.stringify(out));apl++;}catch(e){}}
+      for(var k3 in (d.extras||{})){try{localStorage.setItem('as_ex_'+k3,JSON.stringify(d.extras[k3]));apl++;}catch(e){}}
+     }
+    }catch(e){}
+    leidos++;
+    if(leidos===total){alert('Consolidacion terminada.\n\nArchivos: '+total+'\n'+quien.join('\n')+'\n\nRegistros aplicados: '+apl+'\n\nRecarga la pagina.');}
+   };
+   r.readAsText(f);
+  })(fs[i]);}
+ };
+ inp.click();
+};
+window.renderBackup=function(){};
+})();
+</script>
 </head>
 <body>
 
@@ -3091,7 +3234,7 @@ function guardarActividadCal(){
 }
 
 
-function initBackupTab(){renderBackup();}
+function initBackupTab(){if(typeof renderBackup==='function')renderBackup();}
 function renderMonitor(){
   var el=document.getElementById('tab-monitor');if(!el)return;
   var tots=CLIENTS.length;
