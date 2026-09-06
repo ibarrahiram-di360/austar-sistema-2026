@@ -744,7 +744,18 @@ input,select,textarea{font-size:14.5px !important;padding:10px 13px !important;b
 .sb-title{font-size:20px !important;font-weight:800 !important;}
 .sb-sub{font-size:12px !important;}
 .sb-logo img{height:52px !important;width:auto !important;display:block;}
+/* ETAPA 2 */
+.stat-card{border-radius:8px !important;border:1px solid var(--border) !important;padding:20px 22px !important;box-shadow:0 1px 2px rgba(18,38,26,.04) !important;}
+.stat-val{font-size:29px !important;font-weight:700 !important;letter-spacing:-.028em !important;line-height:1.05 !important;font-variant-numeric:tabular-nums;}
+.stat-lbl{font-size:13px !important;margin-top:6px !important;}
+.nav-section{font-size:11.5px !important;font-weight:600 !important;color:rgba(255,255,255,.42) !important;letter-spacing:.02em !important;text-transform:none !important;padding:16px 12px 5px !important;}
+.bandera{width:26px;height:17.5px;border-radius:2.5px;box-shadow:0 0 0 1px rgba(18,38,26,.16) inset;display:block;flex:none;}
+
 </style>
+
+<script>
+window.BANDERA=function(id){var F={"co":"<rect width=\"30\" height=\"10\" fill=\"#FCD116\"/><rect y=\"10\" width=\"30\" height=\"5\" fill=\"#003893\"/><rect y=\"15\" width=\"30\" height=\"5\" fill=\"#CE1126\"/>","pe":"<rect width=\"30\" height=\"20\" fill=\"#fff\"/><rect width=\"10\" height=\"20\" fill=\"#D91023\"/><rect x=\"20\" width=\"10\" height=\"20\" fill=\"#D91023\"/>","gt":"<rect width=\"30\" height=\"20\" fill=\"#fff\"/><rect width=\"10\" height=\"20\" fill=\"#4997D0\"/><rect x=\"20\" width=\"10\" height=\"20\" fill=\"#4997D0\"/>","pa":"<rect width=\"15\" height=\"10\" fill=\"#fff\"/><rect x=\"15\" width=\"15\" height=\"10\" fill=\"#D21034\"/><rect y=\"10\" width=\"15\" height=\"10\" fill=\"#005293\"/><rect x=\"15\" y=\"10\" width=\"15\" height=\"10\" fill=\"#fff\"/><circle cx=\"7.5\" cy=\"5\" r=\"2.4\" fill=\"#005293\"/><circle cx=\"22.5\" cy=\"15\" r=\"2.4\" fill=\"#D21034\"/>","sv":"<rect width=\"30\" height=\"20\" fill=\"#fff\"/><rect width=\"30\" height=\"6.4\" fill=\"#0F47AF\"/><rect y=\"13.6\" width=\"30\" height=\"6.4\" fill=\"#0F47AF\"/>","hn":"<rect width=\"30\" height=\"20\" fill=\"#fff\"/><rect width=\"30\" height=\"6.1\" fill=\"#0073CF\"/><rect y=\"13.9\" width=\"30\" height=\"6.1\" fill=\"#0073CF\"/><circle cx=\"11\" cy=\"10\" r=\"1\" fill=\"#0073CF\"/><circle cx=\"19\" cy=\"10\" r=\"1\" fill=\"#0073CF\"/><circle cx=\"15\" cy=\"7.4\" r=\"1\" fill=\"#0073CF\"/><circle cx=\"15\" cy=\"12.6\" r=\"1\" fill=\"#0073CF\"/>","cr":"<rect width=\"30\" height=\"20\" fill=\"#fff\"/><rect width=\"30\" height=\"3.4\" fill=\"#002B7F\"/><rect y=\"16.6\" width=\"30\" height=\"3.4\" fill=\"#002B7F\"/><rect y=\"7.2\" width=\"30\" height=\"5.6\" fill=\"#CE1126\"/>","otros":"<rect width=\"30\" height=\"20\" fill=\"#EAF0E8\"/><circle cx=\"15\" cy=\"10\" r=\"7\" fill=\"none\" stroke=\"#2F6E3F\" stroke-width=\"1.4\"/><path d=\"M8 10h14M15 3a11 11 0 0 1 0 14a11 11 0 0 1 0-14\" fill=\"none\" stroke=\"#2F6E3F\" stroke-width=\"1.4\"/>"};var b=F[id]||F.otros;return '<svg class="bandera" viewBox="0 0 30 20" role="img" aria-label="Bandera">'+b+'</sv'+'g>';};
+</script>
 </head>
 <body>
 
@@ -2308,7 +2319,7 @@ function renderAcciones(){
   h+='</div>';
   // ALL estados from ESTADO_POTENCIAL
   var allEstados=Object.keys(ESTADO_POTENCIAL).sort(function(a,b){return ESTADO_POTENCIAL[b].l-ESTADO_POTENCIAL[a].l;});
-  h+='<div style="margin-bottom:20px;padding:14px 16px;background:linear-gradient(135deg,#0a1628,#0f2040);border:1px solid #1e3a5f;border-radius:10px;">';
+  h+='<div style="margin-bottom:20px;padding:14px 16px;background:linear-gradient(135deg,#1B3B23,#2F6E3F);border:1px solid #1e3a5f;border-radius:10px;">';
   h+='<div style="font-size:13px;font-weight:700;color:#D8AE3C;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">🎯 Todos los Estados — Prioridad de Prospección ('+allEstados.length+')</div>';
   h+='<div style="max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;">';
   allEstados.forEach(function(estado,i){
@@ -2412,7 +2423,7 @@ function renderAlianzas(){
   var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   var h='<div class="page-header"><div class="page-title">🤝 Alianzas & Redes</div></div>';
   // Agronetwork panel
-  h+='<div style="margin-bottom:18px;padding:14px 16px;background:linear-gradient(135deg,#0a1628,#0f2040);border:1px solid #1e3a5f;border-radius:10px;">';
+  h+='<div style="margin-bottom:18px;padding:14px 16px;background:linear-gradient(135deg,#1B3B23,#2F6E3F);border:1px solid #1e3a5f;border-radius:10px;">';
   h+='<div style="font-size:13px;font-weight:700;color:#D8AE3C;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">📻 Agronetwork · Agroamigo · AgroDisrupción</div>';
   h+='<div style="display:flex;flex-wrap:wrap;gap:10px;">';
   [{v:'180+',l:'Ediciones revista',c:'#2F6E3F'},{v:'17',l:'Años trayectoria',c:'#D8AE3C'},{v:'300+',l:'Comunidad OLAJ',c:'#60a5fa'},{v:'Agrodisrupción',l:'Podcast activo',c:'#a78bfa'}].forEach(function(s){h+='<div style="background:#0d1f35;border:1px solid #1e3a5f;border-radius:8px;padding:10px 14px;flex:1;min-width:120px;"><div style="font-size:18px;font-weight:800;color:'+s.c+';">'+s.v+'</div><div style="font-size:10px;color:var(--text3);">'+s.l+'</div></div>';});
@@ -2440,7 +2451,7 @@ function renderAlianzas(){
     var col=stColors[a.estatus]||'#6b7280';
     h+='<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+col+';border-radius:8px;padding:14px;">';
     h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">';
-    h+='<div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--text);">'+a.nombre+'</div><div style="font-size:11px;color:var(--text3);">'+a.tipo+(a.contacto?' · '+a.contacto:'')+'</div></div>';
+    h+='<div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--text);">'+a.nombre+'</div><div style="font-size:11px;color:var(--text3);">'+a.tipo+(a.contacto?' · '+a.contacto:'')+' · CEO Hiram · CCO Vale'+'</div></div>';
     h+='<span style="font-size:10px;background:'+col+';color:#fff;padding:2px 7px;border-radius:10px;">'+(a.estatus||'activa')+'</span>';
     h+='<button data-alid="'+a.id+'" data-alnom="'+a.nombre+'" onclick="openActividadAlianza(this.dataset.alid,this.dataset.alnom)" style="background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 8px;color:var(--text2);cursor:pointer;font-size:11px;">+ Actividad</button>';
     h+='</div>';
@@ -2651,7 +2662,7 @@ function renderPotencialCalendario(year,mes){
   var estados=Object.keys(estadosSet).sort(function(a,b){return estadosSet[b]-estadosSet[a];}).slice(0,10);
   if(estados.length===0)return'';
   var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  var html='<div style="margin-bottom:18px;padding:14px 16px;background:linear-gradient(135deg,#0a1628,#0f2040);border:1px solid #1e3a5f;border-radius:10px;">';
+  var html='<div style="margin-bottom:18px;padding:14px 16px;background:linear-gradient(135deg,#1B3B23,#2F6E3F);border:1px solid #1e3a5f;border-radius:10px;">';
   html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">';
   html+='<span style="font-size:16px;">🎯</span>';
   html+='<span style="font-size:13px;font-weight:700;color:#D8AE3C;text-transform:uppercase;letter-spacing:1px;">Potencial de Mercado — '+(meses[mes-1]||'')+' '+year+'</span>';
@@ -2914,7 +2925,7 @@ function renderLatam(){
     var col=statusColors[status]||'#6b7280';
     h+='<div class="latam-card" data-pid="'+p.id+'" style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+col+';border-radius:8px;padding:14px;cursor:pointer;">';
     h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
-    h+='<span style="font-size:20px;">'+p.flag+'</span>';
+    h+=(window.BANDERA?BANDERA(p.id):'<span style="font-size:20px;">'+p.flag+'</span>');
     h+='<span style="font-size:15px;font-weight:700;color:var(--text);">'+p.nombre+'</span>';
     h+='<span style="font-size:11px;background:'+col+';color:#fff;padding:2px 7px;border-radius:10px;">'+(statusLabels[status]||status)+'</span></div>';
     h+='<div style="font-size:12px;color:var(--text2);margin-bottom:6px;">🌾 '+p.cultivos+'</div>';
