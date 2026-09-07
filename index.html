@@ -3346,7 +3346,7 @@ function renderCalendario(){
   hdr+='<button onclick="openNuevaActividadCal(new Date().toISOString().slice(0,10))" style="margin-left:auto;background:#2F6E3F;border:none;border-radius:6px;padding:7px 14px;color:#fff;cursor:pointer;font-size:12px;font-weight:600;">+ Actividad</button>';
   hdr+='</div>';
   // Potencial panel
-  var potHtml=typeof renderPotencialCalendario==='function'?renderPotencialCalendario(y,m+1):'';
+  var potHtml='';/* panel viejo desactivado: cifras infladas y duplica el Calendario operativo. La funcion renderPotencialCalendario sigue en el archivo por si se quiere recuperar. */
   var gridHtml='';
   if(view==='mes'){gridHtml=buildCalMes(y,m);}
   else if(view==='semana'){gridHtml=buildCalSemana(y,m);}
