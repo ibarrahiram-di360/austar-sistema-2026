@@ -1946,7 +1946,9 @@ window.austarLatamNota=function(){
       <div class="sb-sub">Sistema Comercial MX 2026</div>
     </div>
     <div class="nav-section">Principal</div>
-    <div class="nav-item act" onclick="gotoTab('dashboard')" id="nav-dashboard">Dashboard</div>
+    <div class="nav-item act" onclick="gotoTab('calendario')" id="nav-calendario">Calendario</div>
+    <div class="nav-item" onclick="gotoTab('dashboard')" id="nav-dashboard">Dashboard</div>
+    
     <div class="nav-item" onclick="gotoTab('historico')" id="nav-historico">Histórico</div>
     <div class="nav-section">Operación</div>
     <div class="nav-item" onclick="gotoTab('clientes')" id="nav-clientes">Clientes</div>
@@ -1961,7 +1963,7 @@ window.austarLatamNota=function(){
     <div class="nav-item" onclick="gotoTab('planner')" id="nav-planner">Plan de Acción</div>
     <div class="nav-item" onclick="gotoTab('alianzas')" id="nav-alianzas">Alianzas</div>
     <div class="nav-item" onclick="gotoTab('comunidades')" id="nav-comunidades">Grupos</div>
-    <div class="nav-item" onclick="gotoTab('calendario')" id="nav-calendario">Calendario</div>
+    
     <div class="sb-footer">
       <div style="display:flex;align-items:center;gap:8px">
         <div id="user-av" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0"></div>
@@ -1978,7 +1980,7 @@ window.austarLatamNota=function(){
   <div id="main">
 
     <!-- ─── DASHBOARD EJECUTIVO ─── -->
-    <div id="tab-dashboard" class="sc on">
+    <div id="tab-dashboard" class="sc">
       <div class="page-header">
         <div class="page-title">Dashboard ejecutivo</div>
         <div class="page-sub">Visión integrada CDM + Odiseo Amezcua · 2025</div>
@@ -2596,7 +2598,7 @@ window.austarLatamNota=function(){
     <div id="tab-alianzas" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">🤝 Alianzas Institucionales</div><button class="btn btn-g btn-sm" onclick="addAlianza()">+ Nueva alianza</button></div><div class="page-sub">BNI · CDAAJ · ANFACA · APEAJAL · IPADE · OLAJ · AMCHAM</div></div><div style="padding:0 22px 22px" id="alianzas-body"></div></div>
     <div id="tab-comunidades" class="sc"><div class="page-header"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><div class="page-title">🌱 Grupos Austar — Comunidades por Cultivo</div><button class="btn btn-g btn-sm" onclick="addComunidad()">+ Nueva comunidad</button></div><div class="page-sub">Grupos WhatsApp por cultivo · región · miembros · responsable</div></div><div style="padding:0 22px 22px" id="comunidades-body"></div></div>
     <!-- CALENDARIO AUSTAR2030 -->
-    <div id="tab-calendario" class="sc">
+    <div id="tab-calendario" class="sc on">
       <div class="page-header">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
           <div class="page-title">🗓️ Calendario Austar2030</div>
@@ -3211,6 +3213,7 @@ const LATAM_PAISES=[
   {id:'cr',flag:'🇨🇷',pais:'Costa Rica',distribuidor:'Por definir',region:'Centroamérica',cultivos:['Piña','Aguacate','Banano'],contacto:'',tel:'',status:'prospecto',litros_hist:[],notas:''},
   {id:'otros',flag:'🌎',pais:'Otros LATAM',distribuidor:'Nuevos prospectos',region:'LATAM',cultivos:[],contacto:'',tel:'',status:'prospecto',litros_hist:[],notas:'Región abierta para nuevos mercados y contactos internacionales.'}
 ];
+window.LATAM_PAISES=LATAM_PAISES;
 const LATAM_STATUS={prospecto:{l:'Prospecto',c:'t-gy'},contactado:{l:'Contactado',c:'t-bl'},negociacion:{l:'En negociación',c:'t-am'},activo:{l:'Activo ✓',c:'t-gr'},distribuidor:{l:'Distribuidor oficial',c:'t-gr'}};
 function getLatamStatus(id){try{return localStorage.getItem('as_ltst_'+id)||'prospecto';}catch{return'prospecto';}}
 function setLatamStatus(id,s){try{localStorage.setItem('as_ltst_'+id,s);}catch{}}
