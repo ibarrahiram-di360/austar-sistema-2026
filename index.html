@@ -1017,6 +1017,7 @@ window.exportJSON=function(){
   var d=window.austarRecolectar();
   var f=new Date().toISOString().slice(0,10);
   baja('austar-respaldo-'+f+'.json', JSON.stringify(d,null,2));
+  try{ localStorage.setItem('austar_last_backup', f); }catch(e){}
   var n=Object.keys(d.clientes).length, nn=Object.keys(d.notas).length, ne=Object.keys(d.etapas).length;
   alert('Respaldo generado.\n\nClientes: '+n+'\nCon notas: '+nn+'\nCon etapa cambiada: '+ne+'\n\nGuardalo en Drive o Dropbox.');
  }catch(e){alert('No se pudo generar el respaldo: '+e.message);}
@@ -1405,6 +1406,101 @@ function engancharDet(){
 }
 if(document.readyState==='complete'){ engancharDet(); } else { window.addEventListener('load', engancharDet); }
 setInterval(engancharDet, 1200);
+})();
+</script>
+
+<script>
+/* AUSTAR - MONITOR: calidad de datos y avance de captura */
+(function(){
+function tel10(s){ var x=String(s||'').replace(/\D/g,''); return x.length>=10?x.slice(-10):''; }
+function ex(id){ try{ return (typeof getExtra==='function')?getExtra(id):JSON.parse(localStorage.getItem('as_ex_'+id)||'{}'); }catch(e){ return {}; } }
+var NOCULT=['socio comercial','asesor','agroquimicos','agroquimica','promotor austar','empacadora','fruit wash','jalcommerce','agroinfluencer','fertilizantes','golf','otros','frutales','granos'];
+function K(s){ s=s||''; try{ s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,''); }catch(e){} return s.toLowerCase().trim(); }
+window.austarCalidad=function(){
+ var L=(typeof CLIENTS!=='undefined'&&CLIENTS&&CLIENTS.length)?CLIENTS:(window.CRM_DATA||[]);
+ var o={total:L.length,sinTel:0,sinCul:0,sinMun:0,malEtiqueta:0,conHuerto:0,dupClientes:0,dups:[],etiquetas:{},sinCal:0};
+ var mapTel={};
+ for(var i=0;i<L.length;i++){ var c=L[i];
+  var t=tel10(c.tel); if(!t) o.sinTel++; else { mapTel[t]=mapTel[t]||[]; mapTel[t].push(c.nombre); }
+  var cs=c.cultivos||[]; if(!cs.length) o.sinCul++;
+  if(!String(c.municipio||'').trim()) o.sinMun++;
+  var mal=false;
+  for(var j=0;j<cs.length;j++){ if(NOCULT.indexOf(K(cs[j]))>-1){ mal=true; o.etiquetas[cs[j]]=(o.etiquetas[cs[j]]||0)+1; } }
+  if(mal) o.malEtiqueta++;
+  var e=ex(c.id)||{}; if((+e.ha>0)||(+e.arboles>0)) o.conHuerto++;
+ }
+ for(var k in mapTel){ if(mapTel[k].length>1){ o.dupClientes+=mapTel[k].length; o.dups.push({tel:k,nombres:mapTel[k]}); } }
+ o.dups.sort(function(a,b){return b.nombres.length-a.nombres.length;});
+ try{ var r=window.austarCruce(new Date().getMonth()); o.sinCal=r.fuera; o.conCal=r.cub; }catch(e){ o.sinCal=null; }
+ o.ultimoResp=null;
+ try{ var b=localStorage.getItem('austar_last_backup'); if(b){ o.ultimoResp=b; o.diasResp=Math.floor((Date.now()-new Date(b).getTime())/86400000); } }catch(e){}
+ return o;
+};
+function met(v,l,col){ return '<div class="met"><div class="mv"'+(col?' style="color:'+col+'"':'')+'>'+v+'</div><div class="ml">'+l+'</div></div>'; }
+function blk(color,titulo,sub,n,filas){
+ var h='<div class="card" style="padding:0 !important;margin-bottom:12px;overflow:hidden;">';
+ h+='<div style="display:flex;align-items:center;gap:13px;padding:15px 20px;border-bottom:1px solid var(--border);">';
+ h+='<span style="width:4px;height:32px;border-radius:2px;background:'+color+';"></span>';
+ h+='<div><div style="font-size:17px;font-weight:650;">'+titulo+'</div><div style="font-size:13px;color:var(--text3);">'+sub+'</div></div>';
+ h+='<span style="margin-left:auto;font-size:25px;font-weight:700;color:'+color+';">'+n+'</span></div>';
+ for(var i=0;i<filas.length;i++){
+  h+='<div style="display:grid;grid-template-columns:1fr 220px 80px;gap:14px;padding:11px 20px;border-bottom:1px solid var(--bg3);font-size:15px;align-items:center;">';
+  h+='<span style="font-weight:600;">'+filas[i][0]+'</span><span style="color:var(--text2);font-size:14px;">'+filas[i][1]+'</span>';
+  h+='<span style="text-align:right;font-weight:650;">'+filas[i][2]+'</span></div>';
+ }
+ return h+'</div>';
+}
+window.austarMonitorHTML=function(){
+ var o=window.austarCalidad(), h='';
+ h+='<div class="page-header"><div class="page-title">Monitor</div><div class="page-sub">Salud del sistema y calidad de los datos &middot; '+o.total+' clientes</div></div>';
+ if(o.ultimoResp===null){
+  h+='<div style="background:#FFF8F4;border:1px solid #F0D5C7;border-left:4px solid #B04A24;border-radius:8px;padding:15px 20px;margin-bottom:20px;font-size:14.5px;color:var(--text2);"><b style="color:#B04A24;">No hay registro de respaldo en este dispositivo.</b> Ve a Respaldo y exporta el JSON. Lo capturado aqui no tiene copia fuera de este navegador.</div>';
+ } else if(o.diasResp>=3){
+  h+='<div style="background:#FFF8F4;border:1px solid #F0D5C7;border-left:4px solid #B04A24;border-radius:8px;padding:15px 20px;margin-bottom:20px;font-size:14.5px;color:var(--text2);"><b style="color:#B04A24;">Ultimo respaldo hace '+o.diasResp+' dias</b> ('+o.ultimoResp+'). Lo capturado despues no tiene copia.</div>';
+ } else {
+  h+='<div style="background:#F2F7F1;border:1px solid #CBDCCF;border-left:4px solid #2F6E3F;border-radius:8px;padding:15px 20px;margin-bottom:20px;font-size:14.5px;color:var(--text2);">Ultimo respaldo: <b>'+o.ultimoResp+'</b>'+(o.diasResp?' (hace '+o.diasResp+' dia'+(o.diasResp>1?'s':'')+')':' (hoy)')+'.</div>';
+ }
+ var pctH=o.total?Math.round(o.conHuerto/o.total*100):0;
+ var colH=pctH>=70?'var(--green)':(pctH>=30?'var(--amber)':'var(--red)');
+ h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;">';
+ h+=met(o.conCal!=null?o.conCal:'—','Con accion este mes','var(--green)');
+ h+=met(pctH+'%','Con datos de huerto',colH);
+ h+=met(o.sinMun,'Sin municipio','var(--amber)');
+ h+=met(o.dupClientes,'Telefono duplicado', o.dupClientes?'var(--red)':'var(--green)');
+ h+='</div>';
+ if(o.dups.length){
+  var fd=o.dups.slice(0,5).map(function(x){ var t=x.tel; return [x.nombres.slice(0,3).join(' &middot; '), t.slice(0,3)+' '+t.slice(3,6)+' '+t.slice(6), x.nombres.length]; });
+  h+=blk('#B04A24','Telefonos duplicados','Mismo numero en varios registros, probable cliente repetido',o.dups.length,fd);
+ }
+ var fe=[]; for(var e in o.etiquetas) fe.push([e,'Deberia ser tipo de cliente, no cultivo',o.etiquetas[e]]);
+ fe.sort(function(a,b){return b[2]-a[2];});
+ if(fe.length) h+=blk('#D8AE3C','Campo cultivo mal usado','Tipo de cliente guardado como si fuera cultivo',o.malEtiqueta,fe.slice(0,6));
+ var inc=[];
+ if(o.sinMun) inc.push(['Sin municipio','Bloquea el desglose por zona y las rutas de visita',o.sinMun]);
+ if(o.sinCul) inc.push(['Sin cultivo','Quedan fuera del calendario comercial',o.sinCul]);
+ if(o.sinTel) inc.push(['Sin telefono','No se les puede contactar',o.sinTel]);
+ if(o.sinCal) inc.push(['Cultivo sin calendario','Nogal, berries, hortalizas y otros sin patron definido',o.sinCal]);
+ if(inc.length) h+=blk('#B6C4B8','Datos incompletos','Campos vacios que limitan el seguimiento',inc.reduce(function(a,x){return a+x[2];},0),inc);
+ var falta=o.total-o.conHuerto;
+ h+=blk('#2F6E3F','Avance de captura','Hectareas y arboles registrados por Rocio',o.conHuerto+' / '+o.total,[
+  ['Con datos de huerto','Su potencial se calcula con cifras reales',o.conHuerto],
+  ['Pendientes','Se estiman con 10 ha mientras tanto',falta]
+ ]);
+ return h;
+};
+function pintarMonitor(){
+ var el=document.getElementById('tab-monitor'); if(!el) return;
+ el.innerHTML=window.austarMonitorHTML();
+}
+function engancharMon(){
+ var orig=window.renderMonitor;
+ if(typeof orig!=='function') return false;
+ if(orig.__austarMon) return true;
+ var w=function(){ try{ pintarMonitor(); }catch(e){ console.error('monitor:',e); try{ orig.apply(this,arguments); }catch(e2){} } };
+ w.__austarMon=true; window.renderMonitor=w; return true;
+}
+if(document.readyState==='complete'){ engancharMon(); } else { window.addEventListener('load', engancharMon); }
+setInterval(engancharMon, 1200);
 })();
 </script>
 </head>
