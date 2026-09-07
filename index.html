@@ -721,7 +721,49 @@ body,#app,#main{background:#F4F8F2!important}
 </style>
 
 <script src="clients_data.js"></script>
-<script src="ventas_data.js"></script><link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="ventas_data.js"></script>
+<script>
+/* AUSTAR - TABLA DE PRECIOS 2026 */
+(function(){
+/* Precio publico general, pago en una sola exhibicion, por presentacion.
+   Distribuidor: mas de 1500 L en el anio. */
+window.AUSTAR_PRECIOS={
+ rangos:[
+  {min:150, max:Infinity, garrafa:1477, litro:1577, etq:'150 L o mas'},
+  {min:100, max:149,      garrafa:1777, litro:1877, etq:'100 a 149 L'},
+  {min:0,   max:99,       garrafa:1977, litro:2077, etq:'1 a 99 L'}
+ ],
+ distribuidor:1250,
+ umbralDistribuidor:1500,
+ campanas:[{id:'mango-occidente',etq:'Campana mango occidente',precio:1450,estados:['NAYARIT','COLIMA'],cultivos:['MANGO'],activa:false}]
+};
+function N(s){ s=s||''; try{ s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,''); }catch(e){} return s.toUpperCase().trim(); }
+window.austarPrecio=function(litros, presentacion, opts){
+ opts=opts||{};
+ var P=window.AUSTAR_PRECIOS, L=+litros||0;
+ if(opts.distribuidor || L>=P.umbralDistribuidor) return {precio:P.distribuidor, etq:'Distribuidor', rango:'>'+P.umbralDistribuidor+' L'};
+ if(opts.estado && opts.cultivo){
+  for(var i=0;i<P.campanas.length;i++){ var c=P.campanas[i];
+   if(!c.activa) continue;
+   if(c.estados.indexOf(N(opts.estado))>-1 && c.cultivos.indexOf(N(opts.cultivo))>-1)
+    return {precio:c.precio, etq:c.etq, rango:'campana'};
+  }
+ }
+ var esGarrafa = (+presentacion===5) || (opts.presentacion==='garrafa');
+ for(var j=0;j<P.rangos.length;j++){ var r=P.rangos[j];
+  if(L>=r.min && L<=r.max) return {precio: esGarrafa?r.garrafa:r.litro, etq:r.etq+(esGarrafa?' garrafa':' litro'), rango:r.etq};
+ }
+ var u=P.rangos[P.rangos.length-1];
+ return {precio: esGarrafa?u.garrafa:u.litro, etq:u.etq, rango:u.etq};
+};
+/* Valor de un volumen aplicando la tabla */
+window.austarValor=function(litros, opts){
+ var p=window.austarPrecio(litros, (opts&&opts.presentacion)||5, opts);
+ return (+litros||0)*p.precio;
+};
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,300..800&display=swap" rel="stylesheet">
 <style id="austar-restyle">
@@ -834,6 +876,7 @@ window.austarPanelCal=function(mi){
  function lha(cul){ return (typeof window.austarEsFrutal==='function'&&window.austarEsFrutal(cul)) ? DENS*ML/1000 : 0.125; }
  function esF(cul){ return (typeof window.austarEsFrutal==='function') && window.austarEsFrutal(cul); }
  function mx(x){ try{return '$'+Math.round(x).toLocaleString('es-MX');}catch(e){return '$'+Math.round(x);} }
+ function valorL(L){ return (typeof window.austarValor==='function') ? window.austarValor(L,{presentacion:5}) : L*P; }
  var E={}, totL=0, totC=0, totP=0, totS=0;
  for(var k in r.b){ var q=k.split('|'), acc=q[0], est=q[1], cul=q[2], n=r.b[k];
   E[est]=E[est]||{C:0,P:0,S:0,D:0,L:0,cult:{}};
@@ -864,7 +907,7 @@ window.austarPanelCal=function(mi){
  h+='<div class="met" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;background:none;border:none;box-shadow:none;padding:0 !important;margin-bottom:14px;">';
  h+='<div class="met"><div class="mv" style="color:var(--green)">'+totC+'</div><div class="ml">En ventana de cierre</div></div>';
  h+='<div class="met"><div class="mv">'+Math.round(totL).toLocaleString('es-MX')+' L</div><div class="ml">Potencial del mes</div></div>';
- h+='<div class="met"><div class="mv" style="color:var(--amber)">'+mx(totL*P)+'</div><div class="ml">Valor a precio de lista</div></div>';
+ h+='<div class="met"><div class="mv" style="color:var(--amber)">'+mx(valorL(totL))+'</div><div class="ml">Valor estimado</div></div>';
  var pct=(conDato+sinDato)>0?Math.round(conDato/(conDato+sinDato)*100):0;
  var colD=pct>=70?'var(--green)':(pct>=30?'var(--amber)':'var(--red)');
  h+='<div class="met"><div class="mv" style="color:'+colD+'">'+pct+'%</div><div class="ml">Con datos de huerto</div></div>';
@@ -879,7 +922,7 @@ window.austarPanelCal=function(mi){
   h+='<span style="text-align:right;color:var(--text2);">'+o.P+'</span>';
   h+='<span style="text-align:right;color:var(--text2);">'+o.S+'</span>';
   h+='<span style="text-align:right;font-weight:650;">'+Math.round(o.L).toLocaleString('es-MX')+' L</span>';
-  h+='<span style="text-align:right;font-weight:700;color:var(--green);">'+mx(o.L*P)+'</span>';
+  h+='<span style="text-align:right;font-weight:700;color:var(--green);">'+mx(valorL(o.L))+'</span>';
   h+='<span id="'+id+'-f" style="text-align:center;color:var(--text3);">&rsaquo;</span></div>';
   h+='<div id="'+id+'" style="display:none;border-top:1px solid var(--border);background:var(--bg);">';
   var cs=Object.keys(o.cult).sort(function(a,b){return o.cult[b].L-o.cult[a].L;});
@@ -889,7 +932,7 @@ window.austarPanelCal=function(mi){
    h+='<span style="font-weight:600;">'+cu+pill+'</span>';
    h+='<span style="text-align:right;">'+z.C+'</span><span style="text-align:right;color:var(--text2);">'+z.P+'</span><span style="text-align:right;color:var(--text2);">'+z.S+'</span>';
    h+='<span style="text-align:right;font-weight:600;">'+Math.round(z.L).toLocaleString('es-MX')+' L</span>';
-   h+='<span style="text-align:right;font-weight:600;">'+mx(z.L*P)+'</span>';
+   h+='<span style="text-align:right;font-weight:600;">'+mx(valorL(z.L))+'</span>';
    h+='<span data-est="'+e+'" data-cul="'+cu+'" onclick="austarVerClientes(this.dataset.est,this.dataset.cul,'+mi+')" style="text-align:center;color:var(--green);font-weight:700;cursor:pointer;">+</span></div>';
   }
   h+='</div></div>';
@@ -1160,7 +1203,7 @@ window.austarCertDatos=function(){
   else { dosis=150*mlArb/1000; litros=dosis*ha; }
  } else { dosis=DOSIS_GRANO; litros=dosis*ha; }
  var invCap=n('cert-inv-austar');
- var invSug=litros*PRECIO_L;
+ var invSug=(typeof window.austarValor==='function')?window.austarValor(litros,{presentacion:(litros>=5?5:1)}):litros*PRECIO_L;
  var inv=invCap>0?invCap:invSug;
  var sin=n('cert-rend-sin'), con=n('cert-rend-con'), pt=n('cert-precio-ton');
  var dton=(con-sin);
@@ -1334,7 +1377,8 @@ window.austarHuertoCalc=function(id){
  var litros=0, dens=0;
  if(fr){ if(arb>0){ litros=arb*ml/1000; dens=ha>0?arb/ha:0; } else if(ha>0){ litros=ha*150*ml/1000; } }
  else { litros=ha*0.125; }
- return {frutal:fr,ha:ha,arb:arb,alt:alt,copa:copa,primera:primera,edad:edad,ml:ml,litros:litros,dens:dens,valor:litros*PRECIO_L};
+ var val=(typeof window.austarValor==='function')?window.austarValor(litros,{presentacion:5}):litros*PRECIO_L;
+ return {frutal:fr,ha:ha,arb:arb,alt:alt,copa:copa,primera:primera,edad:edad,ml:ml,litros:litros,dens:dens,valor:val};
 };
 window.austarHuertoResumen=function(id){
  var r=window.austarHuertoCalc(id), el=document.getElementById('hu-res'); if(!el) return;
