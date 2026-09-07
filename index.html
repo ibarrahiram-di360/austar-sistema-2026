@@ -763,6 +763,108 @@ window.austarValor=function(litros, opts){
 };
 })();
 </script>
+<script>
+/* AUSTAR - REGISTRO DIARIO DE VENTA */
+(function(){
+var KEY='austar_ventas_manual';
+function leer(){ try{ return JSON.parse(localStorage.getItem(KEY)||'[]'); }catch(e){ return []; } }
+function guardar(a){ try{ localStorage.setItem(KEY, JSON.stringify(a)); return true; }catch(e){ return false; } }
+function val(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }
+function num(id){ var v=parseFloat(String(val(id)).replace(/[^0-9.]/g,'')); return isFinite(v)?v:0; }
+function mxn(x){ try{ return '$'+Math.round(x).toLocaleString('es-MX'); }catch(e){ return '$'+Math.round(x); } }
+window.austarVentasManual=leer;
+/* Todas las ventas: historico + capturadas */
+window.austarTodasVentas=function(){
+ var h=(window.VENTAS||[]).slice();
+ var m=leer();
+ for(var i=0;i<m.length;i++){ var s=m[i];
+  h.push({cliente:s.cliente,razon:'',fecha:s.fecha,cultivo:s.cultivo,municipio:s.municipio||'',
+   estado:s.estado,litros:s.litros,presentacion:s.presentacion,precio:s.precio,
+   mxn:s.litros*s.precio,anio:+String(s.fecha).slice(0,4),mes:(+String(s.fecha).slice(5,7))-1,
+   sinFecha:!s.fecha, manual:true, id:s.id});
+ }
+ return h;
+};
+window.austarPrecioSugerido=function(){
+ var L=num('rv-litros'), pres=val('rv-pres')==='garrafa'?5:1;
+ var est=val('rv-estado'), cul=val('rv-cultivo');
+ var dist=document.getElementById('rv-dist');
+ var r=(typeof window.austarPrecio==='function')?window.austarPrecio(L,pres,{estado:est,cultivo:cul,distribuidor:(dist&&dist.checked)}):{precio:0,etq:''};
+ var pe=document.getElementById('rv-precio');
+ if(pe && !pe.dataset.manual) pe.value=r.precio;
+ var info=document.getElementById('rv-info');
+ if(info){ var p=pe?(+pe.value||r.precio):r.precio;
+  info.innerHTML = L>0 ? ('Rango: <b>'+r.etq+'</b> &middot; '+L+' L x '+mxn(p)+' = <b>'+mxn(L*p)+'</b>') : 'Captura los litros para calcular el precio.'; }
+};
+window.austarGuardarVenta=function(){
+ try{
+  var cli=val('rv-cliente'), cul=val('rv-cultivo'), est=val('rv-estado');
+  var L=num('rv-litros'), pr=num('rv-precio'), f=val('rv-fecha');
+  if(!cli){ alert('Captura el nombre del cliente.'); return; }
+  if(!L){ alert('Captura los litros.'); return; }
+  if(!est){ alert('Captura el estado.'); return; }
+  if(!f) f=new Date().toISOString().slice(0,10);
+  var a=leer();
+  a.push({id:'v'+Date.now(), cliente:cli, cultivo:cul||'SIN CULTIVO', estado:est,
+   municipio:val('rv-mun'), litros:L, presentacion:(val('rv-pres')==='garrafa'?5:1),
+   precio:pr, fecha:f, capturado:new Date().toISOString()});
+  guardar(a);
+  ['rv-cliente','rv-cultivo','rv-mun','rv-litros'].forEach(function(id){ var e=document.getElementById(id); if(e)e.value=''; });
+  var pe=document.getElementById('rv-precio'); if(pe){ pe.value=''; delete pe.dataset.manual; }
+  if(typeof window.austarSetMes==='function'){ var mi=(typeof window.AUSTAR_MES==='number')?window.AUSTAR_MES:new Date().getMonth(); window.austarSetMes(mi); }
+  alert('Venta registrada: '+L+' L de '+(cul||'sin cultivo')+' en '+est+'.');
+ }catch(e){ alert('No se pudo guardar: '+e.message); }
+};
+window.austarBorrarVenta=function(id){
+ if(!confirm('Eliminar este registro de venta?')) return;
+ var a=leer().filter(function(x){ return x.id!==id; });
+ guardar(a);
+ if(typeof window.austarSetMes==='function'){ var mi=(typeof window.AUSTAR_MES==='number')?window.AUSTAR_MES:new Date().getMonth(); window.austarSetMes(mi); }
+};
+window.austarFormVenta=function(mi){
+ var hoy=new Date().toISOString().slice(0,10);
+ var st='width:100%;font-family:inherit;font-size:15px;padding:9px 11px;border:1px solid var(--border);border-radius:7px;background:var(--bg2);color:var(--text);';
+ var lb='font-size:12.5px;color:var(--text3);margin-bottom:5px;font-weight:600;';
+ var oi='oninput="austarPrecioSugerido()"', oc='onchange="austarPrecioSugerido()"';
+ var h='<div class="card" style="margin-bottom:14px;">';
+ h+='<div class="ct">Registrar venta</div>';
+ h+='<div style="font-size:13px;color:var(--text3);margin-bottom:14px;">El precio se calcula solo con la tabla por volumen. Puedes escribir encima.</div>';
+ h+='<div style="display:grid;grid-template-columns:2fr 1.2fr 1.2fr;gap:10px;margin-bottom:10px;">';
+ h+='<div><div style="'+lb+'">Cliente</div><input id="rv-cliente" style="'+st+'" placeholder="Nombre del productor"></div>';
+ h+='<div><div style="'+lb+'">Cultivo</div><input id="rv-cultivo" style="'+st+'" placeholder="Aguacate" '+oi+'></div>';
+ h+='<div><div style="'+lb+'">Estado</div><input id="rv-estado" style="'+st+'" placeholder="Michoacan" '+oi+'></div>';
+ h+='</div>';
+ h+='<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1.1fr;gap:10px;margin-bottom:10px;">';
+ h+='<div><div style="'+lb+'">Municipio</div><input id="rv-mun" style="'+st+'" placeholder="Uruapan"></div>';
+ h+='<div><div style="'+lb+'">Litros</div><input id="rv-litros" type="number" style="'+st+'" placeholder="0" '+oi+'></div>';
+ h+='<div><div style="'+lb+'">Presentacion</div><select id="rv-pres" style="'+st+'" '+oc+'><option value="garrafa">Garrafa 5 L</option><option value="litro">Litro</option></select></div>';
+ h+='<div><div style="'+lb+'">Precio / L</div><input id="rv-precio" type="number" style="'+st+'" oninput="this.dataset.manual=1;austarPrecioSugerido()"></div>';
+ h+='<div><div style="'+lb+'">Fecha</div><input id="rv-fecha" type="date" style="'+st+'" value="'+hoy+'"></div>';
+ h+='</div>';
+ h+='<label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--text2);margin-bottom:12px;cursor:pointer;"><input type="checkbox" id="rv-dist" '+oc+'> Distribuidor (precio $1,250)</label>';
+ h+='<div id="rv-info" style="font-size:14px;color:var(--text2);background:var(--bg3);border-radius:7px;padding:11px 14px;margin-bottom:12px;">Captura los litros para calcular el precio.</div>';
+ h+='<button class="btn btn-g" onclick="austarGuardarVenta()">Registrar venta</button>';
+ var m=leer().filter(function(s){ return (+String(s.fecha).slice(5,7))-1===mi; });
+ if(m.length){
+  var tot=m.reduce(function(a,x){return a+x.litros;},0);
+  h+='<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">';
+  h+='<div style="font-size:13.5px;color:var(--text3);margin-bottom:8px;">Capturado este mes: <b style="color:var(--text)">'+tot+' L</b> en '+m.length+' registro'+(m.length>1?'s':'')+'</div>';
+  for(var i=m.length-1;i>=0 && i>=m.length-5;i--){ var s=m[i];
+   h+='<div style="display:grid;grid-template-columns:1fr 130px 90px 90px 30px;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg3);font-size:14.5px;align-items:center;">';
+   h+='<span><b>'+s.cliente+'</b> <span style="color:var(--text3);font-size:13px;">'+(s.cultivo||'')+'</span></span>';
+   h+='<span style="color:var(--text2);font-size:13.5px;">'+s.estado+'</span>';
+   h+='<span style="text-align:right;font-weight:650;">'+s.litros+' L</span>';
+   h+='<span style="text-align:right;">'+mxn(s.litros*s.precio)+'</span>';
+   h+='<span data-id="'+s.id+'" onclick="austarBorrarVenta(this.dataset.id)" style="text-align:center;color:var(--red);cursor:pointer;font-weight:700;">&times;</span></div>';
+  }
+  h+='</div>';
+ }
+ h+='</div>';
+ return h;
+};
+})();
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,300..800&display=swap" rel="stylesheet">
@@ -893,6 +995,7 @@ window.austarPanelCal=function(mi){
  }
  var ests=Object.keys(E).sort(function(a,b){return E[b].L-E[a].L;});
  var h='';
+ if(typeof window.austarFormVenta==='function'){ h+=window.austarFormVenta(mi); }
  h+='<div class="card" style="margin-bottom:14px;"><div class="ct">Calendario operativo &middot; '+MN[mi]+' 2026</div>';
  h+='<div style="font-size:14px;color:var(--text2);margin-bottom:14px;">'+r.cub+' de '+(r.cub+r.fuera)+' clientes con accion definida &middot; captura: Rocio</div>';
  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;">';
@@ -1573,7 +1676,7 @@ function claveMes(y,m){ return 'as_plan_'+y+'_'+m; }
 function norm(s){ s=s||''; try{ s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,''); }catch(e){} return s.toUpperCase().trim(); }
 window.austarRealMes=function(y,mi){
  var out={}, tot=0;
- var V=window.VENTAS||[];
+ var V=(typeof window.austarTodasVentas==='function')?window.austarTodasVentas():(window.VENTAS||[]);
  for(var i=0;i<V.length;i++){ var s=V[i];
   if(s.sinFecha) continue;
   if(s.anio!==y || s.mes!==mi) continue;
