@@ -1613,6 +1613,117 @@ if(document.readyState==='complete'){ engancharPlan(); } else { window.addEventL
 setInterval(engancharPlan, 1200);
 })();
 </script>
+
+<script>
+/* AUSTAR - LATAM: detalle de pais (openLatamDet no existia) */
+(function(){
+function pais(id){ try{ var L=window.LATAM_PAISES||[]; for(var i=0;i<L.length;i++){ if(L[i].id===id) return L[i]; } }catch(e){} return null; }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+var EST={prospecto:{t:'Prospecto',c:'#B6C4B8'},negociacion:{t:'En negociacion',c:'#D8AE3C'},activo:{t:'Activo',c:'#2F6E3F'},pausado:{t:'Pausado',c:'#B04A24'}};
+window.openLatamDet=function(pid){
+ try{
+  var p=pais(pid); if(!p){ alert('Pais no encontrado: '+pid); return; }
+  window.CURRENT_LATAM=pid;
+  if(typeof gotoTab==='function') gotoTab('latam-det');
+  var t=document.getElementById('ldet-ttl');
+  if(t){ var b=(typeof window.BANDERA==='function')?window.BANDERA(pid):''; t.innerHTML=b+' '+esc(p.pais); }
+  pintarDet(pid);
+ }catch(e){ alert('No se pudo abrir el pais: '+e.message); }
+};
+function pintarDet(pid){
+ var el=document.getElementById('ldet-body'); if(!el) return;
+ var p=pais(pid);
+ var dat=(typeof getLatamData==='function')?getLatamData(pid):{};
+ var notas=(typeof getLatamNotes==='function')?getLatamNotes(pid):[];
+ var pros=(typeof getLatamProspectos==='function')?getLatamProspectos(pid):[];
+ var st=(typeof getLatamStatus==='function')?getLatamStatus(pid):'prospecto';
+ var e=EST[st]||EST.prospecto;
+ var inp='width:100%;font-family:inherit;font-size:15px;padding:9px 11px;border:1px solid var(--border);border-radius:7px;background:var(--bg2);color:var(--text);';
+ var lb='font-size:12.5px;color:var(--text3);margin-bottom:5px;font-weight:600;';
+ var h='';
+ h+='<div class="card" style="margin-bottom:14px;">';
+ h+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">';
+ h+='<div class="ct">'+esc(p.pais)+'</div>';
+ h+='<span style="font-size:12.5px;font-weight:600;padding:3px 11px;border-radius:20px;background:'+e.c+'22;color:'+e.c+';">'+e.t+'</span>';
+ h+='<span style="font-size:13.5px;color:var(--text3);">'+esc(p.region||'')+'</span>';
+ h+='<select id="ld-st" onchange="austarLatamEstado()" style="margin-left:auto;'+inp+'width:auto;">';
+ for(var k in EST){ h+='<option value="'+k+'"'+(k===st?' selected':'')+'>'+EST[k].t+'</option>'; }
+ h+='</select></div>';
+ h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">';
+ h+='<div><div style="'+lb+'">Distribuidor</div><input id="ld-dist" style="'+inp+'" value="'+esc(dat.distribuidor||p.distribuidor||'')+'"></div>';
+ h+='<div><div style="'+lb+'">Contacto</div><input id="ld-cont" style="'+inp+'" value="'+esc(dat.contacto||p.contacto||'')+'"></div>';
+ h+='</div>';
+ h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">';
+ h+='<div><div style="'+lb+'">Telefono</div><input id="ld-tel" style="'+inp+'" value="'+esc(dat.tel||p.tel||'')+'"></div>';
+ h+='<div><div style="'+lb+'">Litros comprometidos</div><input id="ld-lit" type="number" style="'+inp+'" value="'+esc(dat.litros||'')+'"></div>';
+ h+='<div><div style="'+lb+'">Registro sanitario</div><input id="ld-reg" style="'+inp+'" value="'+esc(dat.registro||'')+'" placeholder="Ej. ICA PL0007722023"></div>';
+ h+='</div>';
+ h+='<div style="'+lb+'">Cultivos objetivo</div><div style="margin-bottom:12px;">';
+ var cs=p.cultivos||[]; for(var i=0;i<cs.length;i++){ h+='<span style="display:inline-block;font-size:13px;font-weight:600;padding:3px 11px;border-radius:20px;background:#E8F1E9;color:#2F6E3F;margin:0 6px 6px 0;">'+esc(cs[i])+'</span>'; }
+ if(!cs.length) h+='<span style="font-size:14px;color:var(--text3);">Sin cultivos definidos</span>';
+ h+='</div>';
+ h+='<div style="'+lb+'">Notas del mercado</div>';
+ h+='<textarea id="ld-notas" style="'+inp+'min-height:80px;resize:vertical;">'+esc(dat.notas||p.notas||'')+'</textarea>';
+ h+='<button class="btn btn-g" style="margin-top:12px;" onclick="austarLatamGuardar()">Guardar cambios</button>';
+ h+='</div>';
+ h+='<div class="card" style="padding:0 !important;overflow:hidden;margin-bottom:14px;">';
+ h+='<div style="display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--border);">';
+ h+='<div class="ct">Prospectos</div><span style="font-size:24px;font-weight:700;margin-left:auto;color:var(--green);">'+pros.length+'</span>';
+ if(typeof addLatamProspecto==="function") h+='<button class="btn" onclick="addLatamProspecto(\''+pid+'\')">+ Agregar</button>';
+ h+='</div>';
+ for(var j=0;j<pros.length;j++){ var q=pros[j];
+  h+='<div onclick="openLatamProspecto(\''+pid+'\',\''+esc(q.id)+'\')" style="display:grid;grid-template-columns:1fr 170px 120px;gap:12px;padding:12px 20px;border-bottom:1px solid var(--bg3);font-size:15px;cursor:pointer;align-items:center;">';
+  h+='<span><b>'+esc(q.nombre||q.empresa||'(sin nombre)')+'</b>'+(q.empresa&&q.nombre?'<br><span style="font-size:13px;color:var(--text3);">'+esc(q.empresa)+'</span>':'')+'</span>';
+  h+='<span style="color:var(--text2);font-size:14px;">'+esc(q.tel||q.email||'')+'</span>';
+  h+='<span style="font-size:13.5px;font-weight:600;">'+esc(q.estatus||q.status||'')+'</span></div>';
+ }
+ if(!pros.length) h+='<div style="padding:16px 20px;font-size:14px;color:var(--text3);">Aun no hay prospectos registrados en este mercado.</div>';
+ h+='</div>';
+ h+='<div class="card">';
+ h+='<div class="ct" style="margin-bottom:10px;">Bitacora</div>';
+ h+='<div style="display:flex;gap:10px;margin-bottom:14px;"><input id="ld-nueva" style="'+inp+'" placeholder="Escribe un avance y presiona Agregar">';
+ h+='<button class="btn btn-g" style="white-space:nowrap;" onclick="austarLatamNota()">Agregar</button></div>';
+ if(!notas.length) h+='<div style="font-size:14px;color:var(--text3);">Sin registros todavia.</div>';
+ for(var n2=notas.length-1;n2>=0;n2--){ var nt=notas[n2];
+  h+='<div style="border-left:2px solid var(--border);padding:8px 14px;margin-bottom:8px;font-size:14.5px;">';
+  h+='<div style="font-size:12.5px;color:var(--text3);margin-bottom:3px;">'+esc(nt.fecha||nt.f||'')+'</div>'+esc(nt.texto||nt.t||nt)+'</div>';
+ }
+ h+='</div>';
+ el.innerHTML=h;
+}
+function val(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }
+window.austarLatamGuardar=function(){
+ try{
+  var pid=window.CURRENT_LATAM; if(!pid) return;
+  var d=(typeof getLatamData==='function')?getLatamData(pid):{};
+  d.distribuidor=val('ld-dist'); d.contacto=val('ld-cont'); d.tel=val('ld-tel');
+  d.litros=val('ld-lit'); d.registro=val('ld-reg'); d.notas=val('ld-notas');
+  d.actualizado=new Date().toISOString().slice(0,10);
+  if(typeof saveLatamData==='function') saveLatamData(pid,d);
+  var b=document.querySelector('#ldet-body .btn-g');
+  if(b){ var t=b.textContent; b.textContent='Guardado'; setTimeout(function(){ b.textContent=t; },1600); }
+  if(typeof renderLatam==='function'){ try{ renderLatam(); }catch(e){} }
+ }catch(e){ alert('No se pudo guardar: '+e.message); }
+};
+window.austarLatamEstado=function(){
+ try{
+  var pid=window.CURRENT_LATAM, s=val('ld-st');
+  if(pid && s && typeof setLatamStatus==='function'){ setLatamStatus(pid,s); pintarDet(pid);
+   if(typeof renderLatam==='function'){ try{ renderLatam(); }catch(e){} } }
+ }catch(e){}
+};
+window.austarLatamNota=function(){
+ try{
+  var pid=window.CURRENT_LATAM, txt=val('ld-nueva');
+  if(!pid||!txt) return;
+  var n=(typeof getLatamNotes==='function')?getLatamNotes(pid):[];
+  n.push({fecha:new Date().toISOString().slice(0,10), texto:txt});
+  if(typeof saveLatamNotes==='function') saveLatamNotes(pid,n);
+  pintarDet(pid);
+ }catch(e){ alert('No se pudo agregar: '+e.message); }
+};
+})();
+</script>
 </head>
 <body>
 
