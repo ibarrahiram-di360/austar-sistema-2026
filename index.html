@@ -923,12 +923,30 @@ function pintar(){
  var mi=(typeof window.AUSTAR_MES==='number')?window.AUSTAR_MES:new Date().getMonth();
  var w=document.createElement('div');w.id='austar-cal-panel';
  w.innerHTML=window.austarPanelCal(mi);el.insertBefore(w,el.firstChild);}
-var orig=window.renderCalendario;
-window.renderCalendario=function(){
- if(typeof orig==='function'){try{orig.apply(this,arguments);}catch(e){console.error(e);}}
- try{pintar();}catch(e){console.error('panel cal:',e);}
-};
+function enganchar(){
+ var orig=window.renderCalendario;
+ if(typeof orig!=='function') return false;
+ if(orig.__austar) return true;
+ var w=function(){
+  try{ orig.apply(this,arguments); }catch(e){ console.error(e); }
+  try{ pintar(); }catch(e){ console.error('panel cal:',e); }
+ };
+ w.__austar=true;
+ window.renderCalendario=w;
+ return true;
+}
+if(document.readyState==='complete'){ enganchar(); } else { window.addEventListener('load', enganchar); }
+setInterval(function(){
+ try{
+  enganchar();
+  var el=document.getElementById('tab-calendario');
+  if(!el) return;
+  var visible=(el.offsetParent!==null)||(getComputedStyle(el).display!=='none');
+  if(visible && !document.getElementById('austar-cal-panel')) pintar();
+ }catch(e){}
+}, 900);
 })();
+
 </script>
 
 <script>
