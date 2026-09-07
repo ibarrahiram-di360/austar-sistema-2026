@@ -720,7 +720,8 @@ body,#app,#main{background:#F4F8F2!important}
 .cert-wrapper{background:linear-gradient(135deg,#0a4d3c 0%,#1a7f64 100%);padding:20px;border-radius:12px;}
 </style>
 
-<script src="clients_data.js"></script><link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="clients_data.js"></script>
+<script src="ventas_data.js"></script><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,300..800&display=swap" rel="stylesheet">
 <style id="austar-restyle">
@@ -1524,6 +1525,19 @@ function litros(id,cul){
  return fr ? (HA*DENS*ML/1000) : (HA*0.125);
 }
 function claveMes(y,m){ return 'as_plan_'+y+'_'+m; }
+function norm(s){ s=s||''; try{ s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,''); }catch(e){} return s.toUpperCase().trim(); }
+window.austarRealMes=function(y,mi){
+ var out={}, tot=0;
+ var V=window.VENTAS||[];
+ for(var i=0;i<V.length;i++){ var s=V[i];
+  if(s.sinFecha) continue;
+  if(s.anio!==y || s.mes!==mi) continue;
+  var e=norm(s.estado);
+  out[e]=(out[e]||0)+s.litros; tot+=s.litros;
+ }
+ out.__total=tot;
+ return out;
+};
 window.austarPlanLeer=function(y,m){ try{ return JSON.parse(localStorage.getItem(claveMes(y,m))||'{}'); }catch(e){ return {}; } };
 window.austarPlanGuardar=function(y,m,est,campo,valor){
  try{ var o=window.austarPlanLeer(y,m); o[est]=o[est]||{}; o[est][campo]=valor;
@@ -1548,9 +1562,10 @@ window.austarPlanDatos=function(mi){
 window.austarPlannerHTML=function(mi,y){
  var d=window.austarPlanDatos(mi), plan=window.austarPlanLeer(y,mi), h='';
  var objT=0, realT=0;
+ var RM=window.austarRealMes(y,mi);
  for(var i=0;i<d.ests.length;i++){ var e=d.ests[i], pl=plan[e]||{};
   objT += (pl.obj!=null?+pl.obj:Math.round(d.E[e].L*0.6));
-  realT += (+pl.real||0); }
+  realT += (pl.real!=null?+pl.real:Math.round(RM[norm(e)]||0)); }
  var pct=objT>0?Math.round(realT/objT*100):0;
  h+='<div class="page-header"><div class="page-title">Planner mensual</div><div class="page-sub">'+MN[mi]+' '+y+' &middot; objetivo por estado, sugerido desde el calendario</div></div>';
  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;">';
@@ -1569,7 +1584,9 @@ window.austarPlannerHTML=function(mi,y){
  h+='<span>Estado</span><span style="text-align:right">Cierre</span><span style="text-align:right">Prospec.</span><span style="text-align:right">Seguim.</span><span style="text-align:right">Potencial</span><span style="text-align:right">Objetivo L</span><span style="text-align:right">Real L</span><span style="text-align:right">Avance</span></div>';
  for(var i=0;i<d.ests.length;i++){
   var e=d.ests[i], o=d.E[e], pl=plan[e]||{};
-  var obj=(pl.obj!=null?+pl.obj:Math.round(o.L*0.6)), real=(+pl.real||0);
+  var obj=(pl.obj!=null?+pl.obj:Math.round(o.L*0.6));
+  var auto=Math.round(RM[norm(e)]||0);
+  var real=(pl.real!=null?+pl.real:auto);
   var av=obj>0?Math.min(Math.round(real/obj*100),999):0;
   var col=av>=100?'var(--green)':(av>=50?'var(--amber)':'#B6C4B8');
   var st='width:92px;font-family:inherit;font-size:15px;padding:7px 9px;border:1px solid var(--border);border-radius:6px;text-align:right;background:var(--bg2);color:var(--text);';
