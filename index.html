@@ -1503,6 +1503,116 @@ if(document.readyState==='complete'){ engancharMon(); } else { window.addEventLi
 setInterval(engancharMon, 1200);
 })();
 </script>
+
+<script>
+/* AUSTAR - PLANNER MENSUAL: metas por estado ligadas al calendario */
+(function(){
+var P=1577, HA=10, ML=21, DENS=150;
+var MN=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var M=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+function ex(id){ try{ return (typeof getExtra==='function')?getExtra(id):JSON.parse(localStorage.getItem('as_ex_'+id)||'{}'); }catch(e){ return {}; } }
+function mxn(x){ try{ return '$'+Math.round(x).toLocaleString('es-MX'); }catch(e){ return '$'+Math.round(x); } }
+function esF(c){ return (typeof window.austarEsFrutal==='function') && window.austarEsFrutal(c); }
+function litros(id,cul){
+ var fr=esF(cul), o=ex(id)||{}, ha=+o.ha||0, arb=+o.arboles||0;
+ if(ha>0||arb>0){
+  if(fr){ var alt=+o.altura||5.5, copa=+o.copa||5;
+   var ml=((alt+copa)*2)*(1+(o.primera==='si'?0.2:0)+(o.edad==='viejo'?0.2:0));
+   return arb>0 ? arb*ml/1000 : ha*DENS*ml/1000; }
+  return ha*0.125;
+ }
+ return fr ? (HA*DENS*ML/1000) : (HA*0.125);
+}
+function claveMes(y,m){ return 'as_plan_'+y+'_'+m; }
+window.austarPlanLeer=function(y,m){ try{ return JSON.parse(localStorage.getItem(claveMes(y,m))||'{}'); }catch(e){ return {}; } };
+window.austarPlanGuardar=function(y,m,est,campo,valor){
+ try{ var o=window.austarPlanLeer(y,m); o[est]=o[est]||{}; o[est][campo]=valor;
+  localStorage.setItem(claveMes(y,m), JSON.stringify(o)); return true; }catch(e){ return false; }
+};
+window.austarPlanDatos=function(mi){
+ var r=window.austarCruce(mi), E={}, tot={C:0,P:0,S:0,L:0};
+ for(var k in r.b){ var q=k.split('|'), acc=q[0], est=q[1], cul=q[2], n=r.b[k];
+  E[est]=E[est]||{C:0,P:0,S:0,D:0,L:0};
+  E[est][acc]+=n;
+  if(acc==='C'){ tot.C+=n;
+   var L=0, lst=(r.ids&&r.ids[k])||[];
+   if(lst.length){ for(var z=0;z<lst.length;z++) L+=litros(lst[z],cul); }
+   else { L=(esF(cul)?HA*DENS*ML/1000:HA*0.125)*n; }
+   E[est].L+=L; tot.L+=L;
+  }
+  if(acc==='P')tot.P+=n; if(acc==='S')tot.S+=n;
+ }
+ var ests=Object.keys(E).sort(function(a,b){return E[b].L-E[a].L;});
+ return {E:E, ests:ests, tot:tot};
+};
+window.austarPlannerHTML=function(mi,y){
+ var d=window.austarPlanDatos(mi), plan=window.austarPlanLeer(y,mi), h='';
+ var objT=0, realT=0;
+ for(var i=0;i<d.ests.length;i++){ var e=d.ests[i], pl=plan[e]||{};
+  objT += (pl.obj!=null?+pl.obj:Math.round(d.E[e].L*0.6));
+  realT += (+pl.real||0); }
+ var pct=objT>0?Math.round(realT/objT*100):0;
+ h+='<div class="page-header"><div class="page-title">Planner mensual</div><div class="page-sub">'+MN[mi]+' '+y+' &middot; objetivo por estado, sugerido desde el calendario</div></div>';
+ h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;">';
+ for(var m=0;m<12;m++){ var on=(m===mi);
+  h+='<button onclick="austarPlanMes('+m+')" style="flex:1;min-width:60px;background:'+(on?'#F2F7F1':'var(--bg2)')+';border:1px solid '+(on?'#2F6E3F':'var(--border)')+';border-radius:7px;padding:9px 4px;cursor:pointer;font-weight:'+(on?'700':'500')+';font-size:14px;color:var(--text);">'+M[m]+'</button>'; }
+ h+='</div>';
+ h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">';
+ h+='<div class="met"><div class="mv">'+Math.round(realT).toLocaleString('es-MX')+' L</div><div class="ml">Real del mes</div></div>';
+ h+='<div class="met"><div class="mv" style="color:var(--amber)">'+Math.round(objT).toLocaleString('es-MX')+' L</div><div class="ml">Objetivo del mes</div></div>';
+ h+='<div class="met"><div class="mv" style="color:'+(pct>=100?'var(--green)':(pct>=50?'var(--amber)':'var(--red)'))+'">'+pct+'%</div><div class="ml">Cumplimiento</div></div>';
+ h+='<div class="met"><div class="mv" style="color:var(--green)">'+Math.round(d.tot.L).toLocaleString('es-MX')+' L</div><div class="ml">Potencial en ventana</div></div>';
+ h+='</div>';
+ var G='display:grid;grid-template-columns:1fr 70px 78px 78px 96px 106px 106px 84px;gap:10px;align-items:center;';
+ h+='<div class="card" style="padding:0 !important;overflow:hidden;">';
+ h+='<div style="'+G+'padding:13px 20px;border-bottom:1.5px solid var(--border);font-size:12.5px;color:var(--text3);font-weight:600;">';
+ h+='<span>Estado</span><span style="text-align:right">Cierre</span><span style="text-align:right">Prospec.</span><span style="text-align:right">Seguim.</span><span style="text-align:right">Potencial</span><span style="text-align:right">Objetivo L</span><span style="text-align:right">Real L</span><span style="text-align:right">Avance</span></div>';
+ for(var i=0;i<d.ests.length;i++){
+  var e=d.ests[i], o=d.E[e], pl=plan[e]||{};
+  var obj=(pl.obj!=null?+pl.obj:Math.round(o.L*0.6)), real=(+pl.real||0);
+  var av=obj>0?Math.min(Math.round(real/obj*100),999):0;
+  var col=av>=100?'var(--green)':(av>=50?'var(--amber)':'#B6C4B8');
+  var st='width:92px;font-family:inherit;font-size:15px;padding:7px 9px;border:1px solid var(--border);border-radius:6px;text-align:right;background:var(--bg2);color:var(--text);';
+  h+='<div style="'+G+'padding:11px 20px;border-bottom:1px solid var(--bg3);font-size:15px;">';
+  h+='<span style="font-weight:600;">'+e+'</span>';
+  h+='<span style="text-align:right;font-weight:650;">'+o.C+'</span>';
+  h+='<span style="text-align:right;color:var(--text2);">'+o.P+'</span>';
+  h+='<span style="text-align:right;color:var(--text2);">'+o.S+'</span>';
+  h+='<span style="text-align:right;font-weight:600;">'+Math.round(o.L).toLocaleString('es-MX')+'</span>';
+  h+='<span style="text-align:right;"><input type="number" data-e="'+e+'" value="'+obj+'" style="'+st+'" onchange="austarPlanSet(this.dataset.e,\'obj\',this.value)"></span>';
+  h+='<span style="text-align:right;"><input type="number" data-e="'+e+'" value="'+real+'" style="'+st+'" onchange="austarPlanSet(this.dataset.e,\'real\',this.value)"></span>';
+  h+='<span style="text-align:right;"><span style="display:inline-block;min-width:44px;font-weight:650;color:'+col+';">'+av+'%</span></span>';
+  h+='</div>';
+ }
+ h+='</div>';
+ h+='<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid #D8AE3C;border-radius:8px;padding:15px 20px;margin-top:16px;font-size:14.5px;color:var(--text2);max-width:92ch;">';
+ h+='<b style="color:var(--text)">De donde sale el objetivo.</b> Cada cliente en ventana de cierre se multiplica por la dosis de su cultivo con los datos capturados en su ficha. El objetivo se sugiere al 60% de ese potencial y puedes escribir encima. Los cambios se guardan solos en este dispositivo.</div>';
+ return h;
+};
+window.austarPlanSet=function(est,campo,valor){
+ var mi=(typeof window.AUSTAR_PLAN_MES==='number')?window.AUSTAR_PLAN_MES:new Date().getMonth();
+ var y=window.AUSTAR_PLAN_ANIO||new Date().getFullYear();
+ window.austarPlanGuardar(y,mi,est,campo, (valor===''?null:+valor));
+ pintarPlanner();
+};
+window.austarPlanMes=function(m){ window.AUSTAR_PLAN_MES=m; pintarPlanner(); };
+function pintarPlanner(){
+ var el=document.getElementById('tab-planner'); if(!el) return;
+ var mi=(typeof window.AUSTAR_PLAN_MES==='number')?window.AUSTAR_PLAN_MES:new Date().getMonth();
+ var y=window.AUSTAR_PLAN_ANIO||new Date().getFullYear();
+ el.innerHTML=window.austarPlannerHTML(mi,y);
+}
+function engancharPlan(){
+ var orig=window.renderPlanner;
+ if(typeof orig!=='function') return false;
+ if(orig.__austarPlan) return true;
+ var w=function(){ try{ pintarPlanner(); }catch(e){ console.error('planner:',e); try{ orig.apply(this,arguments); }catch(e2){} } };
+ w.__austarPlan=true; window.renderPlanner=w; return true;
+}
+if(document.readyState==='complete'){ engancharPlan(); } else { window.addEventListener('load', engancharPlan); }
+setInterval(engancharPlan, 1200);
+})();
+</script>
 </head>
 <body>
 
