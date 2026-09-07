@@ -997,13 +997,27 @@ var FRUTALES=['aguacate','mango','limon','naranj','guayab','durazno','nogal','pa
 function K(s){s=s||'';try{s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');}catch(e){}return s.toLowerCase();}
 window.austarEsFrutal=function(cultivo){var k=K(cultivo);for(var i=0;i<FRUTALES.length;i++){if(k.indexOf(FRUTALES[i])>-1)return true;}return false;};
 window.austarDosisHa=function(cultivo){return window.austarEsFrutal(cultivo)?DOSIS_FRUTAL:DOSIS_GRANO;};
+window.austarMlArbol=function(alt,copa,primera,masDe10){
+ var base=((+alt||0)+(+copa||0))*2;
+ var f=1+(primera?0.2:0)+(masDe10?0.2:0);
+ return base*f;
+};
+
 function n(id){var e=document.getElementById(id);if(!e)return 0;var v=parseFloat(String(e.value).replace(/[^0-9.\-]/g,''));return isFinite(v)?v:0;}
 function t(id){var e=document.getElementById(id);return e?String(e.value||'').trim():'';}
 function mxn(x){try{return '$'+Math.round(x).toLocaleString('es-MX');}catch(e){return '$'+Math.round(x);}}
 window.austarCertDatos=function(){
  var ha=n('cert-ha')||1, cultivo=t('cert-cultivo');
- var frutal=window.austarEsFrutal(cultivo), dosis=window.austarDosisHa(cultivo);
- var litros=dosis*ha;
+ var frutal=window.austarEsFrutal(cultivo);
+ var arboles=n('cert-arboles'), alt=n('cert-altura')||5.5, copa=n('cert-copa')||5;
+ var eP=document.getElementById('cert-primera'), eE=document.getElementById('cert-edad');
+ var primera=eP?eP.value==='si':false, edad=eE?eE.value:'joven';
+ var mlArb=window.austarMlArbol(alt,copa,primera,edad==='viejo');
+ var dosis, litros, densidad=0;
+ if(frutal){
+  if(arboles>0){ litros=arboles*mlArb/1000; densidad=ha>0?arboles/ha:0; dosis=ha>0?litros/ha:0; }
+  else { dosis=150*mlArb/1000; litros=dosis*ha; }
+ } else { dosis=DOSIS_GRANO; litros=dosis*ha; }
  var invCap=n('cert-inv-austar');
  var invSug=litros*PRECIO_L;
  var inv=invCap>0?invCap:invSug;
@@ -1017,6 +1031,8 @@ window.austarCertDatos=function(){
  var roiSolo=inv>0?((extra-inv)/inv*100):0;
  var pago=extraHa>0?(inv/ha)/extraHa:0;
  return {ha:ha,cultivo:cultivo,frutal:frutal,dosis:dosis,litros:litros,precioL:PRECIO_L,
+  arboles:arboles,alt:alt,copa:copa,mlArb:mlArb,primera:primera,edad:edad,densidad:densidad,
+  sinArboles:(frutal&&!(arboles>0)), menor2:(edad==='menor2'),
   invSug:invSug,inv:inv,capturada:invCap>0,sin:sin,con:con,pt:pt,dton:dton,
   extraHa:extraHa,extra:extra,otros:otros,neto:neto,roi:roi,roiSolo:roiSolo,pago:pago,
   completo:(sin>0&&con>0&&pt>0)};
@@ -1025,6 +1041,22 @@ window.certCalc=function(){
  try{
   var el=document.getElementById('cert-kpis'); if(!el) return;
   var d=window.austarCertDatos();
+  var fF=document.getElementById('cert-frutal-campos'), fG=document.getElementById('cert-grano-campos');
+  var tip=document.getElementById('cert-tipo-cultivo');
+  if(fF) fF.style.display=d.frutal?'block':'none';
+  if(fG){ fG.style.display=(!d.frutal&&d.cultivo)?'block':'none';
+    fG.innerHTML=d.cultivo?('Grano u hortaliza: '+DOSIS_GRANO+' L/ha. Con '+d.ha+' ha se aplican <b>'+d.litros.toFixed(2)+' L</b>.'):''; }
+  if(tip) tip.textContent=d.cultivo?(d.frutal?'· frutal':'· grano u hortaliza'):'· captura el cultivo';
+  var inf=document.getElementById('cert-dosis-info');
+  if(inf&&d.frutal){
+   if(d.menor2){ inf.innerHTML='<b style="color:var(--red)">Austar no se aplica en arboles de menos de 2 anos.</b>'; }
+   else if(d.sinArboles){ inf.innerHTML='Sin numero de arboles se estima con 150 arb/ha. <b>Captura los arboles</b> para que la dosis sea exacta.'; }
+   else {
+    var aj=[]; if(d.primera)aj.push('primera aplicacion +20%'); if(d.edad==='viejo')aj.push('mas de 10 anos +20%');
+    inf.innerHTML='('+d.alt+' + '+d.copa+') x 2 = '+((d.alt+d.copa)*2).toFixed(1)+' ml'+(aj.length?' · '+aj.join(' · ')+' = <b>'+d.mlArb.toFixed(1)+' ml/arbol</b>':' <b>por arbol</b>')
+     +' · '+d.arboles+' arboles = <b>'+d.litros.toFixed(2)+' L</b>'+(d.densidad?' · densidad '+Math.round(d.densidad)+' arb/ha':'');
+   }
+  }
   var inp=document.getElementById('cert-inv-austar');
   if(inp&&!d.capturada&&d.invSug>0){inp.placeholder=Math.round(d.invSug);}
   function tarj(val,lbl,col){return '<div class="met"><div class="mv" style="font-size:20px;color:'+(col||'var(--text)')+'">'+val+'</div><div class="ml">'+lbl+'</div></div>';}
@@ -1040,7 +1072,7 @@ window.certCalc=function(){
   var colRoi=d.roiSolo>=300?'var(--green)':(d.roiSolo>=100?'var(--amber)':'var(--red)');
   h+=tarj(mxn(d.extra),'Ganancia extra MXN','var(--green)');
   h+=tarj(Math.round(d.roiSolo).toLocaleString('es-MX')+'%','Retorno sobre Austar',colRoi);
-  h+=tarj(d.litros.toFixed(2)+' L','Austar necesario ('+(d.frutal?'frutal':'grano')+')','var(--green)');
+  h+=tarj(d.litros.toFixed(2)+' L',d.frutal?('Austar · '+d.mlArb.toFixed(1)+' ml/arbol'):'Austar · grano','var(--green)');
   h+=tarj(mxn(d.inv),'Inversion Austar'+(d.capturada?'':' (estimada)'),'var(--amber)');
   h+=tarj('+'+d.dton.toFixed(2)+' ton/ha','Rendimiento adicional','var(--green)');
   h+=tarj(mxn(d.neto),'Utilidad neta','var(--green)');
@@ -1071,7 +1103,9 @@ window.austarCertTexto=function(){
  L.push('Precio por tonelada: '+mxn(d.pt));
  L.push('');
  L.push('*NUMEROS*');
- L.push('Austar aplicado: '+d.litros.toFixed(2)+' L ('+d.dosis+' L/ha)');
+ L.push('Austar aplicado: '+d.litros.toFixed(2)+' L');
+ if(d.frutal&&d.arboles>0){L.push('Arboles: '+d.arboles+' · '+d.mlArb.toFixed(1)+' ml por arbol');}
+ else if(!d.frutal){L.push('Dosis: '+DOSIS_GRANO+' L/ha');}
  L.push('Inversion en Austar: '+mxn(d.inv));
  L.push('Ganancia adicional: '+mxn(d.extra));
  if(d.otros>0)L.push('Otros costos declarados: '+mxn(d.otros));
@@ -1121,7 +1155,7 @@ window.certGenerarPDF=function(){
   +fila('Rendimiento sin Austar',d.sin+' ton/ha')+fila('Rendimiento con Austar',d.con+' ton/ha')
   +fila('Diferencia','+'+d.dton.toFixed(2)+' ton/ha')+fila('Precio por tonelada',mxn(d.pt))+'</table>'
   +'<div class="sec">NUMEROS</div><table>'
-  +fila('Austar aplicado',d.litros.toFixed(2)+' L ('+d.dosis+' L/ha)')
+  +fila('Austar aplicado',d.litros.toFixed(2)+' L')+(d.frutal&&d.arboles>0?fila('Arboles tratados',d.arboles+' · '+d.mlArb.toFixed(1)+' ml c/u'):fila('Dosis',d.dosis+' L/ha'))
   +fila('Inversion en Austar',mxn(d.inv))
   +(d.otros>0?fila('Otros costos declarados',mxn(d.otros)):'')
   +fila('Ganancia adicional',mxn(d.extra))
@@ -1630,7 +1664,7 @@ window.renderCertificados=function(){
               <div><div class="lbl">Fecha del certificado</div><input type="date" id="cert-fecha"></div>
               <div><div class="lbl">Teléfono</div><input id="cert-tel" placeholder="333-123-4567"></div>
               <div><div class="lbl">Nombre del productor</div><input id="cert-nombre" placeholder="Nombre completo"></div>
-              <div><div class="lbl">Cultivo</div><input id="cert-cultivo" placeholder="Aguacate, Mango..."></div>
+              <div><div class="lbl">Cultivo</div><input id="cert-cultivo" oninput="certCalc()" placeholder="Aguacate, Mango..."></div>
               <div><div class="lbl">Variedad</div><input id="cert-variedad" placeholder="Hass, Ataulfo..."></div>
               <div><div class="lbl">Estado</div><input id="cert-estado" placeholder="Michoacán"></div>
               <div><div class="lbl">Municipio</div><input id="cert-municipio" placeholder="Uruapan"></div>
@@ -1638,7 +1672,22 @@ window.renderCertificados=function(){
               <div><div class="lbl">Fecha de cosecha</div><input type="date" id="cert-fecha-cos"></div>
             </div>
             <div class="hr"></div>
-            <div class="ct" style="margin-top:8px">Costos y rendimiento</div>
+            <div class="hr"></div>
+<div class="ct" style="margin-top:8px">Huerto <span id="cert-tipo-cultivo" style="font-weight:500;color:var(--text3);font-size:13px"></span></div>
+<div id="cert-frutal-campos" style="display:none">
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+<div><div class="lbl">Numero de arboles</div><input type="number" id="cert-arboles" placeholder="1500" oninput="certCalc()"></div>
+<div><div class="lbl">Altura promedio (m)</div><input type="number" step="0.5" id="cert-altura" value="5.5" oninput="certCalc()"></div>
+<div><div class="lbl">Ancho de copa (m)</div><input type="number" step="0.5" id="cert-copa" value="5" oninput="certCalc()"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+<div><div class="lbl">Primera aplicacion de Austar</div><select id="cert-primera" onchange="certCalc()"><option value="no">No, ya se habia aplicado</option><option value="si">Si, primera vez (+20%)</option></select></div>
+<div><div class="lbl">Edad del huerto</div><select id="cert-edad" onchange="certCalc()"><option value="joven">Entre 2 y 10 anos</option><option value="viejo">Mas de 10 anos (+20%)</option><option value="menor2">Menos de 2 anos</option></select></div>
+</div>
+<div id="cert-dosis-info" style="font-size:13px;color:var(--text2);margin-bottom:10px"></div>
+</div>
+<div id="cert-grano-campos" style="display:none;font-size:13px;color:var(--text2);margin-bottom:10px"></div>
+<div class="ct" style="margin-top:8px">Costos y rendimiento</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
               <div><div class="lbl">Inversión AuStar MXN</div><input type="number" id="cert-inv-austar" value="0" oninput="certCalc()"></div>
               <div><div class="lbl">Otros costos MXN</div><input type="number" id="cert-otros-costos" value="0" oninput="certCalc()"></div>
