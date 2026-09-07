@@ -919,8 +919,6 @@ window.austarPanelCal=function(mi){
   h+='<div onclick="austarToggle(\''+id+'\')" style="'+G+'padding:15px 20px;cursor:pointer;">';
   h+='<span style="font-size:17px;font-weight:650;">'+e+'</span>';
   h+='<span style="text-align:right;font-weight:650;">'+o.C+'</span>';
-  h+='<span style="text-align:right;color:var(--text2);">'+o.P+'</span>';
-  h+='<span style="text-align:right;color:var(--text2);">'+o.S+'</span>';
   h+='<span style="text-align:right;font-weight:650;">'+Math.round(o.L).toLocaleString('es-MX')+' L</span>';
   h+='<span style="text-align:right;font-weight:700;color:var(--green);">'+mx(valorL(o.L))+'</span>';
   h+='<span id="'+id+'-f" style="text-align:center;color:var(--text3);">&rsaquo;</span></div>';
@@ -1625,10 +1623,10 @@ window.austarPlannerHTML=function(mi,y){
  h+='<div class="met"><div class="mv" style="color:'+(pct>=100?'var(--green)':(pct>=50?'var(--amber)':'var(--red)'))+'">'+pct+'%</div><div class="ml">Cumplimiento</div></div>';
  h+='<div class="met"><div class="mv" style="color:var(--green)">'+Math.round(d.tot.L).toLocaleString('es-MX')+' L</div><div class="ml">Potencial en ventana</div></div>';
  h+='</div>';
- var G='display:grid;grid-template-columns:1fr 70px 78px 78px 96px 106px 106px 84px;gap:10px;align-items:center;';
+ var G='display:grid;grid-template-columns:150px 64px 92px 104px 104px 70px 1fr;gap:10px;align-items:center;';
  h+='<div class="card" style="padding:0 !important;overflow:hidden;">';
  h+='<div style="'+G+'padding:13px 20px;border-bottom:1.5px solid var(--border);font-size:12.5px;color:var(--text3);font-weight:600;">';
- h+='<span>Estado</span><span style="text-align:right">Cierre</span><span style="text-align:right">Prospec.</span><span style="text-align:right">Seguim.</span><span style="text-align:right">Potencial</span><span style="text-align:right">Objetivo L</span><span style="text-align:right">Real L</span><span style="text-align:right">Avance</span></div>';
+ h+='<span>Estado</span><span style="text-align:right">Cierre</span><span style="text-align:right">Potencial</span><span style="text-align:right">Objetivo L</span><span style="text-align:right">Real L</span><span style="text-align:right">Avance</span><span>Accion del mes</span></div>';
  for(var i=0;i<d.ests.length;i++){
   var e=d.ests[i], o=d.E[e], pl=plan[e]||{};
   var obj=(pl.obj!=null?+pl.obj:Math.round(o.L*0.6));
@@ -1646,12 +1644,19 @@ window.austarPlannerHTML=function(mi,y){
   h+='<span style="text-align:right;"><input type="number" data-e="'+e+'" value="'+obj+'" style="'+st+'" onchange="austarPlanSet(this.dataset.e,\'obj\',this.value)"></span>';
   h+='<span style="text-align:right;"><input type="number" data-e="'+e+'" value="'+real+'" style="'+st+'" onchange="austarPlanSet(this.dataset.e,\'real\',this.value)"></span>';
   h+='<span style="text-align:right;"><span style="display:inline-block;min-width:44px;font-weight:650;color:'+col+';">'+av+'%</span></span>';
+  var acc=(pl.accion||'').replace(/"/g,'&quot;');
+  h+='<span><input data-e="'+e+'" value="'+acc+'" placeholder="Que vamos a hacer en '+e+' este mes" style="width:100%;font-family:inherit;font-size:14.5px;padding:7px 11px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);" onchange="austarPlanAccion(this.dataset.e,this.value)"></span>';
   h+='</div>';
  }
  h+='</div>';
  h+='<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid #D8AE3C;border-radius:8px;padding:15px 20px;margin-top:16px;font-size:14.5px;color:var(--text2);max-width:92ch;">';
  h+='<b style="color:var(--text)">De donde sale el objetivo.</b> Cada cliente en ventana de cierre se multiplica por la dosis de su cultivo con los datos capturados en su ficha. El objetivo se sugiere al 60% de ese potencial y puedes escribir encima. Los cambios se guardan solos en este dispositivo.</div>';
  return h;
+};
+window.austarPlanAccion=function(est,txt){
+ var mi=(typeof window.AUSTAR_PLAN_MES==='number')?window.AUSTAR_PLAN_MES:new Date().getMonth();
+ var y=window.AUSTAR_PLAN_ANIO||new Date().getFullYear();
+ window.austarPlanGuardar(y,mi,est,'accion',txt);
 };
 window.austarPlanSet=function(est,campo,valor){
  var mi=(typeof window.AUSTAR_PLAN_MES==='number')?window.AUSTAR_PLAN_MES:new Date().getMonth();
@@ -1850,8 +1855,7 @@ window.austarLatamNota=function(){
     <div class="nav-item" onclick="gotoTab('monitor')" id="nav-monitor"><span class="ni">👁️</span>Monitor</div>
     <div class="nav-item" onclick="gotoTab('certificados')" id="nav-certificados"><span class="ni">🏆</span>Certificados</div>
     <div class="nav-item" onclick="gotoTab('backup')" id="nav-backup"><span class="ni">💾</span>Respaldo</div>
-    <div class="nav-item" onclick="gotoTab('planner')" id="nav-planner"><span class="ni">📅</span>Planner Mensual</div>
-    <div class="nav-item" onclick="gotoTab('acciones')" id="nav-acciones"><span class="ni">✅</span>Plan de Acción</div>
+    <div class="nav-item" onclick="gotoTab('planner')" id="nav-planner"><span class="ni">📅</span>Plan de Acción</div>
     <div class="nav-item" onclick="gotoTab('alianzas')" id="nav-alianzas"><span class="ni">🤝</span>Alianzas</div>
     <div class="nav-item" onclick="gotoTab('comunidades')" id="nav-comunidades"><span class="ni">🌱</span>Grupos</div>
     <div class="nav-item" onclick="gotoTab('calendario')" id="nav-calendario"><span class="ni">📆</span>Calendario</div>
