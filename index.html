@@ -2295,7 +2295,7 @@ function logout(){
   user=null; selectedUser=null;
 }
 
-const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det','monitor','backup','certificados','planner','acciones','alianzas','comunidades'];
+const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det','monitor','backup','certificados','planner','acciones','alianzas','comunidades','calendario','grupos'];
 function gotoTab(t){
   ALL_TABS.forEach(x=>{
     const el=document.getElementById('tab-'+x);if(el)el.classList.remove('on');
