@@ -795,18 +795,38 @@ var COL={C:'#2F6E3F',P:'#D8AE3C',S:'#B6C4B8',D:'#8FB79A'};
 function K(s){s=s||'';try{s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');}catch(e){}return s.toUpperCase().replace(/[^A-Z]/g,'');}
 window.austarCruce=function(mi){
  var lista=(typeof CLIENTS!=='undefined'&&CLIENTS&&CLIENTS.length)?CLIENTS:(window.CRM_DATA||[]);
- var b={},tot={C:0,P:0,S:0,D:0},cub=0,fuera=0;
+ var b={},ids={},tot={C:0,P:0,S:0,D:0},cub=0,fuera=0;
  for(var i=0;i<lista.length;i++){
   var cl=lista[i],st=CAL[K(cl.estado)],hit=false,cus=cl.cultivos||[];
   if(st)for(var j=0;j<cus.length;j++){
    var cn=MAP[K(cus[j])];if(!cn)continue;
    var pat=st[cn];if(!pat)continue;
    var a=pat.charAt(mi);if('CPSD'.indexOf(a)<0)continue;
-   var k=a+'|'+cl.estado+'|'+cus[j];b[k]=(b[k]||0)+1;tot[a]++;hit=true;}
+   var k=a+'|'+cl.estado+'|'+cus[j];b[k]=(b[k]||0)+1;tot[a]++;hit=true;
+   if(a==='C'){ ids[k]=ids[k]||[]; ids[k].push(cl.id); }}
   if(hit)cub++;else fuera++;}
- return{b:b,tot:tot,cub:cub,fuera:fuera};};
+ return{b:b,ids:ids,tot:tot,cub:cub,fuera:fuera};};
 window.austarPanelCal=function(mi){
  var r=window.austarCruce(mi), P=1577, HA=10, ML=21, DENS=150;
+ var conDato=0, sinDato=0;
+ function datos(id){ try{ return (typeof getExtra==='function')?getExtra(id):JSON.parse(localStorage.getItem('as_ex_'+id)||'{}'); }catch(e){ return {}; } }
+ function litrosCliente(id,cul){
+  var fr=(typeof window.austarEsFrutal==='function')&&window.austarEsFrutal(cul);
+  var o=datos(id)||{};
+  var ha=+o.ha||0, arb=+o.arboles||0;
+  if(ha>0 || arb>0){
+   conDato++;
+   if(fr){
+    var alt=+o.altura||5.5, copa=+o.copa||5;
+    var ml=((alt+copa)*2)*(1+(o.primera==='si'?0.2:0)+(o.edad==='viejo'?0.2:0));
+    if(arb>0) return arb*ml/1000;
+    return ha*DENS*ml/1000;
+   }
+   return ha*0.125;
+  }
+  sinDato++;
+  return fr ? (HA*DENS*ML/1000) : (HA*0.125);
+ }
  function lha(cul){ return (typeof window.austarEsFrutal==='function'&&window.austarEsFrutal(cul)) ? DENS*ML/1000 : 0.125; }
  function esF(cul){ return (typeof window.austarEsFrutal==='function') && window.austarEsFrutal(cul); }
  function mx(x){ try{return '$'+Math.round(x).toLocaleString('es-MX');}catch(e){return '$'+Math.round(x);} }
@@ -816,7 +836,12 @@ window.austarPanelCal=function(mi){
   E[est][acc]+=n;
   E[est].cult[cul]=E[est].cult[cul]||{C:0,P:0,S:0,D:0,L:0};
   E[est].cult[cul][acc]+=n;
-  if(acc==='C'){ var L=lha(cul)*HA*n; E[est].L+=L; E[est].cult[cul].L+=L; totL+=L; }
+  if(acc==='C'){
+   var L=0, lst=(r.ids&&r.ids[k])||[];
+   if(lst.length){ for(var z=0;z<lst.length;z++){ L+=litrosCliente(lst[z],cul); } }
+   else { L=lha(cul)*HA*n; }
+   E[est].L+=L; E[est].cult[cul].L+=L; totL+=L;
+  }
   if(acc==='C')totC+=n; if(acc==='P')totP+=n; if(acc==='S')totS+=n;
  }
  var ests=Object.keys(E).sort(function(a,b){return E[b].L-E[a].L;});
@@ -828,11 +853,17 @@ window.austarPanelCal=function(mi){
   h+='<button onclick="austarSetMes('+m+')" style="flex:1;min-width:60px;background:'+(on?'#F2F7F1':'var(--bg2)')+';border:1px solid '+(on?'#2F6E3F':'var(--border)')+';border-radius:7px;padding:9px 4px;cursor:pointer;font-weight:'+(on?'700':'500')+';font-size:14px;color:var(--text);">'+M[m]+'</button>'; }
  h+='</div></div>';
  var G='display:grid;grid-template-columns:1fr 74px 74px 74px 100px 122px 30px;gap:10px;align-items:center;';
+ if(sinDato>0){
+  h+='<div style="background:#FFF8F4;border:1px solid #F0D5C7;border-left:4px solid #B04A24;border-radius:8px;padding:13px 18px;margin-bottom:14px;font-size:14px;color:var(--text2);">';
+  h+='<b style="color:#B04A24;">'+sinDato+' de '+(conDato+sinDato)+' clientes en cierre aun sin datos de huerto.</b> Para esos se estima con 10 ha. Captura hectareas y arboles en su ficha para que el potencial sea real.</div>';
+ }
  h+='<div class="met" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;background:none;border:none;box-shadow:none;padding:0 !important;margin-bottom:14px;">';
  h+='<div class="met"><div class="mv" style="color:var(--green)">'+totC+'</div><div class="ml">En ventana de cierre</div></div>';
  h+='<div class="met"><div class="mv">'+Math.round(totL).toLocaleString('es-MX')+' L</div><div class="ml">Potencial del mes</div></div>';
  h+='<div class="met"><div class="mv" style="color:var(--amber)">'+mx(totL*P)+'</div><div class="ml">Valor a precio de lista</div></div>';
- h+='<div class="met"><div class="mv">'+totP+'</div><div class="ml">En prospeccion</div></div>';
+ var pct=(conDato+sinDato)>0?Math.round(conDato/(conDato+sinDato)*100):0;
+ var colD=pct>=70?'var(--green)':(pct>=30?'var(--amber)':'var(--red)');
+ h+='<div class="met"><div class="mv" style="color:'+colD+'">'+pct+'%</div><div class="ml">Con datos de huerto</div></div>';
  h+='</div>';
  h+='<div style="'+G+'padding:0 20px 8px;font-size:12.5px;color:var(--text3);font-weight:600;">';
  h+='<span>Estado y cultivo</span><span style="text-align:right">Cierre</span><span style="text-align:right">Prospec.</span><span style="text-align:right">Seguim.</span><span style="text-align:right">Potencial</span><span style="text-align:right">Valor</span><span></span></div>';
