@@ -1277,6 +1277,105 @@ window.renderCertificados=function(){
 };
 })();
 </script>
+
+<script>
+/* AUSTAR - DATOS DEL HUERTO en la ficha del cliente */
+(function(){
+var PRECIO_L=1577;
+function ex(id){ try{ return (typeof getExtra==='function')?getExtra(id):JSON.parse(localStorage.getItem('as_ex_'+id)||'{}'); }catch(e){ return {}; } }
+function sv(id,o){ try{ if(typeof saveExtra==='function') saveExtra(id,o); else localStorage.setItem('as_ex_'+id,JSON.stringify(o)); }catch(e){} }
+function num(id){ var e=document.getElementById(id); if(!e) return 0; var v=parseFloat(String(e.value).replace(/[^0-9.]/g,'')); return isFinite(v)?v:0; }
+function val(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }
+function mxn(x){ try{ return '$'+Math.round(x).toLocaleString('es-MX'); }catch(e){ return '$'+Math.round(x); } }
+function cli(id){ try{ return (typeof CLIENTS!=='undefined'&&CLIENTS)?CLIENTS.find(function(x){return x.id===id;}):null; }catch(e){ return null; } }
+function frutalDe(c){ if(!c) return false; var cs=c.cultivos||[]; for(var i=0;i<cs.length;i++){ if(typeof window.austarEsFrutal==='function'&&window.austarEsFrutal(cs[i])) return true; } return false; }
+window.austarHuertoCalc=function(id){
+ var c=cli(id), fr=frutalDe(c);
+ var ha=num('hu-ha'), arb=num('hu-arb'), alt=num('hu-alt')||5.5, copa=num('hu-copa')||5;
+ var eP=document.getElementById('hu-primera'), eE=document.getElementById('hu-edad');
+ var primera=eP?eP.value==='si':false, edad=eE?eE.value:'joven';
+ var ml=((alt+copa)*2)*(1+(primera?0.2:0)+(edad==='viejo'?0.2:0));
+ var litros=0, dens=0;
+ if(fr){ if(arb>0){ litros=arb*ml/1000; dens=ha>0?arb/ha:0; } else if(ha>0){ litros=ha*150*ml/1000; } }
+ else { litros=ha*0.125; }
+ return {frutal:fr,ha:ha,arb:arb,alt:alt,copa:copa,primera:primera,edad:edad,ml:ml,litros:litros,dens:dens,valor:litros*PRECIO_L};
+};
+window.austarHuertoResumen=function(id){
+ var r=window.austarHuertoCalc(id), el=document.getElementById('hu-res'); if(!el) return;
+ if(!r.ha){ el.innerHTML='<span style="color:var(--text3)">Captura las hectareas para calcular el potencial.</span>'; return; }
+ if(r.frutal && !r.arb){ el.innerHTML='Sin numero de arboles se estima con 150 arb/ha: <b>'+r.litros.toFixed(1)+' L</b> &middot; '+mxn(r.valor)+'. <b>Captura los arboles</b> para exactitud.'; return; }
+ if(r.frutal){
+  var aj=[]; if(r.primera)aj.push('1a aplicacion +20%'); if(r.edad==='viejo')aj.push('mas de 10 anos +20%');
+  el.innerHTML='('+r.alt+' + '+r.copa+') x 2 = '+((r.alt+r.copa)*2).toFixed(1)+' ml'+(aj.length?' &middot; '+aj.join(' &middot; ')+' = <b>'+r.ml.toFixed(1)+' ml/arbol</b>':' <b>por arbol</b>')+'<br>'+r.arb+' arboles = <b>'+r.litros.toFixed(1)+' L</b> &middot; <b>'+mxn(r.valor)+'</b>'+(r.dens?' &middot; densidad '+Math.round(r.dens)+' arb/ha':'');
+ } else {
+  el.innerHTML='Grano u hortaliza: 0.125 L/ha &middot; '+r.ha+' ha = <b>'+r.litros.toFixed(2)+' L</b> &middot; <b>'+mxn(r.valor)+'</b>';
+ }
+};
+window.austarHuertoGuardar=function(id){
+ try{
+  var o=ex(id);
+  o.ha=num('hu-ha'); o.arboles=num('hu-arb'); o.altura=num('hu-alt'); o.copa=num('hu-copa');
+  o.primera=val('hu-primera'); o.edad=val('hu-edad'); o.municipio=val('hu-mun');
+  o.actualizado=new Date().toISOString().slice(0,10);
+  sv(id,o);
+  var c=cli(id); if(c && o.municipio) c.municipio=o.municipio;
+  var b=document.getElementById('hu-btn');
+  if(b){ var t=b.textContent; b.textContent='Guardado'; b.style.background='var(--green)'; setTimeout(function(){ b.textContent=t; b.style.background=''; },1600); }
+ }catch(e){ alert('No se pudo guardar: '+e.message); }
+};
+function tarjeta(id){
+ var c=cli(id), o=ex(id), fr=frutalDe(c);
+ var oi="oninput=\"austarHuertoResumen('"+id+"')\"", oc="onchange=\"austarHuertoResumen('"+id+"')\"";
+ var st='width:100%;font-family:inherit;font-size:15px;padding:9px 11px;border:1px solid var(--border);border-radius:7px;background:var(--bg2);color:var(--text);';
+ var lb='font-size:12.5px;color:var(--text3);margin-bottom:5px;font-weight:600;';
+ var h='<div class="card" id="hu-card" style="margin-bottom:14px;">';
+ h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;"><div class="ct">Datos del huerto</div>';
+ h+='<span style="font-size:12px;font-weight:600;padding:2px 9px;border-radius:20px;background:'+(fr?'#E8F1E9':'#F3F0E4')+';color:'+(fr?'#2F6E3F':'#8A6D12')+';">'+(fr?'frutal':'grano u hortaliza')+'</span>';
+ h+=(o.actualizado?'<span style="margin-left:auto;font-size:12px;color:var(--text3);">actualizado '+o.actualizado+'</span>':'')+'</div>';
+ h+='<div style="font-size:13px;color:var(--text3);margin-bottom:14px;">Estos datos alimentan el potencial del calendario y el certificado.</div>';
+ h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">';
+ h+='<div><div style="'+lb+'">Municipio</div><input id="hu-mun" style="'+st+'" value="'+((o.municipio||(c&&c.municipio)||'').replace(/"/g,''))+'" placeholder="Ej. Uruapan"></div>';
+ h+='<div><div style="'+lb+'">Hectareas</div><input id="hu-ha" type="number" step="0.5" style="'+st+'" value="'+(o.ha||'')+'" placeholder="10" '+oi+'></div>';
+ h+='</div>';
+ if(fr){
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">';
+  h+='<div><div style="'+lb+'">Numero de arboles</div><input id="hu-arb" type="number" style="'+st+'" value="'+(o.arboles||'')+'" placeholder="1500" '+oi+'></div>';
+  h+='<div><div style="'+lb+'">Altura promedio (m)</div><input id="hu-alt" type="number" step="0.5" style="'+st+'" value="'+(o.altura||5.5)+'" '+oi+'></div>';
+  h+='<div><div style="'+lb+'">Ancho de copa (m)</div><input id="hu-copa" type="number" step="0.5" style="'+st+'" value="'+(o.copa||5)+'" '+oi+'></div>';
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">';
+  h+='<div><div style="'+lb+'">Primera aplicacion de Austar</div><select id="hu-primera" style="'+st+'" '+oc+'><option value="no"'+(o.primera==='no'?' selected':'')+'>No, ya se habia aplicado</option><option value="si"'+(o.primera==='si'?' selected':'')+'>Si, primera vez (+20%)</option></select></div>';
+  h+='<div><div style="'+lb+'">Edad del huerto</div><select id="hu-edad" style="'+st+'" '+oc+'><option value="joven"'+(o.edad==='joven'?' selected':'')+'>Entre 2 y 10 anos</option><option value="viejo"'+(o.edad==='viejo'?' selected':'')+'>Mas de 10 anos (+20%)</option></select></div>';
+  h+='</div>';
+ } else { h+='<input type="hidden" id="hu-arb" value=""><input type="hidden" id="hu-alt" value=""><input type="hidden" id="hu-copa" value=""><input type="hidden" id="hu-primera" value="no"><input type="hidden" id="hu-edad" value="joven">'; }
+ h+='<div id="hu-res" style="font-size:14px;color:var(--text2);background:var(--bg3);border-radius:7px;padding:11px 14px;margin-bottom:12px;line-height:1.6;"></div>';
+ h+='<button id="hu-btn" class="btn btn-g" onclick="austarHuertoGuardar(\''+id+'\')">Guardar datos del huerto</button>';
+ h+='</div>';
+ return h;
+}
+function pintarHuerto(id){
+ var body=document.getElementById('det-body'); if(!body) return;
+ var vieja=document.getElementById('hu-card'); if(vieja) vieja.remove();
+ var w=document.createElement('div'); w.innerHTML=tarjeta(id);
+ body.insertBefore(w.firstChild, body.firstChild);
+ try{ window.austarHuertoResumen(id); }catch(e){}
+}
+function engancharDet(){
+ var orig=window.openDet;
+ if(typeof orig!=='function') return false;
+ if(orig.__austarHuerto) return true;
+ var w=function(id){
+  try{ orig.apply(this,arguments); }catch(e){ console.error(e); }
+  try{ pintarHuerto(id); }catch(e){ console.error('huerto:',e); }
+ };
+ w.__austarHuerto=true;
+ window.openDet=w;
+ return true;
+}
+if(document.readyState==='complete'){ engancharDet(); } else { window.addEventListener('load', engancharDet); }
+setInterval(engancharDet, 1200);
+})();
+</script>
 </head>
 <body>
 
