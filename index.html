@@ -861,6 +861,23 @@ window.austarPanelCal=function(mi){
  }
  return h;
 };
+window.austarWhats=function(tel,nom){
+ if(!tel||tel.length<10){ alert('Este cliente no tiene telefono capturado.'); return; }
+ var t=tel.length===10?('52'+tel):tel;
+ var msg=encodeURIComponent('Hola '+(nom||'')+', le saluda el equipo de Austar Mexico.');
+ window.open('https://wa.me/'+t+'?text='+msg,'_blank');
+};
+window.austarAbrirFicha=function(id){
+ try{
+  var ov=document.getElementById('austar-lista-ov'); if(ov) ov.remove();
+  if(typeof switchTab==='function'){ try{ switchTab('clientes'); }catch(e){} }
+  else if(typeof gotoTab==='function'){ try{ gotoTab('clientes'); }catch(e){} }
+  setTimeout(function(){
+   if(typeof openDet==='function'){ openDet(id); }
+   else { alert('No se pudo abrir la ficha del cliente.'); }
+  }, 120);
+ }catch(e){ alert('Error al abrir la ficha: '+e.message); }
+};
 window.austarToggle=function(id){
  var el=document.getElementById(id), f=document.getElementById(id+'-f');
  if(!el)return; var ab=el.style.display!=='none';
@@ -881,10 +898,13 @@ window.austarVerClientes=function(est,cul,mi){
   h+='<div style="max-height:60vh;overflow:auto;">';
   for(var k=0;k<res.length;k++){ var c=res[k];
    var et=(typeof getStage==='function')?getStage(c):(c.etapa_base||'');
-   h+='<div style="display:grid;grid-template-columns:1fr 150px 110px;gap:12px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--bg3);font-size:15px;">';
+   h+='<div data-cid="'+c.id+'" onclick="austarAbrirFicha(this.dataset.cid)" style="display:grid;grid-template-columns:1fr 140px 96px 40px;gap:12px;align-items:center;padding:11px 6px;border-bottom:1px solid var(--bg3);font-size:15px;cursor:pointer;border-radius:6px;" onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'\'">';
    h+='<span><b>'+c.nombre+'</b><br><span style="font-size:13px;color:var(--text3);">'+(c.municipio||'sin municipio')+'</span></span>';
    h+='<span style="color:var(--text2);font-size:14px;">'+(c.tel||'sin telefono')+'</span>';
-   h+='<span style="font-size:13.5px;font-weight:600;">'+et+'</span></div>';
+   h+='<span style="font-size:13.5px;font-weight:600;">'+et+'</span>';
+   var tl=String(c.tel||'').replace(/\D/g,'');
+   h+='<span data-tel="'+tl+'" data-nom="'+(c.nombre||'').replace(/"/g,'')+'" onclick="event.stopPropagation();austarWhats(this.dataset.tel,this.dataset.nom)" title="WhatsApp" style="text-align:center;cursor:pointer;color:'+(tl.length>=10?'var(--green)':'var(--text3)')+';font-weight:700;">&#9993;</span>';
+   h+='</div>';
   }
   h+='</div>';
   if(typeof openModal==='function'){ openModal(cul+' &middot; '+est, h); return; }
