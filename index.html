@@ -2129,7 +2129,7 @@ window.austarComparativoHTML=function(){
  var flecha=pos?'&#9650;':'&#9660;';
  var h='<div class="card" style="margin-bottom:16px;">';
  h+='<div class="ct">Comparativo proporcional</div>';
- h+='<div style="font-size:13px;color:var(--text3);margin-bottom:14px;">Enero a '+c.mesNombre+', mismo periodo de cada anio. Los meses que faltan no se cuentan.</div>';
+ h+='<div style="font-size:13px;color:var(--text3);margin-bottom:14px;">Enero a '+c.mesNombre+', mismo periodo de cada año. Los meses que faltan no se cuentan.</div>';
  h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">';
  h+='<div class="met"><div class="mv">'+Math.round(c.actual).toLocaleString('es-MX')+' L</div><div class="ml">'+c.anio+' a '+c.mesNombre+'</div></div>';
  h+='<div class="met"><div class="mv" style="color:var(--text2)">'+Math.round(c.previo).toLocaleString('es-MX')+' L</div><div class="ml">'+c.anterior+' mismo periodo</div></div>';
@@ -2313,7 +2313,7 @@ setInterval(function(){
     <div id="tab-historico" class="sc">
       <div class="page-header">
         <div class="page-title">Análisis histórico</div>
-        <div class="page-sub">Ventas CDM + OA · 2017–2025</div>
+        <div class="page-sub">Ventas CDM + OA · 2017–2026</div>
       </div>
       <div style="padding:0 22px 22px">
         <div class="ytabs" id="ytabs">
@@ -2326,6 +2326,32 @@ setInterval(function(){
           <div class="ytab" onclick="setYear(2024)">2024</div>
           <div class="ytab" onclick="setYear(2025)">2025</div>
           <div class="ytab" onclick="setYear('oa')" style="border-color:var(--amber);color:var(--amber)">🌵 Odiseo OA</div>
+        </div>
+        <div class="g5" style="margin-bottom:14px" id="hist-metrics"></div>
+        <div class="g2" style="margin-bottom:14px">
+          <div class="card"><div class="ct" id="hct1">CDM vs OA por año</div><div class="ch-wrap" style="height:200px"><canvas id="hch1"></canvas></div></div>
+          <div class="card"><div class="ct" id="hct2">% participación OA en total</div><div class="ch-wrap" style="height:200px"><canvas id="hch2"></canvas></div></div>
+        </div>
+        <div class="g2" style="margin-bottom:14px">
+          <div class="card">
+            <div class="ct">Top 15 clientes CDM histórico</div>
+            <div id="hist-top" style="max-height:300px;overflow-y:auto"></div>
+          </div>
+          <div class="card">
+            <div class="ct">Análisis estratégico</div>
+            <div id="hist-analysis"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── CLIENTES ─── -->
+    <div id="tab-clientes" class="sc">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
+          <div class="page-title">Clientes</div>
+          <button class="btn btn-sm btn-b" onclick="gotoTab('nuevo')">+ Nuevo prospecto</button><div class="ytab" onclick="setYear(2026)">2026</div>
+          
         </div>
         <div class="g5" style="margin-bottom:14px" id="hist-metrics"></div>
         <div class="g2" style="margin-bottom:14px">
@@ -2900,7 +2926,7 @@ const BADGES={gfg:{key:'gfg',icon:'🌾',label:'Grow for Gold',color:'#f59e0b',b
 // Historical data
 const BY_YEAR=[{year:2019,cdm:13043,oa:23418,total:36461,pct_oa:64},{year:2020,cdm:13855,oa:21211,total:35066,pct_oa:60},{year:2021,cdm:10015,oa:23580,total:33595,pct_oa:70},{year:2022,cdm:11545,oa:24495,total:36040,pct_oa:68},{year:2023,cdm:8267,oa:27769,total:36036,pct_oa:77},{year:2024,cdm:10058,oa:31330,total:41388,pct_oa:76},{year:2025,cdm:11473,oa:37550},{year:2026,cdm:7487,oa:23735,total:31222,pct_oa:76}];
 const OA_FULL=[{year:2017,litros:29581},{year:2018,litros:24630},{year:2019,litros:23418},{year:2020,litros:21211},{year:2021,litros:23580},{year:2022,litros:24495},{year:2023,litros:27769},{year:2024,litros:31330},{year:2025,litros:37550}];
-const CDM_CLIENTES={2019:117,2020:112,2021:116,2022:128,2023:90,2024:83,2025:53};
+const CDM_CLIENTES={2019:117,2020:112,2021:116,2022:128,2023:90,2024:83,2025:53,2026:40};
 const CULT_2025={AGUACATE:6285,MANGO:1517,CANNABIS:1215,NOGAL:890,GOLF:842,PAPAYA:373,MAIZ:79,HORTALIZAS:11};
 const EST_2025={MICHOACAN:5945,JALISCO:3297,SINALOA:1700,NAYARIT:231,NL:105,VERACRUZ:100,CAMPECHE:33,TAMAULIPAS:30};
 const TOP_CLI=[{n:"Sinuhe Alvarez",L:15300,p:22,e:"Michoacán",c:"Aguacate",pa:2020,ua:2025},{n:"Ricardo Naranjo",L:7500,p:9,e:"Michoacán",c:"Aguacate",pa:2019,ua:2021},{n:"H.R. Guerrero Quiroz",L:6103,p:203,e:"Sinaloa",c:"Nogal/Mango",pa:2019,ua:2025},{n:"Juan Pablo Urtado",L:4600,p:7,e:"Michoacán",c:"Aguacate",pa:2025,ua:2025},{n:"Lic. Bernardo Ramos",L:2405,p:8,e:"Sinaloa",c:"Mango",pa:2023,ua:2025},{n:"Agrícola El Puma",L:1689,p:54,e:"Jalisco",c:"Golf",pa:2020,ua:2025},{n:"Osvaldo Rivera Garcia",L:1466,p:35,e:"Jalisco",c:"Cannabis",pa:2022,ua:2025},{n:"Oscar H. Torres Sanchez",L:1361,p:66,e:"Jalisco",c:"Mango/Papaya",pa:2020,ua:2024},{n:"Alfonso Medina Villanueva",L:1035,p:34,e:"Jalisco",c:"Aguacate",pa:2019,ua:2025},{n:"Pedro Medina Villanueva",L:1020,p:26,e:"Michoacán",c:"Aguacate",pa:2019,ua:2024},{n:"Omar Arreola Morales",L:880,p:11,e:"Michoacán",c:"Aguacate",pa:2020,ua:2022},{n:"Eduardo/Gamaliel Fajardo",L:760,p:8,e:"Jalisco",c:"Aguacate",pa:2025,ua:2025},{n:"Chula Brand Mexico",L:700,p:6,e:"Jalisco",c:"Papaya",pa:2025,ua:2025},{n:"Carlos J. Salazar Sanchez",L:681,p:28,e:"Jalisco",c:"Sin definir",pa:2025,ua:2025},{n:"Humberto Sorzano",L:650,p:8,e:"Michoacán",c:"Aguacate",pa:2021,ua:2023}];
@@ -3146,7 +3172,7 @@ function renderHistorico(y){
   const pctOA=Math.round(oaL/(totalL||1)*100);
   const d1=del1!=null?`<div class="md ${del1>=0?'up':'dn'}">${del1>=0?'▲':'▼'}${Math.abs(del1)}% vs ant.</div>`:'';
   document.getElementById('hist-metrics').innerHTML=
-    `<div class="met gl"><div class="mv" style="color:var(--green)">${fmt(totalL)}L</div><div class="ml">Total${y!=='total'&&y!=='oa'?' '+y:' 2019–25'}</div>${d1}</div>`+
+    `<div class="met gl"><div class="mv" style="color:var(--green)">${fmt(totalL)}L</div><div class="ml">Total${y!=='total'&&y!=='oa'?' '+y:' 2019–26'}</div>${d1}</div>`+
     `<div class="met bl"><div class="mv" style="color:var(--blue)">${fmt(cdmL)}L</div><div class="ml">CDM${y!=='total'&&y!=='oa'?' '+y:''}</div></div>`+
     `<div class="met al"><div class="mv" style="color:var(--amber)">${fmt(oaL)}L</div><div class="ml">Odiseo OA</div></div>`+
     `<div class="met pl"><div class="mv" style="color:var(--purple)">${pctOA}%</div><div class="ml">% participación OA</div></div>`+
@@ -3154,7 +3180,7 @@ function renderHistorico(y){
   // Charts
   const years=BY_YEAR.map(r=>r.year);
   if(y==='oa'){
-    document.getElementById('hct1').textContent='Odiseo OA — historial 2017–2025';
+    document.getElementById('hct1').textContent='Odiseo OA — historial 2017–2026';
     document.getElementById('hct2').textContent='Crecimiento OA año a año (%)';
     mkChart('hch1','bar',OA_FULL.map(r=>r.year),[{data:OA_FULL.map(r=>r.litros),backgroundColor:OA_FULL.map((r,i)=>i===OA_FULL.length-1?'#f59e0b':'#854f0b'),borderRadius:5,borderSkipped:false}]);
     const deltas=OA_FULL.map((r,i)=>i===0?0:Math.round((r.litros-OA_FULL[i-1].litros)/OA_FULL[i-1].litros*100));
@@ -4468,10 +4494,10 @@ function renderMonitor(){
 function certInitTab(){if(typeof renderCertificados==='function')renderCertificados();}
 
 var ALIANZAS_DEFAULT=[
-  {id:'bni',nombre:'BNI',tipo:'Red empresarial',contacto:'Leopoldo',estatus:'activa',notas:''},
-  {id:'cdaaj',nombre:'CDAAJ',tipo:'Cámara',contacto:'Leopoldo',estatus:'activa',notas:''},
-  {id:'anfaca',nombre:'ANFACA',tipo:'Asociación Nacional',contacto:'Leopoldo / Odiseo',estatus:'activa',notas:'Propuesta colaboración pendiente'},
-  {id:'apeajal',nombre:'APEAJAL',tipo:'Asociación',contacto:'Leopoldo',estatus:'activa',notas:''},
+  {id:'bni',nombre:'BNI',tipo:'Red empresarial',contacto:'Vale / Hiram',estatus:'activa',notas:''},
+  
+  {id:'anfaca',nombre:'ANFACA',tipo:'Asociación Nacional',contacto:'Vale / Hiram',estatus:'activa',notas:'Propuesta colaboración pendiente'},
+  {id:'apeajal',nombre:'APEAJAL',tipo:'Asociación',contacto:'Vale / Hiram',estatus:'activa',notas:''},
   {id:'ipade',nombre:'IPADE',tipo:'Institución educativa',contacto:'',estatus:'activa',notas:''},
   {id:'inifap',nombre:'INIFAP / Dr. Juan Herrera',tipo:'Institución investigación',contacto:'Dr. Juan Herrera',estatus:'activa',notas:'Austar Academy - sesión ago 25'},
   {id:'consejo_jal',nombre:'Consejo Agropecuario Jalisco',tipo:'Consejo sectorial',contacto:'',estatus:'activa',notas:'Fondo generacional exploratorio'},
