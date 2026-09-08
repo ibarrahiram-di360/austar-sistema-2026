@@ -2014,6 +2014,84 @@ setInterval(function(){
 }, 700);
 })();
 </script>
+
+<script>
+/* AUSTAR - COMPARATIVO PROPORCIONAL ano contra ano */
+(function(){
+var M=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+function todas(){ return (typeof window.austarTodasVentas==='function')?window.austarTodasVentas():(window.VENTAS||[]); }
+function mxn(x){ try{ return '$'+Math.round(x).toLocaleString('es-MX'); }catch(e){ return '$'+Math.round(x); } }
+/* litros por mes de un anio */
+window.austarPorMes=function(anio){
+ var m=new Array(12).fill(0), V=todas();
+ for(var i=0;i<V.length;i++){ var s=V[i];
+  if(s.sinFecha||s.anio!==anio) continue;
+  m[s.mes]+=s.litros; }
+ return m;
+};
+/* comparativo hasta el mes en curso */
+window.austarComparativo=function(){
+ var hoy=new Date(), a=hoy.getFullYear(), mes=hoy.getMonth();
+ var V=todas(), anios={};
+ for(var i=0;i<V.length;i++){ if(!V[i].sinFecha) anios[V[i].anio]=1; }
+ var lista=Object.keys(anios).map(Number).sort();
+ if(lista.indexOf(a)<0) a=lista[lista.length-1];
+ var act=window.austarPorMes(a), ant=window.austarPorMes(a-1);
+ var corte=-1; for(var k=0;k<12;k++){ if(act[k]>0) corte=k; }
+ if(corte<0) corte=Math.max(0,mes-1);
+ function suma(arr,n){ var t=0; for(var j=0;j<=n;j++) t+=arr[j]; return t; }
+ var sa=suma(act,corte), sn=suma(ant,corte);
+ return {anio:a, anterior:a-1, hastaMes:corte, mesNombre:M[corte],
+  actual:sa, previo:sn, var:(sn>0?((sa/sn-1)*100):null),
+  totalPrevio:suma(ant,11), porMesActual:act, porMesPrevio:ant, anios:lista};
+};
+window.austarComparativoHTML=function(){
+ var c=window.austarComparativo();
+ if(!c || !c.previo) return '';
+ var pos=c.var>=0, col=pos?'var(--green)':'var(--red)';
+ var flecha=pos?'&#9650;':'&#9660;';
+ var h='<div class="card" style="margin-bottom:16px;">';
+ h+='<div class="ct">Comparativo proporcional</div>';
+ h+='<div style="font-size:13px;color:var(--text3);margin-bottom:14px;">Enero a '+c.mesNombre+', mismo periodo de cada anio. Los meses que faltan no se cuentan.</div>';
+ h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">';
+ h+='<div class="met"><div class="mv">'+Math.round(c.actual).toLocaleString('es-MX')+' L</div><div class="ml">'+c.anio+' a '+c.mesNombre+'</div></div>';
+ h+='<div class="met"><div class="mv" style="color:var(--text2)">'+Math.round(c.previo).toLocaleString('es-MX')+' L</div><div class="ml">'+c.anterior+' mismo periodo</div></div>';
+ h+='<div class="met"><div class="mv" style="color:'+col+'">'+flecha+' '+Math.abs(c.var).toFixed(0)+'%</div><div class="ml">Variacion real</div></div>';
+ h+='<div class="met"><div class="mv" style="color:var(--text3)">'+Math.round(c.totalPrevio).toLocaleString('es-MX')+' L</div><div class="ml">'+c.anterior+' ano completo</div></div>';
+ h+='</div>';
+ var mx=1; for(var i=0;i<12;i++){ mx=Math.max(mx,c.porMesActual[i],c.porMesPrevio[i]); }
+ h+='<div style="display:flex;gap:16px;font-size:12.5px;color:var(--text2);margin-bottom:10px;">';
+ h+='<span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2F6E3F;margin-right:6px;"></i>'+c.anio+'</span>';
+ h+='<span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#B6C4B8;margin-right:6px;"></i>'+c.anterior+'</span></div>';
+ h+='<div style="display:flex;align-items:flex-end;gap:8px;height:130px;">';
+ for(var m=0;m<12;m++){
+  var futuro=(m>c.hastaMes);
+  h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;">';
+  h+='<div style="flex:1;display:flex;align-items:flex-end;gap:2px;width:100%;">';
+  h+='<i style="flex:1;display:block;border-radius:2px 2px 0 0;background:'+(futuro?'#EDF2EB':'#2F6E3F')+';height:'+(c.porMesActual[m]/mx*100).toFixed(1)+'%;min-height:2px;"></i>';
+  h+='<i style="flex:1;display:block;border-radius:2px 2px 0 0;background:#B6C4B8;height:'+(c.porMesPrevio[m]/mx*100).toFixed(1)+'%;min-height:2px;"></i>';
+  h+='</div>';
+  h+='<small style="font-size:11.5px;color:'+(futuro?'var(--text3)':'var(--text2)')+';">'+M[m]+'</small></div>';
+ }
+ h+='</div></div>';
+ return h;
+};
+function pintarComp(){
+ var el=document.getElementById('tab-dashboard'); if(!el) return;
+ if(document.getElementById('austar-comp')) return;
+ var w=document.createElement('div'); w.id='austar-comp';
+ w.innerHTML=window.austarComparativoHTML();
+ if(!w.innerHTML) return;
+ var ph=el.querySelector('.page-header');
+ if(ph && ph.nextSibling) el.insertBefore(w, ph.nextSibling); else el.insertBefore(w, el.firstChild);
+}
+setInterval(function(){
+ try{ var t=document.getElementById('tab-dashboard');
+  if(t && getComputedStyle(t).display!=='none') pintarComp();
+ }catch(e){}
+}, 800);
+})();
+</script>
 </head>
 <body>
 
