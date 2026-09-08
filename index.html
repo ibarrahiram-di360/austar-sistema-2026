@@ -1896,6 +1896,124 @@ window.austarLatamNota=function(){
 };
 })();
 </script>
+
+<script>
+/* AUSTAR - AGENDA DE ACTIVIDADES (reemplaza la rejilla de mes) */
+(function(){
+var DIAS=['dom','lun','mar','mie','jue','vie','sab'];
+var TIPOS={visita_campo:'Visita a campo',expo:'Expo / Evento',reunion:'Reunion',capacitacion:'Capacitacion',llamada:'Llamada',otro:'Actividad'};
+function acts(){ try{ return (typeof getCalActividades==='function')?getCalActividades():JSON.parse(localStorage.getItem('cal_actividades_2026')||'[]'); }catch(e){ return []; } }
+function grabar(a){ try{ localStorage.setItem('cal_actividades_2026', JSON.stringify(a)); }catch(e){} }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function hoyStr(){ return new Date().toISOString().slice(0,10); }
+window.austarActEstatus=function(id,val){
+ var a=acts();
+ for(var i=0;i<a.length;i++){ if(a[i].id===id){ a[i].estatus=val; a[i].actualizado=hoyStr(); } }
+ grabar(a); window.austarPintarAgenda();
+};
+window.austarActBorrar=function(id){
+ if(!confirm('Eliminar esta actividad?')) return;
+ if(typeof deleteCalActividad==='function'){ deleteCalActividad(id); } else { grabar(acts().filter(function(x){return x.id!==id;})); }
+ window.austarPintarAgenda();
+};
+window.austarActFiltro=function(f){ window.AUSTAR_ACT_FILTRO=f; window.austarPintarAgenda(); };
+function fila(a){
+ var st=a.estatus||'pendiente';
+ var hoy=hoyStr();
+ var vencida=(st!=='hecha' && a.fecha && a.fecha<hoy);
+ var esHoy=(a.fecha===hoy);
+ var dt=a.fecha?new Date(a.fecha+'T12:00:00'):null;
+ var dia=dt?dt.getDate():'--', dsem=dt?DIAS[dt.getDay()]:'';
+ var borde = vencida ? 'border-left:4px solid #B04A24;padding-left:14px;' : (esHoy&&st!=='hecha' ? 'border-left:4px solid #2F6E3F;padding-left:14px;' : '');
+ var op = st==='hecha' ? 'opacity:.62;' : '';
+ var tach = st==='hecha' ? 'text-decoration:line-through;' : '';
+ var colSel = st==='hecha' ? 'border-color:#2F6E3F;background:#F2F7F1;color:#2F6E3F;font-weight:600;' : (st==='progreso' ? 'border-color:#D8AE3C;background:#FDFAF0;color:#8A6D12;font-weight:600;' : '');
+ var h='<div style="display:grid;grid-template-columns:66px 1fr 150px 128px 116px 32px;gap:14px;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px 18px;margin-bottom:8px;'+borde+op+'">';
+ h+='<div style="text-align:center;"><b style="display:block;font-size:20px;font-weight:700;line-height:1;">'+dia+'</b><span style="display:block;font-size:11.5px;color:var(--text3);margin-top:2px;">'+dsem+'</span></div>';
+ h+='<div><div style="font-size:15.5px;font-weight:600;'+tach+'">'+esc(a.titulo||'Sin titulo')+'</div>';
+ var meta=[]; if(a.cultivo)meta.push(esc(a.cultivo)); if(a.notas)meta.push(esc(String(a.notas).slice(0,60)));
+ h+=(meta.length?'<div style="font-size:13px;color:var(--text2);margin-top:3px;">'+meta.join(' &middot; ')+'</div>':'')+'</div>';
+ h+='<div style="font-size:14px;color:var(--text2);">'+esc([a.lugar,a.estado].filter(Boolean).join(', '))+'</div>';
+ h+='<div><span style="display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--bg3);color:var(--text2);">'+(TIPOS[a.tipo]||'Actividad')+'</span></div>';
+ h+='<div><select data-id="'+a.id+'" onchange="austarActEstatus(this.dataset.id,this.value)" style="width:100%;font-family:inherit;font-size:13.5px;padding:6px 9px;border-radius:7px;border:1px solid var(--border);background:var(--bg2);color:var(--text);'+colSel+'">';
+ h+='<option value="pendiente"'+(st==='pendiente'?' selected':'')+'>Pendiente</option>';
+ h+='<option value="progreso"'+(st==='progreso'?' selected':'')+'>En progreso</option>';
+ h+='<option value="hecha"'+(st==='hecha'?' selected':'')+'>Hecha</option></select></div>';
+ h+='<div data-id="'+a.id+'" onclick="austarActBorrar(this.dataset.id)" style="text-align:center;color:var(--text3);cursor:pointer;font-weight:700;">&times;</div>';
+ return h+'</div>';
+}
+window.austarAgendaHTML=function(){
+ var A=acts().slice(), hoy=hoyStr();
+ A.sort(function(x,y){ return String(x.fecha||'').localeCompare(String(y.fecha||'')); });
+ var f=window.AUSTAR_ACT_FILTRO||'todas';
+ function st(a){ return a.estatus||'pendiente'; }
+ var venc=A.filter(function(a){ return st(a)!=='hecha' && a.fecha && a.fecha<hoy; });
+ var hechas=A.filter(function(a){ return st(a)==='hecha'; });
+ var prog=A.filter(function(a){ return st(a)==='progreso'; });
+ var pend=A.filter(function(a){ return st(a)==='pendiente' && (!a.fecha || a.fecha>=hoy); });
+ var h='';
+ h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">';
+ function met(n,l,col){ return '<div class="met"><div class="mv"'+(col?' style="color:'+col+'"':'')+'>'+n+'</div><div class="ml">'+l+'</div></div>'; }
+ h+=met(venc.length,'Vencidas', venc.length?'var(--red)':'var(--text3)');
+ h+=met(prog.length,'En progreso','var(--amber)');
+ h+=met(pend.length,'Pendientes');
+ h+=met(hechas.length,'Completadas','var(--green)');
+ h+='</div>';
+ var filtros=[['todas','Todas'],['vencidas','Vencidas'],['semana','Esta semana'],['progreso','En progreso'],['hechas','Completadas']];
+ h+='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:18px;">';
+ for(var i=0;i<filtros.length;i++){ var on=(f===filtros[i][0]);
+  h+='<button onclick="austarActFiltro(\''+filtros[i][0]+'\')" style="font-family:inherit;font-size:14px;padding:8px 15px;border-radius:20px;border:1px solid '+(on?'#2F6E3F':'var(--border)')+';background:'+(on?'#F2F7F1':'var(--bg2)')+';cursor:pointer;color:var(--text);font-weight:'+(on?'650':'400')+';">'+filtros[i][1]+'</button>'; }
+ h+='<button onclick="openNuevaActividadCal()" style="margin-left:auto;font-family:inherit;font-size:14px;padding:9px 18px;border-radius:7px;border:1px solid #2F6E3F;background:#2F6E3F;color:#fff;font-weight:600;cursor:pointer;">+ Nueva actividad</button>';
+ h+='</div>';
+ function seccion(tit,arr){ if(!arr.length) return '';
+  var s='<div style="font-size:13px;font-weight:650;color:var(--text3);margin:20px 0 8px;">'+tit+'</div>';
+  for(var j=0;j<arr.length;j++) s+=fila(arr[j]);
+  return s; }
+ var d7=new Date(); d7.setDate(d7.getDate()+7); var lim=d7.toISOString().slice(0,10);
+ var sem=pend.filter(function(a){ return a.fecha && a.fecha<=lim; });
+ var desp=pend.filter(function(a){ return !a.fecha || a.fecha>lim; });
+ if(f==='vencidas'){ h+=seccion('Vencidas',venc); }
+ else if(f==='semana'){ h+=seccion('Proximos 7 dias',sem); }
+ else if(f==='progreso'){ h+=seccion('En progreso',prog); }
+ else if(f==='hechas'){ h+=seccion('Completadas',hechas); }
+ else {
+  h+=seccion('Vencidas',venc);
+  h+=seccion('En progreso',prog);
+  h+=seccion('Proximos 7 dias',sem);
+  h+=seccion('Mas adelante',desp);
+  h+=seccion('Completadas',hechas);
+ }
+ if(!A.length) h+='<div style="background:var(--bg2);border:1px dashed var(--border);border-radius:8px;padding:28px;text-align:center;color:var(--text3);font-size:14.5px;">Aun no hay actividades. Agrega la primera con el boton de arriba.</div>';
+ return h;
+};
+window.austarPintarAgenda=function(){
+ var el=document.getElementById('calendario-body');
+ if(!el) return false;
+ el.innerHTML=window.austarAgendaHTML();
+ return true;
+};
+/* repintar cuando se guarde una actividad nueva */
+function engancharGuardar(){
+ var o=window.guardarActividadCal;
+ if(typeof o!=='function' || o.__austarAg) return false;
+ var w=function(){ var r; try{ r=o.apply(this,arguments); }catch(e){ console.error(e); }
+  try{ window.austarPintarAgenda(); }catch(e){}
+  return r; };
+ w.__austarAg=true; window.guardarActividadCal=w; return true;
+}
+setInterval(function(){
+ try{
+  engancharGuardar();
+  var t=document.getElementById('tab-calendario');
+  if(!t) return;
+  var vis=(getComputedStyle(t).display!=='none');
+  var b=document.getElementById('calendario-body');
+  if(vis && b && b.getAttribute('data-austar')!=='1'){ window.austarPintarAgenda(); b.setAttribute('data-austar','1'); }
+  if(!vis && b) b.removeAttribute('data-austar');
+ }catch(e){}
+}, 700);
+})();
+</script>
 </head>
 <body>
 
