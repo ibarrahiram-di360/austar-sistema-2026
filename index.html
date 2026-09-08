@@ -2271,6 +2271,50 @@ setInterval(function(){
 },700);
 })();
 </script>
+
+<script>
+/* AUSTAR - completar el calendario con los estados del crop schedule */
+(function(){
+function K(s){s=s||'';try{s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');}catch(e){}return s.toUpperCase().replace(/[^A-Z]/g,'');}
+/* nombre del estado como lo escribe la cartera -> clave del crop schedule */
+var EST={'COLIMA':'COLIMA','MEXICO':'EDOMEXICO','ESTADODEMEXICO':'EDOMEXICO','COAHUILA':'COAHUILA',
+'OAXACA':'OAXACA','GUERRERO':'GUERRERO','CIUDADDEMEXICO':'DF','DF':'DF','MORELOS':'MORELOS',
+'QUERETARO':'QUERETARO','CAMPECHE':'CAMPECHE','YUCATAN':'YUCATAN','HIDALGO':'HIDALGO',
+'TABASCO':'TABASCO','TLAXCALA':'TLAXCALA','QUINTANAROO':'QUINTANAROO'};
+/* cultivo del crop schedule -> clave usada en el calendario */
+var CUL={'MAIZ':'MAIZGRANO','SORGO':'SORGOGRANO','TRIGO':'TRIGOGRANO','CHILES':'CHILEVERDEYSECO',
+'FRIJOL':'FRIJOL','MANGO':'MANGO','AGUACATE':'AGUACATE','LIMON':'LIMON','NOGAL':'NOGAL',
+'PAPAYA':'PAPAYA','ALGODON':'ALGODON','CARTAMO':'CARTAMO','CEBADA':'CEBADA','SOYA':'SOYA',
+'MANI':'CACAHUATE','CHIA':'CHIA'};
+function patron(m){
+ var s='';
+ for(var i=0;i<12;i++){ var b=1<<i;
+  if(m[1]&b) s+='C';
+  else if(m[0]&b) s+='P';
+  else if(m[2]&b) s+='S';
+  else s+='D'; }
+ return s;
+}
+function completar(){
+ var CAL=window.AUSTAR_CAL2026, CROP=window.AUSTAR_CROP;
+ if(!CAL||!CROP) return false;
+ if(CAL.__completo) return true;
+ var añadidos=0;
+ for(var e in EST){
+  if(CAL[e]) continue;
+  var src=CROP[EST[e]];
+  if(!src) continue;
+  CAL[e]={};
+  for(var c in src){ var k=CUL[c]||c; CAL[e][k]=patron(src[c]); añadidos++; }
+ }
+ CAL.__completo=true;
+ if(añadidos) console.log('Calendario completado:',añadidos,'pares estado-cultivo');
+ return true;
+}
+if(document.readyState==='complete'){ completar(); } else { window.addEventListener('load', completar); }
+setInterval(completar, 1500);
+})();
+</script>
 </head>
 <body>
 
