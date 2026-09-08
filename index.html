@@ -723,6 +723,7 @@ body,#app,#main{background:#F4F8F2!important}
 
 <script src="clients_data.js"></script>
 <script src="ventas_data.js"></script>
+<script src="organizaciones_data.js"></script>
 <script>
 /* AUSTAR - ESTACIONALIDAD REAL (7 anios de ventas 2019-2025) */
 window.AUSTAR_ESTACIONAL={"AGUACATE":[1.2,0.8,6.6,9.6,4.2,5.8,16.2,12.5,15,9,14,5],"MANGO":[1.2,1.1,1.5,4.2,7.3,11.2,33.9,22.9,10.2,2.2,2.1,2.1],"TOMATE":[6.5,11.1,18.3,12.7,2,0.7,13.6,11.8,9.9,3.5,4.9,5.1],"MAIZ":[24.7,4.7,5.8,0.9,3.1,2.4,9.6,11.8,4,2,23.1,8],"GOLF":[10.9,8.5,13.1,7.3,5.8,3.9,6.7,8,11.5,11.3,3.8,9],"NOGAL":[5.4,7.8,24.1,32.9,13.3,3.7,2.3,0,0,0,0.1,10.5],"HORTALIZAS":[0,13,0.7,3.6,6.5,3.3,3.3,10.7,32.6,0.3,18.6,7.5],"ALGODON":[0,0,88.6,0,8.8,0.2,1,0,0,1.4,0,0]};
@@ -2170,6 +2171,106 @@ setInterval(function(){
 }, 800);
 })();
 </script>
+
+<script>
+/* AUSTAR - PROSPECCION: directorio de organizaciones agricolas */
+(function(){
+var KEY='austar_prospeccion';
+var RES=[['','Sin llamar'],['contesto','Contesto'],['no_contesto','No contesto'],['equivocado','Numero equivocado'],['no_interesa','No interesa'],['visita','Agendar visita'],['cliente','Convertido a cliente']];
+function leer(){ try{ return JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ return {}; } }
+function grabar(o){ try{ localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){} }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function orgs(){ return window.ORGANIZACIONES||[]; }
+window.austarProspGuardar=function(idx,campo,val){
+ var o=leer(); o[idx]=o[idx]||{};
+ o[idx][campo]=val; o[idx].fecha=new Date().toISOString().slice(0,10);
+ grabar(o); window.austarPintarProsp();
+};
+window.austarProspEstado=function(e){ window.AUSTAR_PROSP_EST=e; window.austarPintarProsp(); };
+window.austarProspFiltro=function(f){ window.AUSTAR_PROSP_FILT=f; window.austarPintarProsp(); };
+window.austarProspWhats=function(tel,nom){
+ if(!tel){ alert('Sin telefono'); return; }
+ var msg=encodeURIComponent('Buen dia, le saluda el equipo de Austar Mexico. Nos gustaria presentarles nuestro regulador de crecimiento vegetal.');
+ window.open('https://wa.me/52'+tel+'?text='+msg,'_blank');
+};
+window.austarProspHTML=function(){
+ var O=orgs(), est=window.AUSTAR_PROSP_EST||'', filt=window.AUSTAR_PROSP_FILT||'todas', S=leer();
+ var h='';
+ var estados={}; O.forEach(function(x){ estados[x.estado]=(estados[x.estado]||0)+1; });
+ var hechas=0, pend=0, visitas=0, clientes=0;
+ O.forEach(function(x,i){ var s=S[i]||{};
+  if(s.resultado){ hechas++; if(s.resultado==='visita')visitas++; if(s.resultado==='cliente')clientes++; } else pend++; });
+ h+='<div class="page-header"><div class="page-title">Prospeccion</div><div class="page-sub">Directorio de organizaciones agricolas &middot; '+O.length+' contactos en 31 estados</div></div>';
+ h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;">';
+ function met(v,l,c){ return '<div class="met"><div class="mv"'+(c?' style="color:'+c+'"':'')+'>'+v+'</div><div class="ml">'+l+'</div></div>'; }
+ h+=met(hechas,'Llamadas hechas','var(--green)');
+ h+=met(pend,'Pendientes');
+ h+=met(visitas,'Visitas agendadas','var(--amber)');
+ h+=met(clientes,'Convertidos','var(--green)');
+ h+='</div>';
+ var pct=O.length?Math.round(hechas/O.length*100):0;
+ h+='<div style="background:var(--bg3);border-radius:20px;height:8px;margin-bottom:18px;overflow:hidden;"><i style="display:block;height:100%;width:'+pct+'%;background:#2F6E3F;border-radius:20px;"></i></div>';
+ h+='<div style="font-size:13px;color:var(--text3);margin-bottom:14px;">'+pct+'% del directorio contactado</div>';
+ h+='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">';
+ h+='<select onchange="austarProspEstado(this.value)" style="font-family:inherit;font-size:14.5px;padding:9px 12px;border-radius:7px;border:1px solid var(--border);background:var(--bg2);color:var(--text);min-width:200px;">';
+ h+='<option value="">Todos los estados ('+O.length+')</option>';
+ Object.keys(estados).sort().forEach(function(e){ h+='<option value="'+esc(e)+'"'+(e===est?' selected':'')+'>'+esc(e)+' ('+estados[e]+')</option>'; });
+ h+='</select>';
+ [['todas','Todas'],['pendientes','Sin llamar'],['contesto','Contestaron'],['visita','Visitas'],['revisar','Por corregir']].forEach(function(f){
+  var on=(filt===f[0]);
+  h+='<button onclick="austarProspFiltro(\''+f[0]+'\')" style="font-family:inherit;font-size:14px;padding:8px 15px;border-radius:20px;border:1px solid '+(on?'#2F6E3F':'var(--border)')+';background:'+(on?'#F2F7F1':'var(--bg2)')+';cursor:pointer;color:var(--text);font-weight:'+(on?'650':'400')+';">'+f[1]+'</button>'; });
+ h+='</div>';
+ var lista=[];
+ O.forEach(function(x,i){ var s=S[i]||{};
+  if(est && x.estado!==est) return;
+  if(filt==='pendientes' && s.resultado) return;
+  if(filt==='contesto' && s.resultado!=='contesto') return;
+  if(filt==='visita' && s.resultado!=='visita') return;
+  if(filt==='revisar' && s.resultado!=='equivocado') return;
+  lista.push([i,x,s]); });
+ h+='<div style="font-size:13px;color:var(--text3);margin-bottom:10px;">'+lista.length+' organizaciones</div>';
+ var G='display:grid;grid-template-columns:1fr 128px 150px 30px;gap:12px;align-items:start;';
+ for(var k=0;k<lista.length && k<250;k++){
+  var i=lista[k][0], x=lista[k][1], s=lista[k][2];
+  var hecho=!!s.resultado;
+  var col = s.resultado==='cliente'?'#2F6E3F' : (s.resultado==='visita'?'#D8AE3C' : (s.resultado==='equivocado'?'#B04A24':''));
+  h+='<div class="card" style="'+G+'padding:14px 18px;margin-bottom:8px;'+(hecho?'opacity:.85;':'')+(col?'border-left:4px solid '+col+';padding-left:15px;':'')+'">';
+  h+='<div><div style="font-size:15.5px;font-weight:600;line-height:1.3;">'+esc(x.org)+'</div>';
+  h+='<div style="font-size:13px;color:var(--text3);margin-top:3px;">'+esc(x.municipio||'')+(x.municipio?', ':'')+esc(x.estado)+' &middot; '+esc(x.cultivo||'')+'</div>';
+  var cont=[];
+  if(x.tel) cont.push('<span style="color:var(--text2);">'+x.tel.replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3')+'</span>');
+  if(x.mail) cont.push('<a href="mailto:'+esc(x.mail)+'" style="color:var(--green);text-decoration:none;">'+esc(x.mail)+'</a>');
+  h+='<div style="font-size:13.5px;margin-top:5px;">'+cont.join(' &middot; ')+'</div>';
+  if(s.nota) h+='<div style="font-size:13px;color:var(--text2);margin-top:6px;padding:6px 10px;background:var(--bg3);border-radius:6px;">'+esc(s.nota)+(s.fecha?' <span style="color:var(--text3);">&middot; '+s.fecha+'</span>':'')+'</div>';
+  h+='</div>';
+  h+='<div>';
+  if(x.tel) h+='<button onclick="austarProspWhats(\''+x.tel+'\')" style="width:100%;font-family:inherit;font-size:13.5px;padding:8px;border-radius:7px;border:1px solid #2F6E3F;background:#F2F7F1;color:#2F6E3F;font-weight:600;cursor:pointer;">WhatsApp</button>';
+  else h+='<div style="font-size:12.5px;color:var(--text3);text-align:center;padding:8px;">sin telefono</div>';
+  h+='</div>';
+  h+='<div><select data-i="'+i+'" onchange="austarProspGuardar(this.dataset.i,\'resultado\',this.value)" style="width:100%;font-family:inherit;font-size:13.5px;padding:8px;border-radius:7px;border:1px solid '+(col||'var(--border)')+';background:var(--bg2);color:'+(col||'var(--text)')+';font-weight:'+(hecho?'600':'400')+';">';
+  for(var q=0;q<RES.length;q++){ h+='<option value="'+RES[q][0]+'"'+((s.resultado||'')===RES[q][0]?' selected':'')+'>'+RES[q][1]+'</option>'; }
+  h+='</select>';
+  h+='<input data-i="'+i+'" value="'+esc(s.nota||'')+'" placeholder="Nota / correccion" onchange="austarProspGuardar(this.dataset.i,\'nota\',this.value)" style="width:100%;margin-top:6px;font-family:inherit;font-size:13px;padding:7px 9px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);">';
+  h+='</div>';
+  h+='<div style="text-align:center;font-size:18px;color:'+(hecho?'#2F6E3F':'var(--bg3)')+';">&#10003;</div>';
+  h+='</div>';
+ }
+ if(lista.length>250) h+='<div style="font-size:13.5px;color:var(--text3);padding:12px;text-align:center;">Se muestran las primeras 250. Filtra por estado para ver el resto.</div>';
+ if(!lista.length) h+='<div style="background:var(--bg2);border:1px dashed var(--border);border-radius:8px;padding:28px;text-align:center;color:var(--text3);">Sin organizaciones con ese filtro.</div>';
+ return h;
+};
+window.austarPintarProsp=function(){
+ var el=document.getElementById('tab-prospeccion'); if(!el) return;
+ el.innerHTML=window.austarProspHTML();
+};
+setInterval(function(){
+ try{ var t=document.getElementById('tab-prospeccion');
+  if(t && getComputedStyle(t).display!=='none' && t.getAttribute('data-p')!=='1'){ window.austarPintarProsp(); t.setAttribute('data-p','1'); }
+  if(t && getComputedStyle(t).display==='none') t.removeAttribute('data-p');
+ }catch(e){}
+},700);
+})();
+</script>
 </head>
 <body>
 
@@ -2226,6 +2327,7 @@ setInterval(function(){
     <div class="nav-item" onclick="gotoTab('historico')" id="nav-historico">Histórico</div>
     <div class="nav-section">Operación</div>
     <div class="nav-item" onclick="gotoTab('clientes')" id="nav-clientes">Clientes</div>
+    <div class="nav-item" onclick="gotoTab('prospeccion')" id="nav-prospeccion">Prospección</div>
     <div class="nav-item" onclick="gotoTab('inventario')" id="nav-inventario">Inventario</div>
     <div class="nav-item" onclick="gotoTab('nuevo')" id="nav-nuevo">Nuevo prospecto</div>
     <div class="nav-section">Internacional</div>
@@ -2548,6 +2650,7 @@ setInterval(function(){
     </div>
 
     <!-- ─── MONITOR ─── -->
+    <div id="tab-prospeccion" class="sc"></div>
     <div id="tab-monitor" class="sc">
       <div class="page-header">
         <div class="page-title">Panel de monitoreo</div>
@@ -3085,7 +3188,7 @@ function logout(){
   user=null; selectedUser=null;
 }
 
-const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det','monitor','backup','certificados','planner','acciones','alianzas','comunidades','calendario','grupos'];
+const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det','monitor','backup','certificados','planner','acciones','alianzas','comunidades','calendario','grupos','prospeccion'];
 function gotoTab(t){
   ALL_TABS.forEach(x=>{
     const el=document.getElementById('tab-'+x);if(el)el.classList.remove('on');
