@@ -2315,6 +2315,105 @@ if(document.readyState==='complete'){ completar(); } else { window.addEventListe
 setInterval(completar, 1500);
 })();
 </script>
+
+<script>
+/* AUSTAR - GUIA DEL SISTEMA */
+(function(){
+window.austarGuiaHTML=function(){
+ var C=(window.CRM_DATA||[]).length, V=(window.VENTAS||[]).length, O=(window.ORGANIZACIONES||[]).length;
+ var h='';
+ h+='<div class="page-header"><div class="page-title">Gu\u00eda del sistema</div></div>';
+ /* PROPOSITO */
+ h+='<div class="card" style="background:linear-gradient(135deg,#1B3B23,#2F6E3F);color:#fff;border:none;margin-bottom:16px;padding:32px 34px;">';
+ h+='<div style="font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.25;margin-bottom:12px;max-width:34ch;">El sistema no guarda clientes.<br>Dice a qui\u00e9n ver hoy y por qu\u00e9.</div>';
+ h+='<div style="font-size:15.5px;line-height:1.6;opacity:.9;max-width:70ch;">Cruza '+C+' clientes con el calendario de cultivos de 31 estados y ocho a\u00f1os de ventas reales. El resultado es una lista de trabajo diaria: qui\u00e9n est\u00e1 en ventana de compra, con qu\u00e9 cultivo y cu\u00e1ntos litros vale.</div>';
+ h+='<div style="display:flex;gap:34px;margin-top:24px;flex-wrap:wrap;">';
+ [[C,'clientes'],[V,'ventas hist\u00f3ricas'],[O,'organizaciones por contactar'],['31','estados en calendario']].forEach(function(x){
+  h+='<div><div style="font-size:27px;font-weight:700;line-height:1;">'+(typeof x[0]==='number'?x[0].toLocaleString('es-MX'):x[0])+'</div><div style="font-size:13px;opacity:.75;margin-top:3px;">'+x[1]+'</div></div>'; });
+ h+='</div></div>';
+ /* EL CICLO */
+ h+='<div class="card" style="margin-bottom:16px;"><div class="ct">El ciclo</div>';
+ h+='<div style="font-size:13.5px;color:var(--text3);margin-bottom:18px;">Cada paso alimenta al siguiente. Si uno se rompe, el que sigue trabaja con supuestos.</div>';
+ var pasos=[['Calendario','El sistema dice qu\u00e9 estados y cultivos est\u00e1n en ventana este mes'],
+  ['Productor','Se abre su ficha desde la lista, con su historial y sus notas'],
+  ['Captura','Hect\u00e1reas, \u00e1rboles, altura y copa. Aqu\u00ed la estimaci\u00f3n se vuelve dato'],
+  ['Venta','Se registra al cerrarse. El precio sale solo de la tabla por volumen'],
+  ['Medici\u00f3n','El Plan de Acci\u00f3n compara lo real contra el objetivo del mes']];
+ h+='<div style="display:flex;gap:10px;flex-wrap:wrap;">';
+ for(var i=0;i<pasos.length;i++){
+  h+='<div style="flex:1;min-width:150px;background:var(--bg3);border-radius:9px;padding:16px 18px;position:relative;">';
+  h+='<div style="font-size:12px;font-weight:700;color:#2F6E3F;margin-bottom:6px;">'+(i+1)+'</div>';
+  h+='<div style="font-size:15.5px;font-weight:650;margin-bottom:5px;">'+pasos[i][0]+'</div>';
+  h+='<div style="font-size:13px;color:var(--text2);line-height:1.5;">'+pasos[i][1]+'</div></div>'; }
+ h+='</div></div>';
+ /* ROLES */
+ h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">';
+ var roles=[['Roc\u00edo','Captura','Es la \u00fanica que escribe en el sistema. Clientes, datos de huerto, ventas, llamadas de prospecci\u00f3n.','#2F6E3F'],
+  ['Vale','Dirige','Consulta y decide prioridades. Su copia es de lectura y se actualiza al consolidar respaldos.','#D8AE3C'],
+  ['Hiram','Decide','Fija objetivos por estado, precios y campa\u00f1as. Revisa el Monitor.','#1B3B23']];
+ for(var r=0;r<roles.length;r++){
+  h+='<div class="card" style="border-top:3px solid '+roles[r][3]+';">';
+  h+='<div style="font-size:17px;font-weight:700;">'+roles[r][0]+'</div>';
+  h+='<div style="font-size:12.5px;font-weight:600;color:'+roles[r][3]+';text-transform:uppercase;letter-spacing:.04em;margin:2px 0 8px;">'+roles[r][1]+'</div>';
+  h+='<div style="font-size:14px;color:var(--text2);line-height:1.55;">'+roles[r][2]+'</div></div>'; }
+ h+='</div>';
+ /* POR QUE UNA SOLA CAPTURISTA */
+ h+='<div style="background:#FFF8F4;border:1px solid #F0D5C7;border-left:4px solid #B04A24;border-radius:8px;padding:16px 20px;margin-bottom:16px;font-size:14.5px;color:var(--text2);line-height:1.6;">';
+ h+='<b style="color:#B04A24;">Por qu\u00e9 solo una persona captura.</b> Los datos viven en el navegador de cada equipo, no en un servidor. Si dos personas escriben, se crean dos versiones distintas y ninguna es la buena. Por eso Roc\u00edo captura y los dem\u00e1s consultan.</div>';
+ /* LOS 5 PASOS DIARIOS */
+ h+='<div class="card" style="margin-bottom:16px;"><div class="ct">El d\u00eda a d\u00eda</div>';
+ h+='<div style="font-size:13.5px;color:var(--text3);margin-bottom:16px;">Cinco tareas. En ese orden.</div>';
+ var dia=[['Abrir Calendario','Es la primera pantalla. Muestra los estados ordenados por valor y qui\u00e9n est\u00e1 en ventana de cierre este mes.'],
+  ['Trabajar las actividades vencidas','Salen primero, con marca naranja. Se marcan como en progreso o hecha desde el mismo rengl\u00f3n.'],
+  ['Abrir un estado y su cultivo','El bot\u00f3n + abre la lista de productores. Un clic en el nombre abre su ficha.'],
+  ['Capturar los datos del huerto','Municipio, hect\u00e1reas, \u00e1rboles, altura y copa. En grano basta municipio y hect\u00e1reas.'],
+  ['Registrar la venta si cerr\u00f3','Arriba del Calendario. El precio se calcula solo seg\u00fan volumen y presentaci\u00f3n.']];
+ for(var q=0;q<dia.length;q++){
+  h+='<div style="display:grid;grid-template-columns:30px 1fr;gap:14px;padding:12px 0;border-bottom:'+(q<dia.length-1?'1px solid var(--bg3)':'none')+';">';
+  h+='<div style="width:26px;height:26px;border-radius:50%;background:#2F6E3F;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;">'+(q+1)+'</div>';
+  h+='<div><div style="font-size:15.5px;font-weight:600;margin-bottom:3px;">'+dia[q][0]+'</div>';
+  h+='<div style="font-size:14px;color:var(--text2);line-height:1.55;">'+dia[q][1]+'</div></div></div>'; }
+ h+='</div>';
+ /* RESPALDO */
+ var ub=null, dias=null;
+ try{ ub=localStorage.getItem('austar_last_backup'); if(ub) dias=Math.floor((Date.now()-new Date(ub).getTime())/86400000); }catch(e){}
+ var alerta=(ub===null||dias>=3);
+ h+='<div class="card" style="margin-bottom:16px;border-left:4px solid '+(alerta?'#B04A24':'#2F6E3F')+';">';
+ h+='<div class="ct">El respaldo</div>';
+ h+='<div style="font-size:14.5px;color:var(--text2);line-height:1.6;margin-bottom:12px;max-width:78ch;">Todo lo capturado vive en este navegador. No hay servidor que lo guarde. <b style="color:var(--text)">Si no se exporta, se pierde.</b> Cada dos viernes, desde el m\u00f3dulo Respaldo, se descarga el archivo JSON y se guarda en Drive.</div>';
+ h+='<div style="font-size:14px;padding:11px 16px;border-radius:7px;background:'+(alerta?'#FFF8F4':'#F2F7F1')+';color:'+(alerta?'#B04A24':'#2F6E3F')+';font-weight:600;">';
+ h+=(ub===null?'No hay registro de respaldo en este equipo.':(dias===0?'Ultimo respaldo: hoy.':'Ultimo respaldo hace '+dias+' d\u00eda'+(dias>1?'s':'')+' ('+ub+').'));
+ h+='</div></div>';
+ /* QUE SE MIDE */
+ h+='<div class="card"><div class="ct">Qu\u00e9 se mide</div>';
+ h+='<div style="font-size:13.5px;color:var(--text3);margin-bottom:16px;">El sistema no sirve por tenerlo. Sirve si estos cuatro n\u00fameros se mueven.</div>';
+ var mide=[['Clientes con datos de huerto','Mientras falten, el potencial es estimaci\u00f3n. Se ve en Calendario y en Monitor.'],
+  ['Litros reales contra objetivo','Plan de Acci\u00f3n. El real se calcula solo desde las ventas registradas.'],
+  ['Organizaciones contactadas','Prospecci\u00f3n. Cada llamada verifica un dato y abre una puerta.'],
+  ['D\u00edas desde el \u00faltimo respaldo','Monitor. Si pasa de tres, hay trabajo sin copia.']];
+ h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">';
+ for(var w=0;w<mide.length;w++){
+  h+='<div style="background:var(--bg3);border-radius:8px;padding:14px 16px;">';
+  h+='<div style="font-size:15px;font-weight:650;margin-bottom:4px;">'+mide[w][0]+'</div>';
+  h+='<div style="font-size:13.5px;color:var(--text2);line-height:1.5;">'+mide[w][1]+'</div></div>'; }
+ h+='</div>';
+ h+='<div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border);font-size:14.5px;color:var(--text2);line-height:1.6;max-width:80ch;">';
+ h+='Cada dato capturado deja de ser trabajo administrativo en el momento en que el calendario lo usa para decir a qui\u00e9n llamar. <b style="color:var(--text)">Eso es lo que ning\u00fan competidor tiene.</b></div>';
+ h+='</div>';
+ return h;
+};
+window.austarPintarGuia=function(){
+ var el=document.getElementById('tab-guia'); if(!el) return;
+ el.innerHTML=window.austarGuiaHTML();
+};
+setInterval(function(){
+ try{ var t=document.getElementById('tab-guia');
+  if(t && getComputedStyle(t).display!=='none' && t.getAttribute('data-g')!=='1'){ window.austarPintarGuia(); t.setAttribute('data-g','1'); }
+  if(t && getComputedStyle(t).display==='none') t.removeAttribute('data-g');
+ }catch(e){}
+},700);
+})();
+</script>
 </head>
 <body>
 
@@ -2377,6 +2476,7 @@ setInterval(completar, 1500);
     <div class="nav-section">Internacional</div>
     <div class="nav-item" onclick="gotoTab('latam')" id="nav-latam">Mercado LATAM</div>
     <div class="nav-section">Admin</div>
+    <div class="nav-item" onclick="gotoTab('guia')" id="nav-guia">Guía</div>
     <div class="nav-item" onclick="gotoTab('monitor')" id="nav-monitor">Monitor</div>
     <div class="nav-item" onclick="gotoTab('certificados')" id="nav-certificados">Certificados</div>
     <div class="nav-item" onclick="gotoTab('backup')" id="nav-backup">Respaldo</div>
@@ -2670,6 +2770,7 @@ setInterval(completar, 1500);
 
     <!-- ─── MONITOR ─── -->
     <div id="tab-prospeccion" class="sc"></div>
+    <div id="tab-guia" class="sc"></div>
     <div id="tab-monitor" class="sc">
       <div class="page-header">
         <div class="page-title">Panel de monitoreo</div>
@@ -3207,7 +3308,7 @@ function logout(){
   user=null; selectedUser=null;
 }
 
-const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det','monitor','backup','certificados','planner','acciones','alianzas','comunidades','calendario','grupos','prospeccion'];
+const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det','monitor','backup','certificados','planner','acciones','alianzas','comunidades','calendario','grupos','prospeccion','guia'];
 function gotoTab(t){
   ALL_TABS.forEach(x=>{
     const el=document.getElementById('tab-'+x);if(el)el.classList.remove('on');
