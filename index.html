@@ -2253,7 +2253,8 @@ window.austarProspHTML=function(){
   h+='</select>';
   h+='<input data-i="'+i+'" value="'+esc(s.nota||'')+'" placeholder="Nota / correccion" onchange="austarProspGuardar(this.dataset.i,\'nota\',this.value)" style="width:100%;margin-top:6px;font-family:inherit;font-size:13px;padding:7px 9px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);">';
   h+='</div>';
-  h+='<div style="text-align:center;font-size:18px;color:'+(hecho?'#2F6E3F':'var(--bg3)')+';">&#10003;</div>';
+  h+='<div style="text-align:center;"><div style="font-size:18px;color:'+(hecho?'#2F6E3F':'var(--bg3)')+';">&#10003;</div>'
+   +'<div data-edit="'+i+'" onclick="austarProspEditar('+i+')" title="Editar" style="font-size:16px;cursor:pointer;color:var(--text3);margin-top:6px;">&#9998;</div></div>';
   h+='</div>';
  }
  if(lista.length>250) h+='<div style="font-size:13.5px;color:var(--text3);padding:12px;text-align:center;">Se muestran las primeras 250. Filtra por estado para ver el resto.</div>';
@@ -2637,6 +2638,168 @@ setInterval(function(){
   if(db && getComputedStyle(db).display==='none'){ var e=document.getElementById('dash-top5'); if(e) e.removeAttribute('data-a'); }
  }catch(e){}
 },800);
+})();
+</script>
+
+<script>
+/* AUSTAR - edicion de cliente y de organizacion */
+(function(){
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function val(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }
+function cli(id){ try{ var L=(typeof CLIENTS!=='undefined'&&CLIENTS)?CLIENTS:(window.CRM_DATA||[]); for(var i=0;i<L.length;i++){ if(L[i].id===id) return L[i]; } }catch(e){} return null; }
+/* --- EDITAR CLIENTE --- */
+window.austarEditarCliente=function(id){
+ var c=cli(id); if(!c){ alert('Cliente no encontrado'); return; }
+ var body=document.getElementById('det-body'); if(!body) return;
+ if(document.getElementById('ed-card')){ document.getElementById('ed-card').remove(); return; }
+ var st='width:100%;font-family:inherit;font-size:15px;padding:9px 11px;border:1px solid var(--border);border-radius:7px;background:var(--bg2);color:var(--text);';
+ var lb='font-size:12.5px;color:var(--text3);margin-bottom:5px;font-weight:600;';
+ var h='<div class="card" id="ed-card" style="margin-bottom:14px;border-left:3px solid var(--amber);">';
+ h+='<div class="ct">Editar datos del cliente</div>';
+ h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 10px;">';
+ h+='<div><div style="'+lb+'">Nombre</div><input id="ed-nombre" style="'+st+'" value="'+esc(c.nombre||'')+'"></div>';
+ h+='<div><div style="'+lb+'">Tel\u00e9fono</div><input id="ed-tel" style="'+st+'" value="'+esc(c.tel||'')+'"></div>';
+ h+='</div>';
+ h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">';
+ h+='<div><div style="'+lb+'">Estado</div><input id="ed-estado" style="'+st+'" value="'+esc(c.estado||'')+'"></div>';
+ h+='<div><div style="'+lb+'">Municipio</div><input id="ed-mun" style="'+st+'" value="'+esc(c.municipio||'')+'"></div>';
+ h+='<div><div style="'+lb+'">Cultivos (separa con coma)</div><input id="ed-cul" style="'+st+'" value="'+esc((c.cultivos||[]).join(', '))+'"></div>';
+ h+='</div>';
+ h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">';
+ h+='<div><div style="'+lb+'">Correo</div><input id="ed-mail" style="'+st+'" value="'+esc(c.email||c.correo||'')+'"></div>';
+ h+='<div><div style="'+lb+'">Empresa o raz\u00f3n social</div><input id="ed-emp" style="'+st+'" value="'+esc(c.empresa||c.razon||'')+'"></div>';
+ h+='</div>';
+ h+='<button class="btn btn-g" data-id="'+esc(id)+'" onclick="austarGuardarCliente(this.dataset.id)">Guardar cambios</button> ';
+ h+='<button class="btn" onclick="document.getElementById(\'ed-card\').remove()">Cancelar</button>';
+ h+='</div>';
+ var w=document.createElement('div'); w.innerHTML=h;
+ body.insertBefore(w.firstChild, body.firstChild);
+};
+window.austarGuardarCliente=function(id){
+ try{
+  var c=cli(id); if(!c) return;
+  c.nombre=val('ed-nombre')||c.nombre;
+  c.tel=val('ed-tel'); c.estado=val('ed-estado'); c.municipio=val('ed-mun');
+  c.email=val('ed-mail'); c.empresa=val('ed-emp');
+  var cs=val('ed-cul'); c.cultivos = cs ? cs.split(',').map(function(x){return x.trim();}).filter(Boolean) : [];
+  /* persistir en extras para que sobreviva a recargas */
+  try{ var o=(typeof getExtra==='function')?getExtra(id):JSON.parse(localStorage.getItem('as_ex_'+id)||'{}');
+   o.edit={nombre:c.nombre,tel:c.tel,estado:c.estado,municipio:c.municipio,email:c.email,empresa:c.empresa,cultivos:c.cultivos,fecha:new Date().toISOString().slice(0,10)};
+   if(typeof saveExtra==='function') saveExtra(id,o); else localStorage.setItem('as_ex_'+id,JSON.stringify(o)); }catch(e){}
+  var card=document.getElementById('ed-card'); if(card) card.remove();
+  if(typeof openDet==='function') openDet(id);
+  alert('Datos actualizados.');
+ }catch(e){ alert('No se pudo guardar: '+e.message); }
+};
+/* restaurar ediciones guardadas al cargar */
+function restaurar(){
+ try{
+  var L=(typeof CLIENTS!=='undefined'&&CLIENTS)?CLIENTS:(window.CRM_DATA||[]);
+  if(!L||!L.length||window.__edRest) return;
+  var n=0;
+  for(var i=0;i<L.length;i++){ var c=L[i];
+   var o=null; try{ o=JSON.parse(localStorage.getItem('as_ex_'+c.id)||'{}'); }catch(e){}
+   if(o&&o.edit){ var e=o.edit;
+    if(e.nombre)c.nombre=e.nombre; if(e.tel!=null)c.tel=e.tel;
+    if(e.estado)c.estado=e.estado; if(e.municipio!=null)c.municipio=e.municipio;
+    if(e.email!=null)c.email=e.email; if(e.empresa!=null)c.empresa=e.empresa;
+    if(e.cultivos&&e.cultivos.length)c.cultivos=e.cultivos; n++; } }
+  window.__edRest=true;
+  if(n) console.log('Ediciones restauradas:',n);
+ }catch(e){}
+}
+/* --- EDITAR ORGANIZACION EN PROSPECCION --- */
+window.austarProspEditar=function(idx){
+ var O=window.ORGANIZACIONES||[]; var x=O[idx]; if(!x) return;
+ var S={}; try{ S=JSON.parse(localStorage.getItem('austar_prospeccion')||'{}'); }catch(e){}
+ var s=S[idx]||{};
+ var st='width:100%;font-family:inherit;font-size:14.5px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);';
+ var lb='font-size:12px;color:var(--text3);margin-bottom:4px;font-weight:600;';
+ var h='<div style="background:var(--bg3);border-radius:8px;padding:14px 16px;margin-top:10px;" id="pe-'+idx+'">';
+ h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">';
+ h+='<div><div style="'+lb+'">Organizaci\u00f3n</div><input id="pe-org" style="'+st+'" value="'+esc(s.org||x.org)+'"></div>';
+ h+='<div><div style="'+lb+'">Contacto</div><input id="pe-cont" style="'+st+'" value="'+esc(s.contacto||'')+'"></div>';
+ h+='<div><div style="'+lb+'">Tel\u00e9fono</div><input id="pe-tel" style="'+st+'" value="'+esc(s.tel||x.tel||'')+'"></div>';
+ h+='</div>';
+ h+='<div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px;">';
+ h+='<div><div style="'+lb+'">Correo</div><input id="pe-mail" style="'+st+'" value="'+esc(s.mail||x.mail||'')+'"></div>';
+ h+='<div><div style="'+lb+'">Cultivo</div><input id="pe-cul" style="'+st+'" value="'+esc(s.cultivo||x.cultivo||'')+'"></div>';
+ h+='<div><div style="'+lb+'">Municipio</div><input id="pe-mun" style="'+st+'" value="'+esc(s.municipio||x.municipio||'')+'"></div>';
+ h+='<div><div style="'+lb+'">Hect\u00e1reas de la zona</div><input id="pe-ha" type="number" style="'+st+'" value="'+esc(s.ha||'')+'"></div>';
+ h+='</div>';
+ h+='<button class="btn btn-g" data-i="'+idx+'" onclick="austarProspGuardarEdit(this.dataset.i)">Guardar</button> ';
+ h+='<button class="btn" data-i="'+idx+'" onclick="austarProspAProspecto(this.dataset.i)" style="border-color:#2F6E3F;color:#2F6E3F;">Generar prospecto</button> ';
+ h+='<button class="btn" onclick="document.getElementById(\'pe-'+idx+'\').remove()">Cerrar</button>';
+ h+='</div>';
+ var cont=document.getElementById('pe-'+idx);
+ if(cont){ cont.remove(); return; }
+ var btn=document.querySelector('[data-edit="'+idx+'"]');
+ if(btn){ var card=btn.closest('.card'); var w=document.createElement('div'); w.innerHTML=h; card.appendChild(w.firstChild); }
+};
+window.austarProspGuardarEdit=function(idx){
+ try{
+  var S={}; try{ S=JSON.parse(localStorage.getItem('austar_prospeccion')||'{}'); }catch(e){}
+  S[idx]=S[idx]||{};
+  S[idx].org=val('pe-org'); S[idx].contacto=val('pe-cont'); S[idx].tel=val('pe-tel');
+  S[idx].mail=val('pe-mail'); S[idx].cultivo=val('pe-cul'); S[idx].municipio=val('pe-mun');
+  S[idx].ha=val('pe-ha'); S[idx].fecha=new Date().toISOString().slice(0,10);
+  localStorage.setItem('austar_prospeccion', JSON.stringify(S));
+  var O=window.ORGANIZACIONES||[];
+  if(O[idx]){ O[idx].org=S[idx].org||O[idx].org; O[idx].tel=S[idx].tel||O[idx].tel;
+   O[idx].mail=S[idx].mail||O[idx].mail; O[idx].cultivo=S[idx].cultivo||O[idx].cultivo;
+   O[idx].municipio=S[idx].municipio||O[idx].municipio; }
+  if(typeof window.austarPintarProsp==='function') window.austarPintarProsp();
+ }catch(e){ alert('No se pudo guardar: '+e.message); }
+};
+/* de organizacion a prospecto nuevo en la cartera */
+window.austarProspAProspecto=function(idx){
+ try{
+  var O=window.ORGANIZACIONES||[]; var x=O[idx]; if(!x) return;
+  var S={}; try{ S=JSON.parse(localStorage.getItem('austar_prospeccion')||'{}'); }catch(e){}
+  var s=S[idx]||{};
+  var nom=prompt('Nombre del productor que sale de '+(s.org||x.org)+':', s.contacto||'');
+  if(!nom) return;
+  var L=(typeof CLIENTS!=='undefined'&&CLIENTS)?CLIENTS:(window.CRM_DATA||[]);
+  var id='p'+Date.now();
+  var nuevo={id:id, nombre:nom, tel:(s.tel||x.tel||''), estado:x.estado||'',
+   municipio:(s.municipio||x.municipio||''), cultivos:[(s.cultivo||x.cultivo||'')].filter(Boolean),
+   email:(s.mail||x.mail||''), etapa_base:'prospecto', origen:('Directorio: '+(s.org||x.org))};
+  L.push(nuevo);
+  try{ var ex={origen:nuevo.origen, organizacion:(s.org||x.org), creado:new Date().toISOString().slice(0,10)};
+   localStorage.setItem('as_ex_'+id, JSON.stringify(ex)); }catch(e){}
+  try{ var nv=JSON.parse(localStorage.getItem('austar_prospectos_nuevos')||'[]'); nv.push(nuevo);
+   localStorage.setItem('austar_prospectos_nuevos', JSON.stringify(nv)); }catch(e){}
+  S[idx]=S[idx]||{}; S[idx].generados=(S[idx].generados||0)+1;
+  localStorage.setItem('austar_prospeccion', JSON.stringify(S));
+  alert('Prospecto creado: '+nom+'. Ya aparece en Clientes.');
+  if(typeof window.austarPintarProsp==='function') window.austarPintarProsp();
+ }catch(e){ alert('No se pudo crear: '+e.message); }
+};
+/* restaurar prospectos creados en sesiones anteriores */
+function restaurarNuevos(){
+ try{
+  if(window.__nvRest) return;
+  var L=(typeof CLIENTS!=='undefined'&&CLIENTS)?CLIENTS:(window.CRM_DATA||[]);
+  if(!L||!L.length) return;
+  var nv=JSON.parse(localStorage.getItem('austar_prospectos_nuevos')||'[]');
+  var ids={}; L.forEach(function(c){ ids[c.id]=1; });
+  var n=0; nv.forEach(function(x){ if(!ids[x.id]){ L.push(x); n++; } });
+  window.__nvRest=true;
+  if(n) console.log('Prospectos restaurados:',n);
+ }catch(e){}
+}
+/* enganchar el boton Editar datos de la ficha */
+function engancharBoton(){
+ var b=document.getElementById('det-edit-btn');
+ if(!b || b.__austar) return;
+ b.__austar=true;
+ b.addEventListener('click', function(){
+  var id=window.currentDetId;
+  if(!id){ alert('Abre primero la ficha de un cliente.'); return; }
+  window.austarEditarCliente(id);
+ });
+}
+setInterval(function(){ try{ restaurar(); restaurarNuevos(); engancharBoton(); }catch(e){} }, 900);
 })();
 </script>
 </head>
@@ -3537,7 +3700,7 @@ function logout(){
   user=null; selectedUser=null;
 }
 
-const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det','monitor','backup','certificados','planner','acciones','alianzas','comunidades','calendario','grupos','prospeccion','guia','mercado'];
+const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det','monitor','backup','certificados','planner','acciones','alianzas','comunidades','calendario','prospeccion','guia','mercado'];
 function gotoTab(t){
   ALL_TABS.forEach(x=>{
     const el=document.getElementById('tab-'+x);if(el)el.classList.remove('on');
@@ -4954,7 +5117,7 @@ var ALIANZAS_DEFAULT=[
   {id:'ipade',nombre:'IPADE',tipo:'Institución educativa',contacto:'',estatus:'activa',notas:''},
   {id:'inifap',nombre:'INIFAP / Dr. Juan Herrera',tipo:'Institución investigación',contacto:'Dr. Juan Herrera',estatus:'activa',notas:'Austar Academy - sesión ago 25'},
   {id:'consejo_jal',nombre:'Consejo Agropecuario Jalisco',tipo:'Consejo sectorial',contacto:'',estatus:'activa',notas:'Fondo generacional exploratorio'},
-  {id:'alsain',nombre:'ALSAIN (Saúl López)',tipo:'Agencia marketing',contacto:'Saúl López',estatus:'activa',notas:'Redes sociales desde ago 2026'},
+  {id:'alsain',nombre:'ALSAIN (Saúl López)',tipo:'Agencia marketing',contacto:'Saúl López',estatus:'activa',notas:'Redes sociales desde ago 2026'},{id:'agronetwork',nombre:'AgroNetwork (Agroamigo & OLAJ)',tipo:'Medios',contacto:'Vale / Hiram',estatus:'activa',notas:'Plataformas de contenido agrícola del grupo: Agroamigo y OLAJ LATAM.'},
   
 ];
 function getAlianzas(){try{var d=localStorage.getItem('alianzas_austar');var arr=d?JSON.parse(d):[];return arr.length>0?arr:(typeof ALIANZAS_DEFAULT!=='undefined'?ALIANZAS_DEFAULT:[]);}catch(e){return typeof ALIANZAS_DEFAULT!=='undefined'?ALIANZAS_DEFAULT:[];}}
