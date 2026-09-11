@@ -724,6 +724,7 @@ body,#app,#main{background:#F4F8F2!important}
 <script src="clients_data.js"></script>
 <script src="ventas_data.js"></script>
 <script src="organizaciones_data.js"></script>
+<script src="mercado_data.js"></script>
 <script>
 /* AUSTAR - ESTACIONALIDAD REAL (7 anios de ventas 2019-2025) */
 window.AUSTAR_ESTACIONAL={"AGUACATE":[1.2,0.8,6.6,9.6,4.2,5.8,16.2,12.5,15,9,14,5],"MANGO":[1.2,1.1,1.5,4.2,7.3,11.2,33.9,22.9,10.2,2.2,2.1,2.1],"TOMATE":[6.5,11.1,18.3,12.7,2,0.7,13.6,11.8,9.9,3.5,4.9,5.1],"MAIZ":[24.7,4.7,5.8,0.9,3.1,2.4,9.6,11.8,4,2,23.1,8],"GOLF":[10.9,8.5,13.1,7.3,5.8,3.9,6.7,8,11.5,11.3,3.8,9],"NOGAL":[5.4,7.8,24.1,32.9,13.3,3.7,2.3,0,0,0,0.1,10.5],"HORTALIZAS":[0,13,0.7,3.6,6.5,3.3,3.3,10.7,32.6,0.3,18.6,7.5],"ALGODON":[0,0,88.6,0,8.8,0.2,1,0,0,1.4,0,0]};
@@ -2441,6 +2442,105 @@ if(document.readyState==='complete'){ aplicar(); } else { window.addEventListene
 setInterval(aplicar, 1500);
 })();
 </script>
+
+<script>
+/* AUSTAR - MERCADO: superficie nacional vs tu cartera */
+(function(){
+function K(s){s=s||'';try{s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');}catch(e){}return s.toUpperCase().replace(/[^A-Z]/g,'');}
+function mx(x){ try{ return '$'+Math.round(x).toLocaleString('es-MX'); }catch(e){ return '$'+Math.round(x); } }
+function nf(x){ try{ return Math.round(x).toLocaleString('es-MX'); }catch(e){ return Math.round(x); } }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+/* clientes por estado-cultivo */
+function cartera(){
+ var L=(typeof CLIENTS!=='undefined'&&CLIENTS&&CLIENTS.length)?CLIENTS:(window.CRM_DATA||[]);
+ var m={};
+ for(var i=0;i<L.length;i++){ var c=L[i], e=K(c.estado);
+  (c.cultivos||[]).forEach(function(x){ var k=e+'|'+K(x); m[k]=(m[k]||0)+1; });
+ }
+ return m;
+}
+/* ventas historicas por estado-cultivo */
+function ventas(){
+ var V=(typeof window.austarTodasVentas==='function')?window.austarTodasVentas():(window.VENTAS||[]);
+ var m={};
+ for(var i=0;i<V.length;i++){ var s=V[i]; if(s.sinFecha) continue;
+  var k=K(s.estado)+'|'+K(s.cultivo); m[k]=(m[k]||0)+s.litros; }
+ return m;
+}
+var ALIAS={'MAIZGRANO':'MAIZ','SORGOGRANO':'SORGO','TRIGOGRANO':'TRIGO','TOMATEROJOJITOMATE':'TOMATE',
+'TOMATEVERDE':'TOMATILLO','CHILEVERDE':'CHILE','CHILESECO':'CHILE','CANADEAZUCAR':'CANA','NUEZ':'NOGAL',
+'MANZANA':'MANZANO','NARANJA':'NARANJO','AVENAFORRAJERAENVERDE':'AVENA','AVENAGRANO':'AVENA',
+'ALFALFAVERDE':'ALFALFA','ALFALFAACHICALADA':'ALFALFA','ALGODONHUESO':'ALGODON','CAFECEREZA':'CAFE',
+'GARBANZOGRANO':'GARBANZO','CEBADAGRANO':'CEBADA','CALABACITA':'CALABAZA','MAIZFORRAJEROENVERDE':'MAIZ',
+'SORGOFORRAJEROENVERDE':'SORGO','LIMONREAL':'LIMON','TORONJAPOMELO':'TORONJA'};
+function alias(c){ var k=K(c); return ALIAS[k]||k; }
+window.austarMercadoEstado=function(e){ window.AUSTAR_MK_EST=e; window.austarPintarMercado(); };
+window.austarMercadoHTML=function(){
+ var M=window.MERCADO||[], MU=window.MERCADO_MUN||[];
+ if(!M.length) return '<div class="card">No se carg\u00f3 el archivo de mercado.</div>';
+ var CA=cartera(), VE=ventas();
+ var est=window.AUSTAR_MK_EST||'';
+ var h='';
+ h+='<div class="page-header"><div class="page-title">Mercado</div><div class="page-sub">Superficie nacional contra tu cartera &middot; SIAP, cierre agr\u00edcola 2025</div></div>';
+ /* totales */
+ var tHa=0,tL=0,tVal=0;
+ M.forEach(function(x){ tHa+=x.ha; tL+=x.litros; tVal+=x.valorMDP; });
+ var misL=0; for(var k in VE) misL+=VE[k];
+ h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;">';
+ function met(v,l,c){ return '<div class="met"><div class="mv"'+(c?' style="color:'+c+'"':'')+'>'+v+'</div><div class="ml">'+l+'</div></div>'; }
+ h+=met(nf(tHa)+' ha','Superficie mapeada');
+ h+=met(nf(tL)+' L','Potencial nacional','var(--green)');
+ h+=met(mx(tVal*1e6).replace(/,\d{3},\d{3}$/,'M'),'Valor de producci\u00f3n','var(--amber)');
+ h+=met((misL/tL*100).toFixed(2)+'%','Tu penetraci\u00f3n','var(--red)');
+ h+='</div>';
+ /* selector */
+ var estados={}; M.forEach(function(x){ estados[x.estado]=(estados[x.estado]||0)+x.litros; });
+ h+='<div style="margin-bottom:16px;"><select onchange="austarMercadoEstado(this.value)" style="font-family:inherit;font-size:15px;padding:10px 13px;border-radius:7px;border:1px solid var(--border);background:var(--bg2);color:var(--text);min-width:280px;">';
+ h+='<option value="">Todos los estados</option>';
+ Object.keys(estados).sort(function(a,b){return estados[b]-estados[a];}).forEach(function(x){
+  h+='<option value="'+esc(x)+'"'+(x===est?' selected':'')+'>'+esc(x)+' &middot; '+nf(estados[x])+' L</option>'; });
+ h+='</select></div>';
+ var lista=est?M.filter(function(x){return x.estado===est;}):M.slice().sort(function(a,b){return b.litros-a.litros;}).slice(0,40);
+ lista=lista.slice().sort(function(a,b){return b.litros-a.litros;});
+ var G='display:grid;grid-template-columns:1fr 96px 104px 92px 80px 1fr;gap:12px;align-items:center;';
+ h+='<div class="card" style="padding:0 !important;overflow:hidden;">';
+ h+='<div style="'+G+'padding:13px 20px;border-bottom:1.5px solid var(--border);font-size:12.5px;color:var(--text3);font-weight:600;">';
+ h+='<span>Cultivo'+(est?'':' y estado')+'</span><span style="text-align:right">Hect\u00e1reas</span><span style="text-align:right">Potencial</span><span style="text-align:right">Tus clientes</span><span style="text-align:right">Penetr.</span><span>Municipios principales</span></div>';
+ for(var i=0;i<lista.length;i++){ var x=lista[i];
+  var key=K(x.estado)+'|'+alias(x.cultivo);
+  var cli=CA[key]||0, vl=VE[key]||0;
+  var pen=x.litros>0?(vl/x.litros*100):0;
+  var col = cli===0 ? '#B04A24' : (pen<1?'#D8AE3C':'#2F6E3F');
+  var muns=MU.filter(function(m){return m.estado===x.estado && m.cultivo===x.cultivo;})
+            .sort(function(a,b){return b.ha-a.ha;}).slice(0,2)
+            .map(function(m){return esc(m.municipio)+' '+nf(m.ha)+' ha';}).join(' &middot; ');
+  h+='<div style="'+G+'padding:12px 20px;border-bottom:1px solid var(--bg3);font-size:15px;border-left:3px solid '+col+';">';
+  h+='<span><b>'+esc(x.cultivo)+'</b>'+(x.frutal?' <span style="font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:20px;background:#E8F1E9;color:#2F6E3F;">frutal</span>':'')
+    +(est?'':'<br><span style="font-size:12.5px;color:var(--text3);">'+esc(x.estado)+'</span>')+'</span>';
+  h+='<span style="text-align:right;">'+nf(x.ha)+'</span>';
+  h+='<span style="text-align:right;font-weight:650;color:var(--green);">'+nf(x.litros)+' L</span>';
+  h+='<span style="text-align:right;font-weight:650;color:'+(cli?'var(--text)':'#B04A24')+';">'+cli+'</span>';
+  h+='<span style="text-align:right;font-size:13.5px;color:'+col+';font-weight:600;">'+(pen>0?pen.toFixed(2)+'%':'0%')+'</span>';
+  h+='<span style="font-size:13px;color:var(--text2);">'+(muns||'&mdash;')+'</span>';
+  h+='</div>';
+ }
+ h+='</div>';
+ h+='<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid #D8AE3C;border-radius:8px;padding:15px 20px;margin-top:16px;font-size:14.5px;color:var(--text2);line-height:1.6;max-width:92ch;">';
+ h+='<b style="color:var(--text)">C\u00f3mo leerlo.</b> El borde naranja marca cultivos donde no tienes un solo cliente. El potencial usa 3.15 L/ha en frutal y 0.125 en grano. Las cifras de superficie son de SIAP, cierre agr\u00edcola 2025 definitivo &mdash; son p\u00fablicas y verificables.</div>';
+ return h;
+};
+window.austarPintarMercado=function(){
+ var el=document.getElementById('tab-mercado'); if(!el) return;
+ el.innerHTML=window.austarMercadoHTML();
+};
+setInterval(function(){
+ try{ var t=document.getElementById('tab-mercado');
+  if(t && getComputedStyle(t).display!=='none' && t.getAttribute('data-m')!=='1'){ window.austarPintarMercado(); t.setAttribute('data-m','1'); }
+  if(t && getComputedStyle(t).display==='none') t.removeAttribute('data-m');
+ }catch(e){}
+},700);
+})();
+</script>
 </head>
 <body>
 
@@ -2500,6 +2600,7 @@ setInterval(aplicar, 1500);
     <div class="nav-section">Operación</div>
     <div class="nav-item" onclick="gotoTab('clientes')" id="nav-clientes">Clientes</div>
     <div class="nav-item" onclick="gotoTab('prospeccion')" id="nav-prospeccion">Prospección</div>
+    <div class="nav-item" onclick="gotoTab('mercado')" id="nav-mercado">Mercado</div>
     <div class="nav-item" onclick="gotoTab('inventario')" id="nav-inventario">Inventario</div>
     <div class="nav-item" onclick="gotoTab('nuevo')" id="nav-nuevo">Nuevo prospecto</div>
     <div class="nav-section">Internacional</div>
@@ -2799,6 +2900,7 @@ setInterval(aplicar, 1500);
 
     <!-- ─── MONITOR ─── -->
     <div id="tab-prospeccion" class="sc"></div>
+    <div id="tab-mercado" class="sc"></div>
     <div id="tab-guia" class="sc"></div>
     <div id="tab-monitor" class="sc">
       <div class="page-header">
@@ -3337,7 +3439,7 @@ function logout(){
   user=null; selectedUser=null;
 }
 
-const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det','monitor','backup','certificados','planner','acciones','alianzas','comunidades','calendario','grupos','prospeccion','guia'];
+const ALL_TABS=['dashboard','historico','clientes','detalle','inventario','nuevo','latam','latam-det','monitor','backup','certificados','planner','acciones','alianzas','comunidades','calendario','grupos','prospeccion','guia','mercado'];
 function gotoTab(t){
   ALL_TABS.forEach(x=>{
     const el=document.getElementById('tab-'+x);if(el)el.classList.remove('on');
