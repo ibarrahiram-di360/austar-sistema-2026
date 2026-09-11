@@ -2551,6 +2551,94 @@ setInterval(function(){
 },700);
 })();
 </script>
+
+<script>
+/* AUSTAR - ajustes pedidos por el equipo */
+(function(){
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function nf(x){ try{ return Math.round(x).toLocaleString('es-MX'); }catch(e){ return Math.round(x); } }
+function K(s){s=s||'';try{s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');}catch(e){}return s.toUpperCase().trim();}
+/* --- 1. Certificados: selector de cliente --- */
+window.austarCertCliente=function(id){
+ try{
+  var L=(typeof CLIENTS!=='undefined'&&CLIENTS)?CLIENTS:(window.CRM_DATA||[]);
+  var c=null; for(var i=0;i<L.length;i++){ if(L[i].id===id){ c=L[i]; break; } }
+  if(!c) return;
+  function set(k,val){ var e=document.getElementById(k); if(e&&val!=null) e.value=val; }
+  set('cert-nombre', c.nombre||'');
+  set('cert-tel', c.tel||'');
+  set('cert-cultivo', (c.cultivos&&c.cultivos[0])||'');
+  var ex={}; try{ ex=(typeof getExtra==='function')?getExtra(id):JSON.parse(localStorage.getItem('as_ex_'+id)||'{}'); }catch(e){}
+  if(ex.ha) set('cert-ha', ex.ha);
+  if(ex.arboles) set('cert-arboles', ex.arboles);
+  if(ex.altura) set('cert-altura', ex.altura);
+  if(ex.copa) set('cert-copa', ex.copa);
+  var eP=document.getElementById('cert-primera'); if(eP&&ex.primera) eP.value=ex.primera;
+  var eE=document.getElementById('cert-edad'); if(eE&&ex.edad) eE.value=ex.edad;
+  if(typeof certCalc==='function') certCalc();
+ }catch(e){ console.error('cert cliente:',e); }
+};
+function ponerSelector(){
+ var campo=document.getElementById('cert-nombre');
+ if(!campo || document.getElementById('cert-sel')) return;
+ var L=(typeof CLIENTS!=='undefined'&&CLIENTS)?CLIENTS:(window.CRM_DATA||[]);
+ if(!L.length) return;
+ var cont=campo.parentNode;
+ var w=document.createElement('div');
+ var h='<div class="lbl">Seleccionar cliente de la cartera</div>';
+ h+='<select id="cert-sel" onchange="austarCertCliente(this.value)" style="width:100%;font-family:inherit;font-size:15px;padding:9px 11px;border:1px solid var(--border);border-radius:7px;background:var(--bg2);color:var(--text);">';
+ h+='<option value="">Escribir manualmente</option>';
+ var arr=L.slice().sort(function(a,b){ return String(a.nombre||'').localeCompare(String(b.nombre||'')); });
+ for(var i=0;i<arr.length;i++){ var c=arr[i];
+  h+='<option value="'+esc(c.id)+'">'+esc(c.nombre)+(c.estado?' &middot; '+esc(c.estado):'')+'</option>'; }
+ h+='</select>';
+ w.innerHTML=h;
+ w.style.gridColumn='1 / -1';
+ cont.parentNode.insertBefore(w, cont);
+}
+/* --- 2. Dashboard: Top 5 clientes activos con ventas del anio en curso --- */
+window.austarTop5HTML=function(){
+ var V=(typeof window.austarTodasVentas==='function')?window.austarTodasVentas():(window.VENTAS||[]);
+ var y=new Date().getFullYear();
+ var anios={}; V.forEach(function(s){ if(!s.sinFecha) anios[s.anio]=1; });
+ if(!anios[y]){ var ks=Object.keys(anios).map(Number).sort(); y=ks[ks.length-1]||y; }
+ var m={};
+ V.forEach(function(s){ if(s.sinFecha||s.anio!==y) return;
+  var k=K(s.cliente); if(!k) return;
+  if(!m[k]) m[k]={n:s.cliente,L:0,mxn:0,ops:0};
+  m[k].L+=s.litros; m[k].mxn+=s.mxn||0; m[k].ops++; });
+ var arr=Object.keys(m).map(function(k){return m[k];}).sort(function(a,b){return b.L-a.L;}).slice(0,5);
+ if(!arr.length) return '<div style="font-size:14px;color:var(--text3);">Sin ventas registradas en '+y+'.</div>';
+ var h='<div style="font-size:12.5px;color:var(--text3);margin-bottom:8px;">Por litros vendidos en '+y+'</div>';
+ var mx=arr[0].L||1;
+ for(var i=0;i<arr.length;i++){ var x=arr[i];
+  h+='<div style="padding:8px 0;border-bottom:'+(i<arr.length-1?'1px solid var(--bg3)':'none')+';">';
+  h+='<div style="display:flex;align-items:baseline;gap:10px;">';
+  h+='<span style="font-size:14.5px;font-weight:600;flex:1;">'+esc(x.n.slice(0,30))+'</span>';
+  h+='<span style="font-size:14.5px;font-weight:700;color:var(--green);">'+nf(x.L)+' L</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-top:4px;">';
+  h+='<div style="flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;"><i style="display:block;height:100%;width:'+(x.L/mx*100).toFixed(0)+'%;background:#2F6E3F;"></i></div>';
+  h+='<span style="font-size:12px;color:var(--text3);white-space:nowrap;">$'+nf(x.mxn)+' &middot; '+x.ops+' ops</span></div>';
+  h+='</div>'; }
+ return h;
+};
+function pintarTop5(){
+ var el=document.getElementById('dash-top5');
+ if(!el || el.getAttribute('data-a')==='1') return;
+ var h=window.austarTop5HTML();
+ if(h){ el.innerHTML=h; el.setAttribute('data-a','1'); }
+}
+setInterval(function(){
+ try{
+  var t=document.getElementById('tab-certificados');
+  if(t && getComputedStyle(t).display!=='none') ponerSelector();
+  var db=document.getElementById('tab-dashboard');
+  if(db && getComputedStyle(db).display!=='none') pintarTop5();
+  if(db && getComputedStyle(db).display==='none'){ var e=document.getElementById('dash-top5'); if(e) e.removeAttribute('data-a'); }
+ }catch(e){}
+},800);
+})();
+</script>
 </head>
 <body>
 
@@ -2798,12 +2886,12 @@ setInterval(function(){
                 </optgroup>
                 <optgroup label="Salidas — Ventas">
                   <option value="venta">💰 Venta directa — cliente contado</option>
-                  <option value="credito_odiseo">🤝 Crédito Odiseo (90 días) — no es venta aún</option>
-                  <option value="cobro_odiseo">✅ Cobro Odiseo — se convierte en venta</option>
+                  
+                  
                 </optgroup>
                 <optgroup label="Puntos de venta">
-                  <option value="traslado_dasam">🏪 Traslado → Agrícola Dasam</option>
-                  <option value="traslado_pv">🏪 Traslado → Otro punto de venta</option>
+                  
+                  
                 </optgroup>
                 <optgroup label="Otros">
                   <option value="devolucion">↩️ Devolución a almacén</option>
@@ -4867,7 +4955,7 @@ var ALIANZAS_DEFAULT=[
   {id:'inifap',nombre:'INIFAP / Dr. Juan Herrera',tipo:'Institución investigación',contacto:'Dr. Juan Herrera',estatus:'activa',notas:'Austar Academy - sesión ago 25'},
   {id:'consejo_jal',nombre:'Consejo Agropecuario Jalisco',tipo:'Consejo sectorial',contacto:'',estatus:'activa',notas:'Fondo generacional exploratorio'},
   {id:'alsain',nombre:'ALSAIN (Saúl López)',tipo:'Agencia marketing',contacto:'Saúl López',estatus:'activa',notas:'Redes sociales desde ago 2026'},
-  {id:'agrofertil',nombre:'Agrofértil (Carlos Garzón)',tipo:'Distribuidor LATAM',contacto:'Carlos Garzón',estatus:'activa',notas:'Master Distribuidor Colombia 2000L'},
+  
 ];
 function getAlianzas(){try{var d=localStorage.getItem('alianzas_austar');var arr=d?JSON.parse(d):[];return arr.length>0?arr:(typeof ALIANZAS_DEFAULT!=='undefined'?ALIANZAS_DEFAULT:[]);}catch(e){return typeof ALIANZAS_DEFAULT!=='undefined'?ALIANZAS_DEFAULT:[];}}
 function saveAlianza(a){var arr=getAlianzas();if(!a.id)a.id='al_'+Date.now();var i=arr.findIndex(function(x){return x.id===a.id;});if(i>=0)arr[i]=a;else arr.push(a);localStorage.setItem('alianzas_austar',JSON.stringify(arr));}
