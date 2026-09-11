@@ -1079,6 +1079,8 @@ window.austarPanelCal=function(mi){
  for(var m=0;m<12;m++){ var on=(m===mi);
   h+='<button onclick="austarSetMes('+m+')" style="flex:1;min-width:60px;background:'+(on?'#F2F7F1':'var(--bg2)')+';border:1px solid '+(on?'#2F6E3F':'var(--border)')+';border-radius:7px;padding:9px 4px;cursor:pointer;font-weight:'+(on?'700':'500')+';font-size:14px;color:var(--text);">'+M[m]+'</button>'; }
  h+='</div></div>';
+ var potEst={}; ests.forEach(function(e){ potEst[e]=E[e].L; });
+ if(typeof window.austarMetaHTML==='function'){ h+=window.austarMetaHTML(mi, potEst); }
  var G='display:grid;grid-template-columns:1fr 74px 74px 74px 100px 122px 30px;gap:10px;align-items:center;';
  if(sinDato>0){
   h+='<div style="background:#FFF8F4;border:1px solid #F0D5C7;border-left:4px solid #B04A24;border-radius:8px;padding:13px 18px;margin-bottom:14px;font-size:14px;color:var(--text2);">';
@@ -1175,7 +1177,7 @@ window.austarVerClientes=function(est,cul,mi){
   ov.innerHTML='<div style="background:var(--bg2);border-radius:10px;padding:22px 26px;max-width:760px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.25);"><div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;"><div class="ct">'+cul+' &middot; '+est+'</div><button onclick="document.getElementById(\'austar-lista-ov\').remove()" style="margin-left:auto;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);">&times;</button></div>'+h+'</div>';
  }catch(e){ alert('No se pudo abrir la lista: '+e.message); }
 };
-window.austarSetMes=function(m){window.AUSTAR_MES=m;var el=document.getElementById('austar-cal-panel');if(el)el.innerHTML=window.austarPanelCal(m);};
+window.austarSetMes=function(m){ window.AUSTAR_MES=m;window.AUSTAR_MES=m;var el=document.getElementById('austar-cal-panel');if(el)el.innerHTML=window.austarPanelCal(m);};
 function pintar(){
  var el=document.getElementById('tab-calendario');if(!el)return;
  if(document.getElementById('austar-cal-panel'))return;
@@ -2802,6 +2804,98 @@ function engancharBoton(){
 setInterval(function(){ try{ restaurar(); restaurarNuevos(); engancharBoton(); }catch(e){} }, 900);
 })();
 </script>
+
+<script>
+/* AUSTAR - Calendario: meta y avance por estado (absorbe el Plan de Accion) */
+(function(){
+function K(s){s=s||'';try{s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');}catch(e){}return s.toUpperCase().trim();}
+function nf(x){ try{ return Math.round(x).toLocaleString('es-MX'); }catch(e){ return Math.round(x); } }
+function mxn(x){ return '$'+nf(x); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+/* hectareas del mercado por estado (SIAP) */
+function haMercado(){
+ var m={}, M=window.MERCADO||[];
+ M.forEach(function(x){ var k=K(x.estado); m[k]=(m[k]||0)+x.ha; });
+ return m;
+}
+/* hectareas capturadas por estado (de la cartera) */
+function haCartera(){
+ var m={}, L=(typeof CLIENTS!=='undefined'&&CLIENTS)?CLIENTS:(window.CRM_DATA||[]);
+ L.forEach(function(c){
+  var o=null; try{ o=JSON.parse(localStorage.getItem('as_ex_'+c.id)||'{}'); }catch(e){}
+  var ha=o&&+o.ha||0; if(ha>0){ var k=K(c.estado); m[k]=(m[k]||0)+ha; } });
+ return m;
+}
+/* litros vendidos del mes por estado */
+function vendido(y,mi){
+ var m={}, tot=0;
+ var V=(typeof window.austarTodasVentas==='function')?window.austarTodasVentas():(window.VENTAS||[]);
+ V.forEach(function(s){ if(s.sinFecha||s.anio!==y||s.mes!==mi) return;
+  var k=K(s.estado); m[k]=m[k]||{L:0,mxn:0}; m[k].L+=s.litros; m[k].mxn+=s.mxn||0; tot+=s.litros; });
+ m.__tot=tot;
+ return m;
+}
+function clave(y,mi){ return 'as_meta_'+y+'_'+mi; }
+window.austarMetaLeer=function(y,mi){ try{ return JSON.parse(localStorage.getItem(clave(y,mi))||'{}'); }catch(e){ return {}; } };
+window.austarMetaSet=function(est,campo,valor){
+ var mi=(typeof window.AUSTAR_MES==='number')?window.AUSTAR_MES:new Date().getMonth();
+ var y=new Date().getFullYear();
+ var o=window.austarMetaLeer(y,mi); o[est]=o[est]||{};
+ o[est][campo]=(valor===''?null:+valor);
+ try{ localStorage.setItem(clave(y,mi), JSON.stringify(o)); }catch(e){}
+ if(typeof window.austarSetMes==='function') window.austarSetMes(mi);
+};
+/* tabla de meta y avance, se inserta debajo de los indicadores del calendario */
+window.austarMetaHTML=function(mi, potPorEstado){
+ var y=new Date().getFullYear();
+ var HM=haMercado(), HC=haCartera(), VD=vendido(y,mi), META=window.austarMetaLeer(y,mi);
+ var ests=Object.keys(potPorEstado||{}).sort(function(a,b){ return potPorEstado[b]-potPorEstado[a]; });
+ if(!ests.length) return '';
+ var tObj=0,tVen=0,tPot=0,tMxn=0,tHaM=0,tHaC=0;
+ ests.forEach(function(e){
+  var k=K(e), pot=potPorEstado[e]||0;
+  var mt=META[e]||{};
+  tObj+=(mt.obj!=null?mt.obj:Math.round(pot*0.6));
+  var v=(VD[k]||{L:0,mxn:0});
+  tVen+=(mt.real!=null?mt.real:v.L); tMxn+=v.mxn; tPot+=pot;
+  tHaM+=(HM[k]||0); tHaC+=(HC[k]||0); });
+ var pct=tObj>0?Math.round(tVen/tObj*100):0;
+ var G='display:grid;grid-template-columns:1fr 92px 88px 92px 96px 92px 66px 104px;gap:10px;align-items:center;';
+ var h='<div class="card" style="padding:0 !important;overflow:hidden;margin-bottom:14px;">';
+ h+='<div style="padding:15px 20px 4px;"><div class="ct">Meta y avance del mes</div>';
+ h+='<div style="font-size:13px;color:var(--text3);margin-bottom:12px;">El objetivo lo defines t\u00fa. Lo vendido sale de las ventas registradas.</div></div>';
+ h+='<div style="'+G+'padding:10px 20px;border-top:1px solid var(--border);border-bottom:1.5px solid var(--border);font-size:12px;color:var(--text3);font-weight:600;">';
+ h+='<span>Estado</span><span style="text-align:right">ha mercado</span><span style="text-align:right">ha tuyas</span><span style="text-align:right">Potencial</span><span style="text-align:right">Objetivo L</span><span style="text-align:right">Vendido L</span><span style="text-align:right">Avance</span><span style="text-align:right">Cierre $</span></div>';
+ for(var i=0;i<ests.length;i++){ var e=ests[i], k=K(e);
+  var pot=potPorEstado[e]||0, mt=META[e]||{}, v=(VD[k]||{L:0,mxn:0});
+  var obj=(mt.obj!=null?mt.obj:Math.round(pot*0.6));
+  var ven=(mt.real!=null?mt.real:v.L);
+  var av=obj>0?Math.min(Math.round(ven/obj*100),999):0;
+  var col=av>=100?'var(--green)':(av>=50?'var(--amber)':'#B6C4B8');
+  var st='width:100%;font-family:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;text-align:right;background:var(--bg2);color:var(--text);';
+  var haM=HM[k]||0, haC=HC[k]||0;
+  h+='<div style="'+G+'padding:10px 20px;border-bottom:1px solid var(--bg3);font-size:14.5px;">';
+  h+='<span style="font-weight:600;">'+esc(e)+'</span>';
+  h+='<span style="text-align:right;color:var(--text3);">'+(haM?nf(haM):'&mdash;')+'</span>';
+  h+='<span style="text-align:right;font-weight:600;color:'+(haC?'var(--text)':'#B04A24')+';">'+(haC?nf(haC):'0')+'</span>';
+  h+='<span style="text-align:right;color:var(--green);font-weight:600;">'+nf(pot)+'</span>';
+  h+='<span style="text-align:right;"><input type="number" data-e="'+esc(e)+'" value="'+obj+'" style="'+st+'" onchange="austarMetaSet(this.dataset.e,\'obj\',this.value)"></span>';
+  h+='<span style="text-align:right;"><input type="number" data-e="'+esc(e)+'" value="'+Math.round(ven)+'" style="'+st+'" onchange="austarMetaSet(this.dataset.e,\'real\',this.value)"></span>';
+  h+='<span style="text-align:right;font-weight:700;color:'+col+';">'+av+'%</span>';
+  h+='<span style="text-align:right;font-weight:600;">'+(v.mxn?mxn(v.mxn):'&mdash;')+'</span>';
+  h+='</div>'; }
+ var pctT=tObj>0?Math.round(tVen/tObj*100):0;
+ h+='<div style="'+G+'padding:13px 20px;background:var(--bg3);font-size:14.5px;font-weight:700;">';
+ h+='<span>Total</span><span style="text-align:right">'+nf(tHaM)+'</span><span style="text-align:right">'+nf(tHaC)+'</span>';
+ h+='<span style="text-align:right;color:var(--green);">'+nf(tPot)+'</span><span style="text-align:right">'+nf(tObj)+'</span>';
+ h+='<span style="text-align:right">'+nf(tVen)+'</span>';
+ h+='<span style="text-align:right;color:'+(pctT>=100?'var(--green)':(pctT>=50?'var(--amber)':'var(--red)'))+';">'+pctT+'%</span>';
+ h+='<span style="text-align:right">'+mxn(tMxn)+'</span></div>';
+ h+='</div>';
+ return h;
+};
+})();
+</script>
 </head>
 <body>
 
@@ -2871,7 +2965,6 @@ setInterval(function(){ try{ restaurar(); restaurarNuevos(); engancharBoton(); }
     
     <div class="nav-item" onclick="gotoTab('certificados')" id="nav-certificados">Certificados</div>
     <div class="nav-item" onclick="gotoTab('backup')" id="nav-backup">Respaldo</div>
-    <div class="nav-item" onclick="gotoTab('planner')" id="nav-planner">Plan de Acción</div>
     <div class="nav-item" onclick="gotoTab('alianzas')" id="nav-alianzas">Alianzas</div>
     <div class="nav-item" onclick="gotoTab('comunidades')" id="nav-comunidades">Grupos</div>
     
