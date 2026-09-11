@@ -1024,8 +1024,8 @@ window.austarCruce=function(mi){
  for(var i=0;i<lista.length;i++){
   var cl=lista[i],st=CAL[K(cl.estado)],hit=false,cus=cl.cultivos||[];
   if(st)for(var j=0;j<cus.length;j++){
-   var cn=MAP[K(cus[j])];if(!cn)continue;
-   var pat=st[cn];if(!pat)continue;
+   var kk=K(cus[j]); var cn=MAP[kk]||kk;
+   var pat=st[cn]||st[kk];if(!pat)continue;
    var a=pat.charAt(mi);if('CPSD'.indexOf(a)<0)continue;
    var k=a+'|'+cl.estado+'|'+cus[j];b[k]=(b[k]||0)+1;tot[a]++;hit=true;
    if(a==='C'){ ids[k]=ids[k]||[]; ids[k].push(cl.id); }}
@@ -2302,11 +2302,21 @@ function completar(){
  if(CAL.__completo) return true;
  var añadidos=0;
  for(var e in EST){
-  if(CAL[e]) continue;
   var src=CROP[EST[e]];
   if(!src) continue;
-  CAL[e]={};
-  for(var c in src){ var k=CUL[c]||c; CAL[e][k]=patron(src[c]); añadidos++; }
+  if(!CAL[e]) CAL[e]={};
+  for(var c in src){ var k=CUL[c]||c;
+   if(!CAL[e][k]){ CAL[e][k]=patron(src[c]); añadidos++; }
+   if(k!==c && !CAL[e][c]){ CAL[e][c]=patron(src[c]); añadidos++; } }
+ }
+ /* y para TODOS los estados del crop schedule, no solo los del mapa */
+ for(var e2 in CROP){
+  var dest=null;
+  for(var kk in CAL){ if(kk.indexOf('__')===0) continue; if(K(kk)===e2){ dest=kk; break; } }
+  if(!dest) continue;
+  for(var c2 in CROP[e2]){ var k2=CUL[c2]||c2;
+   if(!CAL[dest][k2]){ CAL[dest][k2]=patron(CROP[e2][c2]); añadidos++; }
+   if(k2!==c2 && !CAL[dest][c2]){ CAL[dest][c2]=patron(CROP[e2][c2]); añadidos++; } }
  }
  CAL.__completo=true;
  if(añadidos) console.log('Calendario completado:',añadidos,'pares estado-cultivo');
