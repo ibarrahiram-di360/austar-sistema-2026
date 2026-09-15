@@ -1072,7 +1072,6 @@ window.austarPanelCal=function(mi){
  }
  var ests=Object.keys(E).sort(function(a,b){return E[b].L-E[a].L;});
  var h='';
- if(typeof window.austarFormVenta==='function'){ h+=window.austarFormVenta(mi); }
  h+='<div class="card" style="margin-bottom:14px;"><div class="ct">Calendario operativo &middot; '+MN[mi]+' 2026</div>';
  h+='<div style="font-size:14px;color:var(--text2);margin-bottom:14px;">'+r.cub+' de '+(r.cub+r.fuera)+' clientes con accion definida &middot; captura: Rocio</div>';
  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;">';
@@ -1834,6 +1833,13 @@ window.austarPlannerHTML=function(mi,y){
   h+='</div>';
  }
  h+='</div>';
+ var sHa=0,sL=0,sCli=0;
+ lista.forEach(function(z){ sHa+=z.ha; sL+=z.litros; var kk=K(z.estado)+'|'+alias(z.cultivo); sCli+=(CA[kk]||0); });
+ h+='<div style="'+G+'padding:14px 20px;background:var(--bg3);font-size:15px;font-weight:700;border-top:1.5px solid var(--border);">';
+ h+='<span>Total'+(est?' '+esc(est):' (mostrado)')+'</span>';
+ h+='<span style="text-align:right;">'+nf(sHa)+'</span>';
+ h+='<span style="text-align:right;color:var(--green);">'+nf(sL)+' L</span>';
+ h+='<span style="text-align:right;">'+sCli+'</span><span></span><span></span></div>';
  h+='<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid #D8AE3C;border-radius:8px;padding:15px 20px;margin-top:16px;font-size:14.5px;color:var(--text2);max-width:92ch;">';
  h+='<b style="color:var(--text)">De donde sale el objetivo.</b> Cada cliente en ventana de cierre se multiplica por la dosis de su cultivo con los datos capturados en su ficha. El objetivo se sugiere al 60% de ese potencial y puedes escribir encima. Los cambios se guardan solos en este dispositivo.</div>';
  return h;
@@ -2857,7 +2863,10 @@ window.austarMetaHTML=function(mi, potPorEstado){
   var mt=META[e]||{};
   tObj+=(mt.obj!=null?mt.obj:Math.round(pot*0.6));
   var v=(VD[k]||{L:0,mxn:0});
-  tVen+=(mt.real!=null?mt.real:v.L); tMxn+=v.mxn; tPot+=pot;
+  var vv=(mt.real!=null?mt.real:v.L);
+  tVen+=vv;
+  tMxn+=(mt.real!=null ? ((typeof window.austarValor==='function')?window.austarValor(vv,{presentacion:5}):vv*1477) : v.mxn);
+  tPot+=pot;
   tHaM+=(HM[k]||0); tHaC+=(HC[k]||0); });
  var pct=tObj>0?Math.round(tVen/tObj*100):0;
  var G='display:grid;grid-template-columns:1fr 92px 88px 92px 96px 92px 66px 104px;gap:10px;align-items:center;';
@@ -2882,7 +2891,10 @@ window.austarMetaHTML=function(mi, potPorEstado){
   h+='<span style="text-align:right;"><input type="number" data-e="'+esc(e)+'" value="'+obj+'" style="'+st+'" onchange="austarMetaSet(this.dataset.e,\'obj\',this.value)"></span>';
   h+='<span style="text-align:right;"><input type="number" data-e="'+esc(e)+'" value="'+Math.round(ven)+'" style="'+st+'" onchange="austarMetaSet(this.dataset.e,\'real\',this.value)"></span>';
   h+='<span style="text-align:right;font-weight:700;color:'+col+';">'+av+'%</span>';
-  h+='<span style="text-align:right;font-weight:600;">'+(v.mxn?mxn(v.mxn):'&mdash;')+'</span>';
+  var cierre = (mt.real!=null)
+   ? ((typeof window.austarValor==='function') ? window.austarValor(ven,{presentacion:5}) : ven*1477)
+   : v.mxn;
+  h+='<span style="text-align:right;font-weight:600;">'+(cierre?mxn(cierre):'&mdash;')+'</span>';
   h+='</div>'; }
  var pctT=tObj>0?Math.round(tVen/tObj*100):0;
  h+='<div style="'+G+'padding:13px 20px;background:var(--bg3);font-size:14.5px;font-weight:700;">';
@@ -2894,6 +2906,45 @@ window.austarMetaHTML=function(mi, potPorEstado){
  h+='</div>';
  return h;
 };
+})();
+</script>
+
+<script>
+/* AUSTAR - Certificados: elegir cliente por nombre */
+(function(){
+function K(s){s=s||'';try{s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');}catch(e){}return s.toUpperCase().trim();}
+function llenar(){
+ var dl=document.getElementById('cert-lista');
+ if(!dl || dl.getAttribute('data-ok')==='1') return;
+ var L=(typeof CLIENTS!=='undefined'&&CLIENTS)?CLIENTS:(window.CRM_DATA||[]);
+ if(!L||!L.length) return;
+ var h='';
+ var arr=L.slice().sort(function(a,b){ return String(a.nombre||'').localeCompare(String(b.nombre||'')); });
+ for(var i=0;i<arr.length;i++){ var c=arr[i]; if(!c.nombre) continue;
+  h+='<option value="'+String(c.nombre).replace(/"/g,'')+'">'+(c.estado?String(c.estado).replace(/"/g,''):'')+'</option>'; }
+ dl.innerHTML=h; dl.setAttribute('data-ok','1');
+}
+window.austarCertPorNombre=function(nombre){
+ try{
+  if(!nombre||nombre.length<4) return;
+  var L=(typeof CLIENTS!=='undefined'&&CLIENTS)?CLIENTS:(window.CRM_DATA||[]);
+  var k=K(nombre), c=null;
+  for(var i=0;i<L.length;i++){ if(K(L[i].nombre)===k){ c=L[i]; break; } }
+  if(!c) return;
+  function set(id,val){ var e=document.getElementById(id); if(e&&val!=null&&val!=='') e.value=val; }
+  set('cert-tel', c.tel||'');
+  set('cert-cultivo', (c.cultivos&&c.cultivos[0])||'');
+  var ex={}; try{ ex=JSON.parse(localStorage.getItem('as_ex_'+c.id)||'{}'); }catch(e){}
+  if(ex.ha) set('cert-ha', ex.ha);
+  if(ex.arboles) set('cert-arboles', ex.arboles);
+  if(ex.altura) set('cert-altura', ex.altura);
+  if(ex.copa) set('cert-copa', ex.copa);
+  var eP=document.getElementById('cert-primera'); if(eP&&ex.primera) eP.value=ex.primera;
+  var eE=document.getElementById('cert-edad'); if(eE&&ex.edad) eE.value=ex.edad;
+  if(typeof certCalc==='function') certCalc();
+ }catch(e){ console.error('cert nombre:',e); }
+};
+setInterval(llenar, 900);
 })();
 </script>
 </head>
@@ -3396,7 +3447,7 @@ window.austarMetaHTML=function(mi, potPorEstado){
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
               <div><div class="lbl">Fecha del certificado</div><input type="date" id="cert-fecha"></div>
               <div><div class="lbl">Teléfono</div><input id="cert-tel" placeholder="333-123-4567"></div>
-              <div><div class="lbl">Nombre del productor</div><input id="cert-nombre" placeholder="Nombre completo"></div>
+              <div><div class="lbl">Nombre del productor</div><input id="cert-nombre" list="cert-lista" placeholder="Escribe o elige de la cartera" oninput="austarCertPorNombre(this.value)"><datalist id="cert-lista"></datalist></div>
               <div><div class="lbl">Cultivo</div><input id="cert-cultivo" oninput="certCalc()" placeholder="Aguacate, Mango..."></div>
               <div><div class="lbl">Variedad</div><input id="cert-variedad" placeholder="Hass, Ataulfo..."></div>
               <div><div class="lbl">Estado</div><input id="cert-estado" placeholder="Michoacán"></div>
@@ -3633,7 +3684,7 @@ const TIPO_LBL={agricultor:'Agricultor',socio_comercial:'Socio Comerc.',casa_agr
 const BADGES={gfg:{key:'gfg',icon:'🌾',label:'Grow for Gold',color:'#f59e0b',bg:'#451a03'},reto:{key:'reto',icon:'🏆',label:'Reto Austar',color:'#22c55e',bg:'#14532d'},academy:{key:'academy',icon:'🎓',label:'Austar Academy',color:'#3b82f6',bg:'#1e3a5f'}};
 
 // Historical data
-const BY_YEAR=[{year:2019,cdm:13043,oa:23418,total:36461,pct_oa:64},{year:2020,cdm:13855,oa:21211,total:35066,pct_oa:60},{year:2021,cdm:10015,oa:23580,total:33595,pct_oa:70},{year:2022,cdm:11545,oa:24495,total:36040,pct_oa:68},{year:2023,cdm:8267,oa:27769,total:36036,pct_oa:77},{year:2024,cdm:10058,oa:31330,total:41388,pct_oa:76},{year:2025,cdm:11473,oa:37550},{year:2026,cdm:7487,oa:23735,total:31222,pct_oa:76}];
+const BY_YEAR=[{year:2019,cdm:13043,oa:23418,total:36461,pct_oa:64},{year:2020,cdm:13855,oa:21211,total:35066,pct_oa:60},{year:2021,cdm:10015,oa:23580,total:33595,pct_oa:70},{year:2022,cdm:11545,oa:24495,total:36040,pct_oa:68},{year:2023,cdm:8267,oa:27769,total:36036,pct_oa:77},{year:2024,cdm:10058,oa:31330,total:41388,pct_oa:76},{year:2025,cdm:11473,oa:37550,total:49023,pct_oa:77},{year:2026,cdm:7487,oa:23735,total:31222,pct_oa:76}];
 const OA_FULL=[{year:2017,litros:29581},{year:2018,litros:24630},{year:2019,litros:23418},{year:2020,litros:21211},{year:2021,litros:23580},{year:2022,litros:24495},{year:2023,litros:27769},{year:2024,litros:31330},{year:2025,litros:37550}];
 const CDM_CLIENTES={2019:117,2020:112,2021:116,2022:128,2023:90,2024:83,2025:53,2026:40};
 const CULT_2025={AGUACATE:6285,MANGO:1517,CANNABIS:1215,NOGAL:890,GOLF:842,PAPAYA:373,MAIZ:79,HORTALIZAS:11};
